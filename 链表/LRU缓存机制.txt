@@ -1,0 +1,126 @@
+题目难度：HARD
+
+运用你所掌握的数据结构，设计和实现一个  LRU (最近最少使用) 缓存机制。它应该支持以下操作： 获取数据 get 和 写入数据 put 。
+
+获取数据 get(key) - 如果密钥 (key) 存在于缓存中，则获取密钥的值（总是正数），否则返回 -1。
+写入数据 put(key, value) - 如果密钥不存在，则写入其数据值。当缓存容量达到上限时，它应该在写入新数据之前删除最近最少使用的数据值，从而为新的数据值留出空间。
+
+进阶:
+
+你是否可以在 O(1) 时间复杂度内完成这两种操作？
+
+示例:
+
+LRUCache cache = new LRUCache( 2 /* 缓存容量 */ );
+
+cache.put(1, 1);
+cache.put(2, 2);
+cache.get(1);       // 返回  1
+cache.put(3, 3);    // 该操作会使得密钥 2 作废
+cache.get(2);       // 返回 -1 (未找到)
+cache.put(4, 4);    // 该操作会使得密钥 1 作废
+cache.get(1);       // 返回 -1 (未找到)
+cache.get(3);       // 返回  3
+cache.get(4);       // 返回  4
+
+思路：主要就是考察链表增删改查操作，注意一下查的是后要把对应节点给到头，(经常使用)，超出缓存容量要把最后面的节点删除再放入新的节点
+即可实现当缓存容量达到上限时，它应该在写入新数据之前删除最近最少使用的数据值，从而为新的数据值留出空间。
+详细见下面注释。
+
+执行用时 :
+95 ms
+, 在所有 Java 提交中击败了
+98.11%
+的用户
+内存消耗 :
+59.1 MB
+, 在所有 Java 提交中击败了
+89.24%
+的用户
+
+下面是java版代码：
+上代码：
+/*1.首先我们应该维护一个双向链表，在这个链表中，我们应该使链表中的数据这样排列：越近使用的数据越排在前面，越久没有使用的数据排在后面。此外，链表中的所有数据缓存在一个HashMap中。
+2.我们插入一个数据的时候，首先查找HashMap中是否有这个数据？
+2.1 如果没有这个数据，我们要判断现在HashMap中是否还有剩余空间？如果没有剩余空间，需要将双向链表中最后一个数据删除（在HashMap中也要删除这个数据，注意删除的时候空指针等异常情况）。然后将要插入的数据放到双向链表的头部。
+2.2 如果有这个数据，我们首先应该将这个数据与它的前驱和后驱断开（注意可能造成空指针异常的情况），然后将这个数据插入到头结点。
+3. 当我们需要获取一个数据的时候，查找HashMap中是否有这个数据？
+3.1 如果有这个数据， 我们首先应该将这个数据与它的前驱和后驱断开（注意可能造成空指针异常的情况），然后将这个数据插入到头结点。
+3.2 如果没有这个数据，返回-1。*/
+class LRUCache {
+    /**
+    * 需要实现以下
+    * 1.维护一个双向链表，还有他的头结点和尾结点
+    * 2.插入数据时，首先判断cache中是否有该结点？如果没有，检查缓存是否还有空间？如果没有空间，清除双线链表的尾部结点。将该结点插入到双向链表的头部
+    * 3.根据key获得数据的时候，查看cache中是否有key对应的结点？如果有，将该结点插入到头结点前面，返回数据：：如果没有，返回-1。
+    */
+    private int capacity;
+    private LinkNode first;
+    private LinkNode last;
+    private HashMap<Integer,LinkNode> cache;
+    public LRUCache(int capacity) {
+        this.capacity=capacity;
+        cache = new HashMap<Integer,LinkNode>(capacity);
+    }
+    
+    public int get(int key) {
+        LinkNode res=cache.get(key);
+        if(res==null){
+            return -1;
+        }
+        moveNodeToFirst(res);
+        return res.val;
+    }
+    
+    public void put(int key, int value) {
+        LinkNode temp=cache.get(key);
+        if(temp==null){
+            if(cache.size()>=capacity){
+                removeLastNode();
+            }
+            temp=new LinkNode();
+            temp.key=key;
+        }
+        temp.val=value;
+        moveNodeToFirst(temp);
+        cache.put(key,temp);
+    }
+    
+    private void removeLastNode(){
+        LinkNode temp=last;
+        last=last.pre;
+        if(last!=null){
+            last.next=null;
+        }else{
+            first=last=null;
+        }
+        cache.remove(temp.key);
+    }
+    
+    private void moveNodeToFirst(LinkNode node){
+        if(first==node) return;
+        if(node.pre!=null){
+            node.pre.next=node.next;
+        }
+        if(node.next!=null){
+            node.next.pre=node.pre;
+        }
+        if(node==last){
+            last=last.pre;
+        }
+        if(last==null){
+            last=first=node;
+            return;
+        }
+        node.next=first;
+        first.pre=node;
+        node.pre=null;
+        first=node;
+    }
+}
+class LinkNode{
+    LinkNode pre;
+    LinkNode next;
+    int key;
+    int val;
+}
