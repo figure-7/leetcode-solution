@@ -1,0 +1,55 @@
+题目难度：HARD
+
+实现一个 MajorityChecker 的类，它应该具有下述几个 API：
+
+MajorityChecker(int[] arr) 会用给定的数组 arr 来构造一个 MajorityChecker 的实例。
+int query(int left, int right, int threshold) 有这么几个参数：
+0 <= left <= right < arr.length 表示数组 arr 的子数组的长度。
+2 * threshold > right - left + 1，也就是说阀值 threshold 始终比子序列长度的一半还要大。
+每次查询 query(...) 会返回在 arr[left], arr[left+1], ..., arr[right] 中至少出现阀值次数 threshold 的元素，如果不存在这样的元素，就返回 -1。
+
+ 
+
+示例：
+
+MajorityChecker majorityChecker = new MajorityChecker([1,1,2,2,1,1]);
+majorityChecker.query(0,5,4); // 返回 1
+majorityChecker.query(0,3,3); // 返回 -1
+majorityChecker.query(2,3,2); // 返回 2
+ 
+
+提示：
+
+1 <= arr.length <= 20000
+1 <= arr[i] <= 20000
+对于每次查询，0 <= left <= right < len(arr)
+对于每次查询，2 * threshold > right - left + 1
+查询次数最多为 10000
+
+思路：没啥的其实，就是迷惑人，注意一下条件2 * threshold > right - left + 1，也就是说他给你的阈值都是要求在所给定区间里出现一半次数以上的....一维数组水过去，啥优化不加都能过
+
+上代码：
+#define _for(i,a,b) for(int i = (a);i < b;i ++)
+
+
+class MajorityChecker
+{
+	public:
+		vector<int> v;
+        int hash[20003];
+		MajorityChecker(vector<int>& arr)
+		{
+			v = arr;
+		}
+
+		int query(int left, int right, int threshold)
+		{
+            memset(hash,0,sizeof(hash));
+            _for(i,left,right+1)
+                hash[v[i]] ++;
+            _for(i,0,20003)
+                if(2*hash[i] > right-left+1 && hash[i]>=threshold)
+                    return i;
+			return -1;
+		}
+};
