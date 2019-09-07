@@ -1,0 +1,79 @@
+题目难度：EASY
+
+给定一个整数数组 nums ，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+
+示例:
+
+输入: [-2,1,-3,4,-1,2,1,-5,4],
+输出: 6
+解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。
+进阶:
+
+如果你已经实现复杂度为 O(n) 的解法，尝试使用更为精妙的分治法求解。
+
+思路：分三种情况，第一：最大值在左侧区间（0，mid-1）,返回左侧最大区间即可
+		  第二：最大值在右侧区间（mid+1，n-1）,返回左侧最大区间即可
+		  第三：最大值经过mid下标，加上mid下标对应的值即可
+（分治法即二分法）
+
+执行用时 : 16 ms, 在Maximum Subarray的C++提交中击败了69.26% 的用户
+内存消耗 : 9.4 MB, 在Maximum Subarray的C++提交中击败了74.50% 的用户
+（感觉跟dp没啥区别，时间上没有优化到......）
+
+上代码：
+
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) {
+        int n = nums.size();
+        return devide(nums, 0, n - 1, INT_MIN);
+    }
+    int devide(vector<int>& num, int left, int right, int tmax) {
+        if(left >right) {
+            return INT_MIN;
+        }
+        int mid = left + (right -left) / 2;
+        int lmax = devide(num, left, mid - 1, tmax);
+        int rmax = devide(num, mid + 1, right, tmax);
+        tmax = max(tmax, lmax);
+        tmax = max(tmax, rmax);
+        int sum = 0;
+        int mlax = 0;
+        for(int i = mid - 1; i >= left; i--) {
+            sum += num[i];
+            mlax = max(sum, mlax);
+        }
+        sum = 0;
+        int mrmax = 0;
+        for(int j = mid + 1; j <= right; j++) {
+            sum += num[j];
+            mrmax = max(sum, mrmax);
+        }
+        tmax = max(tmax, num[mid] + mlax + mrmax);
+        return tmax;
+    }
+};
+
+还有一种跟简单的算法：
+一次遍历，累加，累加和小于0就将累加值赋值0，每次都对最大值作比较即可
+
+执行用时 : 8 ms, 在Maximum Subarray的C++提交中击败了98.30% 的用户
+内存消耗 : 9.3 MB, 在Maximum Subarray的C++提交中击败了77.06% 的用户
+（反倒比上一个快了，空间效率也高，所以那么做的目的在哪里........）
+
+上代码：
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) {
+        int res = nums[0];
+        int sum = 0;
+        for (int num : nums) {
+            if (sum > 0)
+                sum += num;
+            else
+                sum = num;
+            res = max(res, sum);
+        }
+        return res;
+    }
+};

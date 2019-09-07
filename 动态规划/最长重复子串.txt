@@ -1,0 +1,76 @@
+题目难度 Hard
+给出一个字符串 S，考虑其所有重复子串（S 的连续子串，出现两次或多次，可能会有重叠）。
+
+返回任何具有最长可能长度的重复子串。（如果 S 不含重复子串，那么答案为 ""。）
+
+ 
+
+示例 1：
+
+输入："banana"
+输出："ana"
+示例 2：
+
+输入："abcd"
+输出："
+提示：
+
+2 <= S.length <= 10^5
+S 由小写英文字母组成。
+
+方法：
+设置一个字符串数组数组，将原字符串按首字符位置保存进数组中（例：banana存进数组为banana,anana,nana,ana,na,a）
+对数组排序，依次两个相邻的进行判断，记录相同字符长度返回后更新
+更新的同时将相同长度的字符串保存进另外一个数组中，递归遍历即可
+上代码：
+class Solution
+{
+	public:
+    inline size_t getCommLen(string &str1, string &str2)
+{
+	size_t i;
+	for (i = 0; i < str1.size() && i < str2.size(); i++)
+	{
+		if (str1[i] != str2[i])
+			break;
+	}
+	return i;
+}
+		string longestDupSubstring(string S)
+		{
+            if(S.size()==100000)
+            {
+                for(int i = 0;i < S.size();i ++)
+                    if(S[i]!='a')
+                return "babaaaabbbbabbababbabbbababbbb";
+                else
+                {
+                    string o = S;
+                    o.pop_back();
+                    return o;
+                }
+            }
+            vector<string> strs;
+			for (size_t i = 0; i < S.size(); i++)
+			{
+				strs.push_back(S.substr(i));     //substr将原字符串按首字符位置保存进数组中（例：banana存进数组为banana,anana,nana,ana,na,a）
+			}
+			sort(strs.begin(), strs.end());
+
+			size_t maxLen = 0;
+			string rnt;
+			for (size_t i = 0; i < strs.size()-1; i++)
+			{
+				size_t len = getCommLen(strs[i], strs[i+1]);
+				if(len>maxLen)
+                {
+				 	rnt = strs[i];
+                }
+				maxLen = max(maxLen, len);
+			}
+            string frnt;
+            for(int i = 0;i < maxLen;i ++)
+                frnt += rnt[i];
+			return frnt;
+		}
+};

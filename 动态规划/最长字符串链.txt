@@ -1,0 +1,67 @@
+题目难度：MEDIUM
+给出一个单词列表，其中每个单词都由小写英文字母组成。
+
+如果我们可以在 word1 的任何地方添加一个字母使其变成 word2，那么我们认为 word1 是 word2 的前身。例如，"abc" 是 "abac" 的前身。
+
+词链是单词 [word_1, word_2, ..., word_k] 组成的序列，k >= 1，其中 word_1 是 word_2 的前身，word_2 是 word_3 的前身，依此类推。
+
+从给定单词列表 words 中选择单词组成词链，返回词链的最长可能长度。
+ 
+
+示例：
+
+输入：["a","b","ba","bca","bda","bdca"]
+输出：4
+解释：最长单词链之一为 "a","ba","bda","bdca"。
+ 
+
+提示：
+
+1 <= words.length <= 1000
+1 <= words[i].length <= 16
+words[i] 仅由小写英文字母组成。
+思路：设一个新的数组，
+先将数组中每项两两比较，后一项包含前一项就把两个对应下标在新的数组中赋1（区分开）
+例如上面的示例得到的数组为1值得下标如下
+02 03 04 05 06
+12 13 14 15 16
+23 24 25 26
+34 35 36
+46
+56
+然后用DFS深度遍历测出二维数组最大深度（最长词链）即可
+也就是根据上面得到：02->23->34->46（代码中v[i]中的i:0->2->3->4->6）
+上代码：
+class Solution {
+public:
+    bool g[1005][1005],v[1005];
+    int f[1005],n;
+    void dfs(int x)
+    {
+        f[x]=1;
+        v[x]=1;
+        for(int i=0;i<n;i++)if(g[x][i])         //DFS深度优先遍历二维数组
+        {
+            if(!v[i])dfs(i);
+            f[x]=max(f[x],f[i]+1);              //有连着的就加一，取最大。
+        }
+    }
+    int longestStrChain(vector<string>& words) {
+        n=words.size();
+        int i,j,k,l,x,y,ans=0;
+        for(i=0;i<n;i++)for(j=0;j<n;j++)if(words[i].size()+1==words[j].size())//后一项个数为前一项的个数加一，即可能产生词链
+        {
+            x=words[i].size();                  //记录前一个项的值个数
+            y=words[j].size();                  //记录后一个项的值个数
+            for(k=0;k<x;k++)if(words[i][k]!=words[j][k])break;        //k记录从前至后的相同字节数
+            for(l=0;l<x;l++)if(words[i][x-l-1]!=words[j][y-l-1])break;//l记录从后至前的相同字节数
+            if(k+l>=x)g[i][j]=1;                //如果相同字符总数等于前一个下标的字符数，对应二维数组值赋1，两个下标分别对应前一个词链下标和后一个词链的下标
+        }
+        for(i=0;i<n;i++)
+        {
+            if(!v[i])dfs(i);
+            ans=max(ans,f[i]);
+        }
+        return ans;
+    }
+};

@@ -1,0 +1,47 @@
+给定不同面额的硬币 coins 和一个总金额 amount。编写一个函数来计算可以凑成总金额所需的最少的硬币个数。如果没有任何一种硬币组合能组成总金额，返回 -1。
+示例 1:
+
+输入: coins = [1, 2, 5], amount = 11
+输出: 3 
+解释: 11 = 5 + 5 + 1
+示例 2:
+
+输入: coins = [2], amount = 3
+输出: -1
+说明:
+你可以认为每种硬币的数量是无限的。
+
+思路：该题依旧dp，借鉴一句话：每个硬币可以取无限次。。直觉就想到完全背包的思路了
+最后看结果是不是与所需钱数总和一致即可
+dp表达式为：dp[i] = min(dp[i],dp[i]-coins[i]+1)
+
+执行用时 :
+124 ms
+, 在所有 C++ 提交中击败了
+26.26%
+的用户
+内存消耗 :
+12.6 MB
+, 在所有 C++ 提交中击败了
+69.60%
+的用户
+
+上代码：
+class Solution {
+public:
+    int coinChange(vector<int>& coins, int amount) {
+        //完全背包
+        //转移方程:dp[V] = min (dp[V - vi] + 1 , dp[j])
+        if(coins.empty())
+            return -1; 
+        vector<int> dp(amount+1,amount+1);
+        dp[0] = 0;
+        for(int i = 0 ; i < coins.size();++i){
+            for(int V = 1 ; V <= amount;V++){
+                if(V >= coins[i])
+                    dp[V] = min(dp[V],dp[V-coins[i]]+1);
+            }    
+        }
+        return dp[amount] == amount+1 ? -1 : dp[amount];
+    }
+};

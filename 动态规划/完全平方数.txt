@@ -1,0 +1,36 @@
+题目难度：MEDIUM
+
+给定正整数 n，找到若干个完全平方数（比如 1, 4, 9, 16, ...）使得它们的和等于 n。你需要让组成和的完全平方数的个数最少。
+
+示例 1:
+
+输入: n = 12
+输出: 3 
+解释: 12 = 4 + 4 + 4.
+示例 2:
+
+输入: n = 13
+输出: 2
+解释: 13 = 4 + 9.
+
+思路：先把每个平方数存入对应平方数下标的数组里，赋值为1，（最少需要1个平方数，即自己）
+之后调用dp对每个值去最小的平方数累加即可
+dp表达式为：dp[i+j*j] = min(dp[i+j*j] + dp[i]+1)
+
+执行用时 : 156 ms, 在Perfect Squares的C++提交中击败了54.47% 的用户
+内存消耗 : 11.3 MB, 在Perfect Squares的C++提交中击败了52.00% 的用户
+
+上代码：
+class Solution {
+public:
+    int numSquares(int n) {
+        vector<int> dp(n + 1, INT_MAX);
+        dp[0] = 0;
+        for(int i = 0; i <= n; i++) {
+            for(int j = 1; i + j * j <= n; j++) {
+                dp[i + j * j] = min(dp[i + j * j], dp[i]+1);
+            }
+        }
+        return dp[n];
+    }
+};

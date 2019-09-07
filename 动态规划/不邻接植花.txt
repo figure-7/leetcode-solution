@@ -1,0 +1,83 @@
+有 N 个花园，按从 1 到 N 标记。在每个花园中，你打算种下四种花之一。
+
+paths[i] = [x, y] 描述了花园 x 到花园 y 的双向路径。
+
+另外，没有花园有 3 条以上的路径可以进入或者离开。
+
+你需要为每个花园选择一种花，使得通过路径相连的任何两个花园中的花的种类互不相同。
+
+以数组形式返回选择的方案作为答案 answer，其中 answer[i] 为在第 (i+1) 个花园中种植的花的种类。花的种类用  1, 2, 3, 4 表示。保证存在答案。
+示例 1：
+
+输入：N = 3, paths = [[1,2],[2,3],[3,1]]
+输出：[1,2,3]
+示例 2：
+
+输入：N = 4, paths = [[1,2],[3,4]]
+输出：[1,2,1,2]
+示例 3：
+
+输入：N = 4, paths = [[1,2],[2,3],[3,4],[4,1],[1,3],[2,4]]
+输出：[1,2,3,4]
+
+思路：先设一个二维数组a，把每个花坛相邻的所有花坛记录到对应的该花坛数组空间内，
+然后设定一个color数组，对每个花坛的相邻情况做判断，
+如果有相邻的花坛，就把color内对应花坛的值加一，否则就直接赋值，使接下来的花坛值为第一种花，再递归判断（动态规划）
+最后遍历color即为输出结果。
+
+
+上代码：
+
+
+#define _for(i,a,b) for(int i = (a);i < b;i ++)
+
+int n,m;
+
+class Solution
+{
+	public:
+        int color[10000];
+        vector<vector<int>> a;
+		bool OK(int t)
+		{
+			for(int j=0; j<a[t].size(); j++)
+			{
+                if(color[t]==color[a[t][j]])        //判断是否有与其相连的花种，没有就false 
+						return false;
+			}
+			return true;
+		}
+		bool traceback(int t)               
+		{
+			int oldvalue=0;
+			if(t==n)                            //花坛都已赋值到color中
+			{
+				return true;
+			}
+			for(int i=1; i<=m; i++) 
+			{
+				oldvalue=color[t];
+				color[t]=i;
+				if(OK(t))     
+				{
+					if(traceback(t+1)) return true;         //递归，因为上一次出现了相连的花种，所以oldvalue不能直接赋值，要加1再做判断
+				}
+				color[t]=oldvalue;   // 没有与其相连的花，就直接把oldvalue值付给第t个花坛
+			}
+            return false;    //接下来如果没结束，就在继续判断，这时候下一个花坛就为第一种花了。
+		}
+		vector<int> gardenNoAdj(int N, vector<vector<int>>& paths)
+		{
+			a.resize(10000);
+            n = N;
+			m = 4;
+            _for(i,0,paths.size())
+            {a[paths[i][0]-1].push_back(paths[i][1]-1);a[paths[i][1]-1].push_back(paths[i][0]-1);}   //新建一个为维数组a，把所有与四种花相连的花的种类记录下来
+    		//第二句不能少，否则OK里判断出错
+			traceback(0);        //从0 开始计算，0即代表第一种花，
+			vector<int> rnt(N,0);
+			_for(i,0,N)
+				rnt[i] = color[i];
+			return rnt;
+		}
+};

@@ -1,0 +1,55 @@
+题目难度：MEDIUM
+
+给定一个整数数组 nums ，找出一个序列中乘积最大的连续子序列（该序列至少包含一个数）。
+
+示例 1:
+
+输入: [2,3,-2,4]
+输出: 6
+解释: 子数组 [2,3] 有最大乘积 6。
+示例 2:
+
+输入: [-2,0,-1]
+输出: 0
+解释: 结果不能为 2, 因为 [-2,-1] 不是子数组。
+
+思路：这里需要注意乘数为负数时，会变成最小值，这个最小值需要额外记录，当后面又出现负数时，累积值变为最大值存入maxP
+所以maxP需要比较的是 1.minP*当前值
+		     2.maxP*当前值
+		     3.当前值
+这三者中的最大值
+minP需要比较的是：1.maxP*当前值
+		  2.minP*当前值
+二者中的最小值
+注意当遇见0的时候，就把maxP，minP都赋值为0，并从下一个元素开始判断
+dp表达式为maxDP[i+1] = max(maxDP[i] * A[i + 1], A[i + 1], minDP[i] * A[i + 1])
+	  minDP[i+1] = min(minDP[i] * A[i + 1], A[i + 1], maxDP[i] * A[i + 1])
+	  dp[i + 1] = max(dp[i], maxDP[i + 1])
+(中间过程比较繁琐，意外情况想了半天，也是没做出来.....)
+
+执行用时 : 4 ms, 在Maximum Product Subarray的C++提交中击败了99.35% 的用户
+内存消耗 : 9 MB, 在Maximum Product Subarray的C++提交中击败了79.95% 的用户
+
+上代码：
+class Solution {
+public:
+    int maxProduct(vector<int>& nums) {
+        int n = nums.size();
+        if(n==0) {
+            return 0;
+        }
+        else if(n==1) {
+            return nums[0];
+        }
+        int p = nums[0];
+        int maxP = nums[0];
+        int minP = nums[0];
+        for(int i = 1; i < n; i++) {
+            int t = maxP;
+            maxP = max(max(maxP * nums[i], nums[i]), minP * nums[i]);
+            minP = min(min(t * nums[i], nums[i]), minP * nums[i]);
+            p = max(maxP, p);
+        }
+        return p;
+    }
+};

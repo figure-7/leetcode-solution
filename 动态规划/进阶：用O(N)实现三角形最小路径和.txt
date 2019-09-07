@@ -1,0 +1,43 @@
+题目难度：MEDIUM
+
+给定一个三角形，找出自顶向下的最小路径和。每一步只能移动到下一行中相邻的结点上。
+
+例如，给定三角形：
+
+[
+     [2],
+    [3,4],
+   [6,5,7],
+  [4,1,8,3]
+]
+自顶向下的最小路径和为 11（即，2 + 3 + 5 + 1 = 11）。
+
+思路：从后向前遍历，因为需要空间复杂度O(N)， 所以这里先设置一个一维数组
+先存放最后一行的值，在每一行依次向前访问，到前一行去判断相邻的最小的数，加起来
+这样到第一行就只剩下dp[0]在变了，返回dp[0]即可
+dp表达式：dp[j] = triangle[i][j] + min(dp[j], dp[j + 1]);
+
+执行用时 : 20 ms, 在Triangle的C++提交中击败了32.61% 的用户
+内存消耗 : 9.7 MB, 在Triangle的C++提交中击败了90.00% 的用户
+
+上代码：
+class Solution {
+public:
+    int minimumTotal(vector<vector<int>>& triangle) {
+        if(triangle.empty()) {
+            return 0;
+        }
+        int row = triangle.size();
+        vector<int> dp;
+        dp.resize(row);
+        for(int i = 0; i < dp.size(); i++) {
+            dp[i] = triangle[row - 1][i];
+        }
+        for(int i = row - 2; i >= 0; i--) {
+            for(int j = 0; j <= i; j++) {
+                dp[j] = triangle[i][j] + min(dp[j], dp[j + 1]);
+            }
+        }
+        return dp[0];
+    }
+};

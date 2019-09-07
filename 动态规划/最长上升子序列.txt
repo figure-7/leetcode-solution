@@ -1,0 +1,61 @@
+题目难度：MEDIUM
+
+给定一个无序的整数数组，找到其中最长上升子序列的长度。
+
+示例:
+
+输入: [10,9,2,5,3,7,101,18]
+输出: 4 
+解释: 最长的上升子序列是 [2,3,7,101]，它的长度是 4。
+说明:
+
+可能会有多种最长上升子序列的组合，你只需要输出对应的长度即可。
+你算法的时间复杂度应该为 O(n2) 。
+进阶: 你能将算法的时间复杂度降低到 O(n log n) 吗?
+
+思路：1：使用dp数组放置当前升序的子序列，故dp数组是一个升序的子序列，且长度为max
+
+	2：遍历数组nums，找到元素num，在dp中满足dp[i-1] < num < dp[i] 的i，将dp[i] = num
+	3：思路较复杂，可自行按照案列逐步推断
+
+执行用时 :
+4 ms
+, 在所有 C++ 提交中击败了
+98.18%
+的用户
+内存消耗 :
+8.7 MB
+, 在所有 C++ 提交中击败了
+23.25%
+的用户
+
+上代码：
+class Solution {
+public:
+    int lengthOfLIS(vector<int> & nums) {
+        if(nums.size() == 0) {
+            return 0;
+        }
+		int dp[nums.size()];
+        int max = 0;
+        for (int num : nums) {
+            int low = 0;
+            int high = max;
+          
+            // 在区间[0, max) 找到
+            while (low < high) {
+                int mid = low + (high - low) / 2;
+                if (dp[mid] < num) {
+                    low = mid + 1;
+                } else {
+                    high = mid;
+                }
+            }
+            dp[low] = num;
+            if (low == max) {
+                max++;
+            }
+        }
+        return max;
+	}
+};

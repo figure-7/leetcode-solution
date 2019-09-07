@@ -1,0 +1,69 @@
+题目难度：MEDIUM
+
+给定一个整数 n，生成所有由 1 ... n 为节点所组成的二叉搜索树。
+
+示例:
+
+输入: 3
+输出:
+[
+  [1,null,3,2],
+  [3,2,null,1],
+  [3,1,null,null,2],
+  [2,1,3],
+  [1,null,2,null,3]
+]
+解释:
+以上的输出对应以下 5 种不同结构的二叉搜索树：
+
+   1         3     3      2      1
+    \       /     /      / \      \
+     3     2     1      1   3      2
+    /     /       \                 \
+   2     1         2                 3
+
+思路：二叉树的排列数为左子树【0，i-1】的排列数乘上右子树【i+1，n】的排列数
+使用递归即可
+
+执行用时 : 28 ms, 在Unique Binary Search Trees II的C++提交中击败了95.33% 的用户
+内存消耗 : 17.4 MB, 在Unique Binary Search Trees II的C++提交中击败了16.88% 的用户
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<TreeNode*> generateTrees(int n) {
+        return generate(1, n, n);
+    }
+    vector<TreeNode*> generate(int start, int stop, int flag) {
+        vector<TreeNode*> vs;
+        if(flag==0) {
+            return vs;
+        }
+        if(start > stop) {
+            vs.push_back(NULL);
+            return vs; 
+        }
+        for(int i = start; i <= stop; i++) {
+            auto l = generate(start, i - 1,flag);
+            auto r = generate(i + 1, stop,flag);
+            for(int j = 0; j < l.size(); j++) {
+                for(int k = 0; k < r.size(); k++) {
+                    TreeNode* n = new TreeNode(i);
+                    n->left = l[j];
+                    n->right = r[k];
+                    vs.push_back(n);
+                }
+            }
+        }
+        return vs;
+    }
+};
