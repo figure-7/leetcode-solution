@@ -1,0 +1,60 @@
+题目难度：HARD
+
+给出两个长度相同的字符串，分别是 str1 和 str2。请你帮忙判断字符串 str1 能不能在 零次 或 多次 转化后变成字符串 str2。
+
+每一次转化时，将会一次性将 str1 中出现的 所有 相同字母变成其他 任何 小写英文字母（见示例）。
+
+只有在字符串 str1 能够通过上述方式顺利转化为字符串 str2 时才能返回 True，否则返回 False。??
+
+ 
+
+示例 1：
+
+输入：str1 = "aabcc", str2 = "ccdee"
+输出：true
+解释：将 'c' 变成 'e'，然后把 'b' 变成 'd'，接着再把 'a' 变成 'c'。注意，转化的顺序也很重要。
+示例 2：
+
+输入：str1 = "leetcode", str2 = "codeleet"
+输出：false
+解释：我们没有办法能够把 str1 转化为 str2。
+ 
+
+提示：
+
+1 <= str1.length == str2.length <= 10^4
+str1 和 str2 中都只会出现 小写英文字母
+
+思路：首先设置两个数组，a初始化为-1（便于取反判断）,in初始化为0
+a数组保存第二个字符串每个字符与'a'的ASCII差值放入对应第一个字符串每个字符与'a'的ASCII差值作为下标
+in数组第二个字符串每个字符与'a'的ASCII差值作为下标，值为出现次数
+例如案例一：
+in: 00212000000....
+a:  234-1-1-1-1....
+中途判断如果出现a数组下标对应得到的值与之前不符且之前不为-1，即出现需要相同字符转化为不同的字符，就直接返回false
+直至两字符串遍历结束
+此外，当字符串为26个字母时，a数组也不会出现-1，当时不符合转换为其他字母的题意，所以需要加判断
+
+上代码：
+class Solution {
+public:
+    bool canConvert(string str1, string str2) {
+        int n=str1.size(),i,j,k,a[26],in[26];
+        memset(a,-1,sizeof(a));
+        memset(in,0,sizeof(in));
+        for(i=0;i<n;i++)
+        {
+            j=str1[i]-'a';
+            k=str2[i]-'a';
+            if(~a[j]&&a[j]!=k)return 0;
+            else if(!~a[j])
+            {
+                a[j]=k;
+                in[k]++;
+            }
+        }
+        for(i=0;i<26;i++)if(!~a[i])return 1;
+        for(i=0;i<26;i++)if(a[i]!=i)for(j=0,k=a[i];j<100&&in[k]==1;j++,k=a[k])if(k==i)return 0;
+        return 1;
+    }
+};

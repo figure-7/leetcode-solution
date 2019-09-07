@@ -1,0 +1,129 @@
+题目难度：MEDIUM
+
+实现一个基本的计算器来计算一个简单的字符串表达式的值。
+
+字符串表达式仅包含非负整数，+， - ，*，/ 四种运算符和空格  。 整数除法仅保留整数部分。
+
+示例 1:
+
+输入: "3+2*2"
+输出: 7
+示例 2:
+
+输入: " 3/2 "
+输出: 1
+示例 3:
+
+输入: " 3+5 / 2 "
+输出: 5
+说明：
+
+你可以假设所给定的表达式都是有效的。
+请不要使用内置的库函数 eval。
+
+思路：任何表达式最后都可以精简成 pre + cur +/-/*// next;
+
+
+pre cur next 分别为三个状态
+
+状态转移方式
+
+
+sign = + : pre += cur, cur = next
+
+sign = - : pre += cur, cur = -next
+
+sign = * : cur *= next
+sign = / : cur /= next
+
+
+例如：
+
+样例 "3+2*2"
+
+
+pre = 3, cur = 2, next = 2
+
+
+
+逐步更新状态
+
+初始化：pre = 0, cur = 0, next = 0, sign = +
+
+
+pre = 0, cur = 0, next = 3, sign = +
+
+pre = 0, cur = 3, next = 2, sign = *
+
+pre = 3, cur = 2, next = 2
+
+
+一个更复杂的样例："1000/10/5+3*2+1"
+
+
+pre = 1000/10/5, cur = 3*2, next = 1
+
+
+逐步更新状态
+
+初始化：pre = 0, cur = 0, next = 0, sign = +
+
+pre = 0, cur = 0, next = 1000, sign = /
+
+pre = 0, cur = 1000, next = 10, sign = /
+
+pre = 0, cur = 100, next = 5, sign = +
+
+pre = 0, cur = 20, next = 3, sign = *
+
+pre = 20, cur = 3, next = 2, sign = +
+
+pre = 20, cur = 6, next = 1
+
+
+
+执行用时 :
+8 ms
+, 在所有 C++ 提交中击败了
+98.93%
+的用户
+内存消耗 :
+9.9 MB
+, 在所有 C++ 提交中击败了
+86.36%
+的用户
+炫耀一下:
+
+class Solution {
+public:
+    int calculate(string s) {
+    int pre = 0, cur = 0, next = 0;
+    int sign = '+';
+    for (char ch : s) {
+        if (ch == ' ') continue;
+        if (ch >= '0' && ch <= '9') {
+            next = 10 * next + (ch - '0');
+        }
+        else {
+            process(pre, cur, next, sign);
+            sign = ch;
+        }
+    }
+    process(pre, cur, next, sign);
+    return pre + cur;
+}
+
+void process(int& pre, int& cur, int& next, char sign) {
+    if (sign == '+') {
+        pre += cur;
+        cur = next;
+    }
+    else if (sign == '-') {
+        pre += cur;
+        cur = -next;
+    }
+    else if (sign == '*') cur *= next;
+    else cur /= next;
+    next = 0;
+}
+};

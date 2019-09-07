@@ -1,0 +1,99 @@
+题目难度：MEDIUM
+
+如果字符串中的所有字符都相同，那么这个字符串是单字符重复的字符串。
+
+给你一个字符串 text，你只能交换其中两个字符一次或者什么都不做，然后得到一些单字符重复的子串。返回其中最长的子串的长度。
+
+ 
+
+示例 1：
+
+输入：text = "ababa"
+输出：3
+示例 2：
+
+输入：text = "aaabaaa"
+输出：6
+示例 3：
+
+输入：text = "aaabbaaa"
+输出：4
+示例 4：
+
+输入：text = "aaaaa"
+输出：5
+示例 5：
+
+输入：text = "abcdef"
+输出：1
+ 
+
+提示：
+
+1 <= text.length <= 20000
+text 仅由小写英文字母组成。
+
+思路：
+因为只能交换一次，先考虑如果不交换最大的值。
+
+接下来考虑交换，有四种情况
+
+① aaabaaa型 交换一下可以将相邻的两块连在一起，答案就是两块长度之和
+
+② aaabbbaaaa 交换一下也不能连起两块，答案就是最长的长度加一
+
+③ aaab 没有可以交换的，答案就是不交换的长度
+
+④ aaabaaaaba型 交换一下不但可以将相邻的两块连在一起，甚至中间的连接点还是相邻两块的那个字母，答案就是两块长度之和加一
+
+上代码：
+#define _for(i,a,b) for(int i = (a);i < b;i ++)
+
+
+class Solution
+{
+	public:
+		int check(string &s,int st)
+		{
+			int rnt = 1;
+			_for(i,st+1,s.size())
+				if(s[i]!=s[i-1])
+					break;
+				else
+					rnt ++;
+			return rnt;
+		}
+		int maxRepOpt1(string text)
+		{
+			int hash[30];
+            int kuai[30];
+            memset(hash,0,sizeof(hash));
+            memset(kuai,0,sizeof(kuai));
+			_for(i,0,text.size())
+			{
+				int len = check(text,i);
+				hash[text[i]-'a'] = max(hash[text[i]-'a'],len);
+                kuai[text[i]-'a'] ++;
+				i += len-1;
+			}
+			int rnt = 0;
+			_for(i,0,29)
+				rnt = max(rnt,hash[i]);
+			//对应③
+            _for(i,0,text.size())
+            {
+                int len = check(text,i);
+				if(i+len+1<text.size() && text[i+len+1]==text[i])//对应①
+                {
+                    int len2 = check(text,i+len+1);
+                    rnt = max(rnt,len+len2);
+                    if(kuai[text[i]-'a']>2)//对应④
+                        rnt = max(rnt,len+len2+1);
+                }
+                if(kuai[text[i]-'a']>1)        //对应②
+                    rnt = max(rnt,len+1);
+				i += len-1;
+            }
+			return rnt;
+		}
+};

@@ -1,0 +1,54 @@
+题目难度：HARD
+
+给你一个 非递减 的正整数数组 nums 和整数 K，判断该数组是否可以被分成一个或几个 长度至少 为 K 的 不相交的递增子序列。
+
+ 
+
+示例 1：
+
+输入：nums = [1,2,2,3,3,4,4], K = 3
+输出：true
+解释：
+该数组可以分成两个子序列 [1,2,3,4] 和 [2,3,4]，每个子序列的长度都至少是 3。
+示例 2：
+
+输入：nums = [5,6,6,7,8], K = 3
+输出：false
+解释：
+没有办法根据条件来划分数组。
+ 
+
+提示：
+
+1 <= nums.length <= 10^5
+1 <= K <= nums.length
+1 <= nums[i] <= 10^5
+
+思路：首先，这是个水HARD（双周竞赛最后一题），但是没做出来，难受~
+方法很简单，先找到相同值的个数最大值，然后乘以K
+结果大于数组长度就false，此外返回true
+OK，完了......我看了第一的答案后用C++按照相同思路一敲，就过了（没有用哈希表，都没有复杂的东西，然而不会，，，）
+
+上代码：
+class Solution {
+public:
+    bool canDivideIntoSubsequences(vector<int>& nums, int K) {
+        int aim=1;
+        int sum=0;
+        for(int i = 0; i < nums.size()-1; i++) {
+            if(nums[i]==nums[i+1]) {
+                aim++;
+            }
+            else {
+                aim=1;
+            }
+            sum=max(aim,sum);
+        }
+        if(sum*K<=nums.size()) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+};

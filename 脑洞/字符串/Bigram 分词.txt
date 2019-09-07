@@ -1,0 +1,54 @@
+题目难度：EASY
+
+给出第一个词 first 和第二个词 second，考虑在某些文本 text 中可能以 "first second third" 形式出现的情况，其中 second 紧随 first 出现，third 紧随 second 出现。
+
+对于每种这样的情况，将第三个词 "third" 添加到答案中，并返回答案。
+
+
+
+示例 1：
+
+输入：text = "alice is a good girl she is a good student", first = "a", second = "good"
+输出：["girl","student"]
+示例 2：
+
+输入：text = "we will we will rock you", first = "we", second = "will"
+输出：["we","rock"]
+
+思路：先将字符串按空格分开成字符串数组（这里上网查了一下，说啥的都有，还不如自己写写试试
+搞半天没明白，直接扔了这题），然后坐姿符串比较即可。。我是垃圾！
+
+上代码：
+#define _for(i,a,b) for(int i = (a);i < b;i ++)
+
+class Solution
+{
+	public:
+		vector<string> findOcurrences(string text, string first, string second)
+		{
+			vector<string> rnt;
+			vector<string> li;
+			string tmp;
+			int i = 0;
+			while(i < text.size())
+			{
+				while(text[i] != ' ' && i < text.size())
+				{
+					tmp += text[i];
+					i ++;
+				}
+                i ++;
+				li.push_back(tmp);
+				tmp.clear();
+			}
+			_for(j,0,li.size())
+			{
+				if(li[j]==first && j+1 < li.size() && li[j+1]==second)
+				{
+					if(j+2<li.size())
+						rnt.push_back(li[j+2]);
+				}
+			}
+			return rnt;
+		}
+};

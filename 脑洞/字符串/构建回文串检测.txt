@@ -1,0 +1,83 @@
+题目难度：MEDIUM
+
+给你一个字符串 s，请你对 s 的子串进行检测。
+
+每次检测，待检子串都可以表示为 queries[i] = [left, right, k]。我们可以 重新排列 子串 s[left], ..., s[right]，并从中选择 最多 k 项替换成任何小写英文字母。 
+
+如果在上述检测过程中，子串可以变成回文形式的字符串，那么检测结果为 true，否则结果为 false。
+
+返回答案数组 answer[]，其中 answer[i] 是第 i 个待检子串 queries[i] 的检测结果。
+
+注意：在替换时，子串中的每个字母都必须作为 独立的 项进行计数，也就是说，如果 s[left..right] = "aaa" 且 k = 2，我们只能替换其中的两个字母。（另外，任何检测都不会修改原始字符串 s，可以认为每次检测都是独立的）
+
+ 
+
+示例：
+
+输入：s = "abcda", queries = [[3,3,0],[1,2,0],[0,3,1],[0,3,2],[0,4,1]]
+输出：[true,false,false,true,true]
+解释：
+queries[0] : 子串 = "d"，回文。
+queries[1] : 子串 = "bc"，不是回文。
+queries[2] : 子串 = "abcd"，只替换 1 个字符是变不成回文串的。
+queries[3] : 子串 = "abcd"，可以变成回文的 "abba"。 也可以变成 "baab"，先重新排序变成 "bacd"，然后把 "cd" 替换为 "ab"。
+queries[4] : 子串 = "abcda"，可以变成回文的 "abcba"。
+ 
+
+提示：
+
+1 <= s.length, queries.length <= 10^5
+0 <= queries[i][0] <= queries[i][1] < s.length
+0 <= queries[i][2] <= s.length
+s 中只有小写英文字母
+
+思路：三种方式，1.硬算，超时。2.堆排队列，超时。。3.数组遍历，超时。。
+时间O(N^2)大了就超时，烦
+之后看了大佬思路
+先对每个字符对应下标和值对应ASCII码与字符aASCII码差值作为下标存放进二维数组中，并对后面的对应下标累加
+然后对queries遍历，然后每次只要遍历26次即可，取差值判断存在该字符数量是否为偶数
+是偶数就直接能凑成回文形式，不是就加一，最后在将总数除二判断是否小于等于queries【i】【2】
+小于等于了就放入true，否则是false即可
+例如案例1
+sum 10000000000000000000000000
+    11000000000000000000000000
+    11100000000000000000000000
+    11110000000000000000000000
+    21110000000000000000000000
+
+上代码：
+#define _for(i,a,b) for(int i = (a);i < b;i ++)
+#define _rep(i,a,b) for(int i = (a);i > b;i --)
+
+class Solution
+{
+	public:
+		vector<bool> canMakePaliQueries(string s, vector<vector<int>>& queries)
+		{
+			vector<bool> v;
+			long long sum[100003][27];
+			memset(sum,0,sizeof(sum));
+			sum[1][s[0]-'a'] ++;
+			_for(i,2,s.size()+1)
+			{
+				memcpy(sum[i],sum[i-1],sizeof(sum[i]));
+				sum[i][s[i-1]-'a'] ++;
+			}
+			
+			_for(i,0,queries.size())
+			{
+				int rnt = 0;
+				_for(j,0,27)
+				{
+					int tmp = sum[queries[i][1]+1][j]-sum[queries[i][0]][j];
+					if(tmp&0x1)
+                        rnt ++;
+				}
+				if(rnt/2<=queries[i][2])
+					v.push_back(true);
+				else
+					v.push_back(false);
+			}
+			return v;
+		}
+};

@@ -1,0 +1,92 @@
+题目难度：HARD
+
+给定一个未排序的整数数组，找出最长连续序列的长度。
+
+要求算法的时间复杂度为 O(n)。
+
+示例:
+
+输入: [100, 4, 200, 1, 3, 2]
+输出: 4
+解释: 最长连续序列是 [1, 2, 3, 4]。它的长度为 4。
+
+思路：C++不能使用sort函数，时间不符合要求，但是却过了而且效率贼高，（我也不知道怎么回事。。具体看下面的效率结果）
+下面是java版，就使用哈希表，然后遍历哈希表，找到相邻的值就把他删除并且记录连续数值个数
+最后取连续值个数的最大值即可
+
+C++水个执行用时 :
+12 ms
+, 在所有 C++ 提交中击败了
+95.03%
+的用户
+内存消耗 :
+9.1 MB
+, 在所有 C++ 提交中击败了
+92.80%
+的用户
+
+java版执行用时 :
+15 ms
+, 在所有 Java 提交中击败了
+61.89%
+的用户
+内存消耗 :
+39.9 MB
+, 在所有 Java 提交中击败了
+30.61%
+的用户
+
+上代码：
+
+先说水的：
+class Solution {
+public:
+    int longestConsecutive(vector<int>& nums) {
+        if(nums.size() == 0) {
+            return 0;
+        }
+        int sum = 0;
+        int res = 0;
+        sort(nums.begin(), nums.end());
+        for(int i = 0; i < nums.size()-1; i++) {
+            while(i < nums.size() - 2 && nums[i] == nums[i+1]) {
+                i++;
+            }
+            if(nums[i] + 1 == nums[i+1]) {
+                sum++;
+            }
+            else {
+                sum = 0;
+            }
+            res = max(sum,res);
+        }
+        return res+1;
+    }
+};
+
+正确答案：
+class Solution {
+    public int longestConsecutive(int[] nums) {
+        Set<Integer> numsSet = new HashSet<>();
+        for (Integer num : nums) {
+            numsSet.add(num);
+        }
+        int longest = 0;
+        for (Integer num : nums) {
+            if (numsSet.remove(num)) {
+                // 向当前元素的左边搜索,eg: 当前为100, 搜索：99，98，97,...
+                int currentLongest = 1;
+                int current = num;
+                while (numsSet.remove(current - 1)) current--;
+                currentLongest += (num - current);
+		// 向当前元素的右边搜索,eg: 当前为100, 搜索：101，102，103,...
+                current = num;
+                while(numsSet.remove(current + 1)) current++;
+                currentLongest += (current - num);
+        	// 搜索完后更新longest.
+                longest = Math.max(longest, currentLongest);
+            }
+        }
+        return longest;
+    }
+}

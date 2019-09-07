@@ -1,0 +1,58 @@
+题目难度：MEDIUM
+
+你有一套活字字模 tiles，其中每个字模上都刻有一个字母 tiles[i]。返回你可以印出的非空字母序列的数目。
+
+ 
+
+示例 1：
+
+输入："AAB"
+输出：8
+解释：可能的序列为 "A", "B", "AA", "AB", "BA", "AAB", "ABA", "BAA"。
+示例 2：
+
+输入："AAABBC"
+输出：188
+ 
+
+提示：
+
+1 <= tiles.length <= 7
+tiles 由大写英文字母组成
+
+思路：可以先进行O（N^2）的两次对字符串长度的遍历，
+分别放入一个新的字符串数组中去，再调用next_permutation(tmp.begin(),tmp.end())字典排序作为外部while循环
+返回字符串数组的长度即可
+
+上代码：
+#define _for(i,a,b) for(int i = (a);i < b;i ++)
+
+class Solution
+{
+	public:
+		set<string> s;
+		int numTilePossibilities(string tiles)
+		{
+			s.clear();
+			int rnt = 0;
+			for (int S = 1; S < 1 << tiles.size(); S ++)
+			{
+				string tmp;
+				_for(i,0,tiles.size())
+				{
+					if(S>>i & 0x1)
+						tmp += tiles[i];
+				}
+                sort(tmp.begin(),tmp.end());
+				do
+				{
+					if(!s.count(tmp))
+					{
+						rnt ++;
+						s.insert(tmp);
+					}
+				}while(next_permutation(tmp.begin(),tmp.end()));
+			}
+			return rnt;
+		}
+};
