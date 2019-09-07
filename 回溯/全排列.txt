@@ -1,0 +1,66 @@
+题目难度：MEDIUM
+
+给定一个没有重复数字的序列，返回其所有可能的全排列。
+
+示例:
+
+
+	输入: [1,2,3]
+
+	输出:
+[
+  [1,2,3],
+  [1,3,2],
+  [2,1,3],
+  [2,3,1],
+  [3,1,2],
+  [3,2,1] 
+]
+
+思路：还是DFS + BackTracking，需要注意的是我们需要一个bool类型数组用来记录访问过的值
+初值都为false，放进数组后就变味true，然后在DFS后面在赋回初值false即可
+还有去重即可（例如代码中对应上例：下面三局不加则输出：
+isVisited[i] = true不加，输出[[1,1,1],[1,1,2],[1,1,3],[1,2,1],[1,2,2],[1,2,3],[1,3,1],[1,3,2],[1,3,3],[2,1,1],[2,1,2],[2,1,3],[2,2,1],[2,2,2],[2,2,3],[2,3,1],[2,3,2],[2,3,3],[3,1,1],[3,1,2],[3,1,3],[3,2,1],[3,2,2],[3,2,3],[3,3,1],[3,3,2],[3,3,3]]
+isVisited[i] = false不加，输出[[1,2,3]]
+curr.pop_back()不加，输出[[1,2,3],[1,2,3],[1,2,1],[1,2,3]]）
+
+执行用时 :
+20 ms
+, 在所有C++提交中击败了
+88.31%
+的用户
+内存消耗 :
+10.9 MB
+, 在所有C++提交中击败了
+5.98%
+的用户
+
+上代码：
+class Solution {
+public:
+    vector<vector<int>> permute(vector<int>& nums) {
+        vector<vector<int>> permutations;
+        vector<int> curr;
+        if(nums.size() <= 0) {
+            return permutations;
+        }
+        vector<bool> isVisited(nums.size(), false);
+        DFS(permutations, curr, nums, isVisited);
+        return permutations;
+    }
+    void DFS(vector<vector<int>>& permutations, vector<int> curr, vector<int> nums, vector<bool> isVisited) {
+        if(curr.size() == nums.size()) {
+            permutations.push_back(curr);
+            return;
+        }
+        for(int i = 0; i < nums.size(); i++) {
+            if(isVisited[i] == false) {
+                isVisited[i] = true;
+                curr.push_back(nums[i]);
+                DFS(permutations, curr, nums, isVisited);
+                isVisited[i] = false;
+                curr.pop_back();
+            }
+        }
+    }
+};

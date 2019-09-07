@@ -1,0 +1,53 @@
+题目难度：MEDIUM
+
+给出 n 代表生成括号的对数，请你写出一个函数，使其能够生成所有可能的并且有效的括号组合。
+
+例如，给出 n = 3，生成结果为：
+
+[
+  "((()))",
+  "(()())",
+  "(())()",
+  "()(())",
+  "()()()"
+]
+
+思路：BackTracking+DFS，设两个变量，一个记录左括号数，一个记录右括号数
+每次回溯里判断左括号数是否小于总个数n，小于就加一个左括号
+之后调用回溯函数
+然后再判断右括号数是否小于左括号数,小于就加一个右括号数
+字符串直接+字符就可以了，最后放进string数组中即可
+
+执行用时 :
+8 ms
+, 在所有 C++ 提交中击败了
+94.25%
+的用户
+内存消耗 :
+17.5 MB
+, 在所有 C++ 提交中击败了
+31.48%
+的用户
+
+上代码：
+class Solution {
+public:
+    vector<string> ans;
+    void backtrack(string S, int left, int right,int n, vector<string> &ans){
+        if (S.length()==2*n){
+        ans.push_back(S);
+        return ;
+        }
+        if (left < n){
+  
+        backtrack(S+"(",left+1,right,n,ans);
+        }
+        if (right < left){
+        backtrack(S+')',left, right+1,n,ans);
+        }
+    }
+    vector<string> generateParenthesis(int n) {
+        backtrack("",0,0,n,ans);
+        return ans;
+    }
+};

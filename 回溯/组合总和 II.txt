@@ -1,0 +1,98 @@
+题目难度：MEDIUM
+
+给定一个数组?candidates?和一个目标数?target?，
+找出?candidates?中所有可以使数字和为?target?的组合。
+
+
+candidates?中的每个数字在每个组合中只能使用一次。
+
+
+说明：
+
+
+	所有数字（包括目标数）都是正整数。
+解集不能包含重复的组合。?
+
+
+示例?1:
+
+
+	输入: candidates =?[10,1,2,7,6,1,5], target =?8,
+
+	所求解集为:
+
+	[
+  
+		[1, 7],
+  
+		[1, 2, 5],
+  
+		[2, 6],
+  
+		[1, 1, 6]
+	
+]
+
+
+示例 2:
+	输入: candidates = [2,5,2,1,2], target = 5,
+	所求解集为:
+	[
+  		[1,2,2],
+  		[5]
+	]
+思路：这道题也是非常标准的回溯算法的步骤，唯一需要注意的两个点是：
+
+
+	求总和问题一般会先排个序，然后顺序相加，当result>target时，后面还没相加的所有的因为排序，就都剪枝了。
+
+	组合问题保证不重复的方法，可以想象一颗递归树，每次不能长出来两个相同的枝，否则就会有重复。
+
+
+
+执行用时 :
+
+176 ms
+, 在所有C++提交中击败了
+14.32%
+的用户
+内存消耗 :
+55.1 MB
+, 在所有C++提交中击败了
+13.81%
+的用户
+
+上代码：
+class Solution {
+public:
+    vector<vector<int>> combinationSum2(vector<int>& candidates, int target) {
+        vector<vector<int>> ret;
+        if(candidates.size() == 0 || target < 0) {
+            return ret;
+        }
+        vector<int> curr;
+        sort(candidates.begin(), candidates.end());   //先排序，便于后面讲相同的项取消
+        int n = candidates.size();
+        BackTracking(ret, curr, candidates, n, target, 0);
+        return ret;
+    }
+    void BackTracking(vector<vector<int>>& ret, vector<int> curr, vector<int> candidates, int n, int target, int level) {
+        if(target==0) {
+            ret.push_back(curr);
+            return;
+        }
+        else if(target < 0) {
+            return;
+        }
+        for(int i = level; i < n; i++) {
+            curr.push_back(candidates[i]);
+            target -= candidates[i];
+            BackTracking(ret,curr,candidates,n,target,i+1);
+            curr.pop_back();
+            target += candidates[i];        //另一遍时需要把target重新赋初值
+            while(i < n - 1 && candidates[i] == candidates[i+1]) {
+                i++;                //避免产生相同的项
+            }
+        }
+    }
+};

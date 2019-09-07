@@ -1,0 +1,63 @@
+题目难度：MEDIUM
+
+给定一个可包含重复数字的序列，返回所有不重复的全排列。
+
+示例:
+
+输入: [1,1,2]
+输出:
+[
+  [1,1,2],
+  [1,2,1],
+  [2,1,1]
+]
+
+思路：还是DFS + BackTracking 回溯算法，应用之前的水题方法没有问题，对操作后二维数组排序在进行删除操作，
+但是到这里会超时。。。所以需要在代码中做手脚，即先对给定数组排序
+在for循环借位对相同数值进行pass操作即可
+（实际会的一题，但是......我对二维数组排了序，EMMMMMMM）
+
+执行用时 :
+48 ms
+, 在所有C++提交中击败了
+59.04%
+的用户
+内存消耗 :
+12.7 MB
+, 在所有C++提交中击败了
+13.45%
+的用户
+
+上代码：
+class Solution {
+public:
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
+        vector<vector<int>> permutations;
+        vector<int> curr;
+        if(nums.size() <= 0) {
+            return permutations;
+        }
+        vector<bool> isVisited(nums.size(), false);
+        sort(nums.begin(), nums.end());
+        DFS(permutations, curr, nums, isVisited);
+        return permutations;
+    }
+    void DFS(vector<vector<int>>& permutations, vector<int> curr, vector<int> nums, vector<bool> isVisited) {
+        if(curr.size() == nums.size()) {
+            permutations.push_back(curr);
+            return;
+        }
+        for(int i = 0; i < nums.size(); i++) {
+            if(isVisited[i] == false) {
+                isVisited[i] = true;
+                curr.push_back(nums[i]);
+                DFS(permutations, curr, nums, isVisited);
+                isVisited[i] = false;
+                curr.pop_back();
+                while(i < nums.size() - 1 && nums[i] == nums[i + 1]) {
+                    i++;
+                }
+            }
+        }
+    }
+};
