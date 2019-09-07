@@ -1,0 +1,53 @@
+题目难度：MEDIUM
+
+给出二叉树的根节点 root，树上每个节点都有一个不同的值。
+
+如果节点值在 to_delete 中出现，我们就把该节点从树上删去，最后得到一个森林（一些不相交的树构成的集合）。
+
+返回森林中的每棵树。你可以按任意顺序组织答案。
+
+ 
+
+示例：
+
+
+
+输入：root = [1,2,3,4,5,6,7], to_delete = [3,5]
+输出：[[1,2,null,4],[6],[7]]
+
+思路：第一次做返回节点类型vector的题，不知如何下手，其实比较简单，就将其当做是正常的vector即可
+先把要删除的节点值放入表里，然后新设置一个节点类型数组
+之后调用DFS深度遍历，遇见要删除的节点就设置一个bool类型值变为true，之后带入下一次DFS
+这样每次可以根据bool类型值判断是加入NULL然后结束该次遍历还是继续正常添值
+最后返回数组即可
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	unordered_set<int> S;	
+	vector<TreeNode*> R;   
+	TreeNode* dfs(TreeNode *t, bool keep) {
+		if (t == NULL) return NULL;	
+		bool del = S.count(t->val) > 0;
+		if (keep && !del) R.emplace_back(t);
+		t->left = dfs(t->left, del);
+		t->right = dfs(t->right, del);
+		return del ? NULL : t;
+	}
+    vector<TreeNode*> delNodes(TreeNode* root, vector<int>& to_delete) {
+    	S.clear(), R.clear();
+    	for (auto x : to_delete)
+    		S.insert(x);
+    	dfs(root, true);
+		return R; 
+    }
+};

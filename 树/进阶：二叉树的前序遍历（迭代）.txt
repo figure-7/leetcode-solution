@@ -1,0 +1,53 @@
+题目难度：MEDIUM
+给定一个二叉树，返回它的 前序 遍历。
+
+ 示例:
+
+输入: [1,null,2,3]  
+   1
+    \
+     2
+    /
+   3 
+
+输出: [1,2,3]
+进阶: 递归算法很简单，你可以通过迭代算法完成吗？
+来看你一下这个迭代算法
+思路：先把根节点放进数组中，
+（注意这里数组定义是节点类型的（TreeNode*））
+再开辟一个栈，
+右子节点先进栈，左子节点再进站
+每次去一个节点，栈先进后出的道理，先取完左节点，再取出临近的右节点
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> preorderTraversal(TreeNode* root) {
+        vector<int> vals;
+        if(root==NULL) {
+            return vals;
+        }
+        vector<TreeNode*> nodes;
+        nodes.push_back(root);
+        while(!nodes.empty()) {
+            TreeNode* n = nodes.back();
+            vals.push_back(n->val);
+            nodes.pop_back();
+            if(n->right) {
+                nodes.push_back(n->right);
+            }
+            if(n->left) {
+                nodes.push_back(n->left);
+            }
+        }
+        return vals;
+    }
+};

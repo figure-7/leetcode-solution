@@ -1,0 +1,61 @@
+题目难度：HARD
+给定一个二叉树，返回它的 后序 遍历。
+
+示例:
+
+输入: [1,null,2,3]  
+   1
+    \
+     2
+    /
+   3 
+
+输出: [3,2,1]
+进阶: 递归算法很简单，你可以通过迭代算法完成吗？
+思路：这次用递归，还是一个节点类型vector，一个栈
+根进栈，有右子节点先进栈，左子节点后进
+都没有就出栈
+这是还要设置一个新的节点pre记录此时出栈节点
+如果这个节点是新的栈顶节点的左节点或右节点
+该节点就出栈，同时pre记录此时出栈节点
+不断循环输出即可
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> postorderTraversal(TreeNode* root) {
+        vector<int> vals;
+        if(root == NULL) {
+            return vals;
+        }
+        vector<TreeNode*> nodes;
+        TreeNode* pre = NULL;
+        nodes.push_back(root);
+        while(!nodes.empty()){
+            TreeNode* p = nodes.back();
+            if((p->left == NULL && p->right == NULL) || 
+               (pre != NULL && (pre  == p->left || pre == p->right))) {
+                vals.push_back(p->val);
+                nodes.pop_back();
+                pre = p;            //记录当前被拿出的节点
+            }
+            else{
+                if(p->right != NULL) {
+                    nodes.push_back(p->right);
+                }
+                if(p->left != NULL) {
+                    nodes.push_back(p->left);
+                }
+            }
+        }
+        return vals;
+    }
+};

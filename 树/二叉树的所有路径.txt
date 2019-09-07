@@ -1,0 +1,71 @@
+题目难度：EASY
+给定一个二叉树，返回所有从根节点到叶子节点的路径。
+
+说明: 叶子节点是指没有子节点的节点。
+
+示例:
+
+输入:
+
+   1
+ /   \
+2     3
+ \
+  5
+
+输出: ["1->2->5", "1->3"]
+
+解释: 所有根节点到叶子节点的路径为: 1->2->5, 1->3
+
+思路：需要两个数组，一个用来保存路径上的节点数，并将节点值依次放入数组中，另一个用来保存路径的值
+先bfs深度遍历，递归算出所有路劲的节点数
+再调用建立路径函数，将节点值用“->”连接起来返回放入字符串数组中
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<string> binaryTreePaths(TreeNode* root) {
+        vector<string> ret;
+        if(!root) {
+            return ret;
+        }
+        vector<int> path;
+        BFS(root, path, ret);
+        return ret;
+    }
+    void BFS(TreeNode* node, vector<int>& path, vector<string>& result) {
+        if(node == nullptr) return;
+        path.push_back(node->val);
+        if(node->left == nullptr && node->right == nullptr) {
+            result.push_back(generatePath(path));
+        }
+        else {
+            if(node->left != nullptr) {
+              BFS(node->left, path, result);
+                path.pop_back();
+            }
+            if(node->right != nullptr) {
+              BFS(node->right, path, result);
+                path.pop_back();
+            }
+        }
+    }
+    string  generatePath(vector<int> path) {
+        stringstream ss;
+        int i;
+        for(i=0; i<path.size() - 1; i++) {
+            ss << path[i] << "->";
+        }
+        ss << path[i];
+        return ss.str();
+    }
+};

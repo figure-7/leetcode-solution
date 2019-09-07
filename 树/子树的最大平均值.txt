@@ -1,0 +1,62 @@
+题目难度：MEDIUM
+
+给你一棵二叉树的根节点 root，找出这棵树的 每一棵 子树的 平均值 中的 最大 值。
+
+子树是树中的任意节点和它的所有后代构成的集合。
+
+树的平均值是树中节点值的总和除以节点数。
+
+ 
+
+示例：
+
+
+
+输入：[5,6,1]
+输出：6.00000
+解释： 
+以 value = 5 的节点作为子树的根节点，得到的平均值为 (5 + 6 + 1) / 3 = 4。
+以 value = 6 的节点作为子树的根节点，得到的平均值为 6 / 1 = 6。
+以 value = 1 的节点作为子树的根节点，得到的平均值为 1 / 1 = 1。
+所以答案取最大值 6。
+ 
+
+提示：
+
+树中的节点数介于 1 到 5000之间。
+每个节点的值介于 0 到 100000 之间。
+如果结果与标准答案的误差不超过 10^-5，那么该结果将被视为正确答案。
+
+思路：DFS遍历，下面的方法设置了一个表类型的方法。分别把遍历节点数和节点值总和保存入表。
+每次使用make_pair（）函数返回一次值给表中，由于是先对左右节点的递归调用，所以直接就把所有种子树结果得出。
+并且之前表是不存在在祖先节点的。注意只要当前计算出的值小于加了一个子节点的值出完个数小于当前值，就更新值。
+因为它的子树平均值肯定比上面那个树的平均值大。
+
+上代码：
+class Solution {
+public:
+    double ret = 0;
+    pair<int, int> dfs(TreeNode* root) {
+        int cal = 1;
+        int sum = root->val;
+        if (root->left) {
+            pair<int, int> test = dfs(root->left);
+            cal += test.first;
+            sum += test.second;
+        }
+        if (root->right) {
+            pair<int, int> test = dfs(root->right);
+            cal += test.first;
+            sum += test.second;
+        }
+        if (ret < (double)sum / cal) {
+            ret = (double)sum / cal;
+        }
+        return make_pair(cal, sum);
+    }
+    double maximumAverageSubtree(TreeNode* root) {
+        ret = 0;
+        dfs(root);
+        return ret;
+    }
+};

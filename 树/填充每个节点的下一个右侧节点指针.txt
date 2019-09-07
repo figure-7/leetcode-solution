@@ -1,0 +1,91 @@
+题目难度：MEDIUM
+给定一个完美二叉树，其所有叶子节点都在同一层，每个父节点都有两个子节点。二叉树定义如下：
+
+struct Node {
+  int val;
+  Node *left;
+  Node *right;
+  Node *next;
+}
+填充它的每个 next 指针，让这个指针指向其下一个右侧节点。如果找不到下一个右侧节点，则将 next 指针设置为 NULL。
+
+初始状态下，所有 next 指针都被设置为 NULL。
+
+ 
+
+示例：
+
+
+
+输入：{"$id":"1","left":{"$id":"2","left":{"$id":"3","left":null,"next":null,"right":null,"val":4},"next":null,"right":{"$id":"4","left":null,"next":null,"right":null,"val":5},"val":2},"next":null,"right":{"$id":"5","left":{"$id":"6","left":null,"next":null,"right":null,"val":6},"next":null,"right":{"$id":"7","left":null,"next":null,"right":null,"val":7},"val":3},"val":1}
+
+输出：{"$id":"1","left":{"$id":"2","left":{"$id":"3","left":null,"next":{"$id":"4","left":null,"next":{"$id":"5","left":null,"next":{"$id":"6","left":null,"next":null,"right":null,"val":7},"right":null,"val":6},"right":null,"val":5},"right":null,"val":4},"next":{"$id":"7","left":{"$ref":"5"},"next":null,"right":{"$ref":"6"},"val":3},"right":{"$ref":"4"},"val":2},"next":null,"right":{"$ref":"7"},"val":1}
+
+解释：给定二叉树如图 A 所示，你的函数应该填充它的每个 next 指针，以指向其下一个右侧节点，如图 B 所示。
+ 
+
+提示：
+
+你只能使用常量级额外空间。
+使用递归解题也符合要求，本题中递归程序占用的栈空间不算做额外的空间复杂度。
+思路：由于是完全二叉树
+先向左遍历，有左子节点就把他的next给右子节点
+注意还要判断该节点有无next节点
+有的话就要把他的next节点的左子节点给他的右子节点的next
+将他的next节点给他，即横向遍历用next连接上不是同一个父亲节点的一行节点
+（注意这里要用一个first节点记录每一行开头的节点，然后移动p节点遍历一行的左节点，再把first节点地址给p）
+之后再按列更新节点遍历即可
+
+（连输入输出都看不懂，，做什么啊。。）
+
+上代码：
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    Node* left;
+    Node* right;
+    Node* next;
+
+    Node() {}
+
+    Node(int _val, Node* _left, Node* _right, Node* _next) {
+        val = _val;
+        left = _left;
+        right = _right;
+        next = _next;
+    }
+};
+*/
+class Solution {
+public:
+    Node* connect(Node* root) {
+        if(!root) {
+            return NULL;
+        }
+        Node* p = root;         //移动靶
+        Node* first = NULL;     //记录每行的第一个节点
+        while(p) {
+            if(!first) {
+                first = p->left;
+            }
+            if(p->left) {
+                p->left->next = p->right;   //一个父亲的左右节点用next连接
+            }
+            else {
+                break;
+            }
+            if(p->next) {
+                p->right->next = p->next->left;//一行的非相同父亲节点用next连接
+                p = p->next;                    //移动靶指向该节点的next节点
+                continue;                       //继续上述while循环里的操作
+            }
+            else {
+                p = first;                     //移动靶指向下一行的首个节点
+                first = NULL;
+            }
+        }
+        return root;
+    }
+};

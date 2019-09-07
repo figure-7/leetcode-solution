@@ -1,0 +1,65 @@
+题目难度：MEDIUM
+给定一个二叉树，原地将它展开为链表。
+
+例如，给定二叉树
+
+    1
+   / \
+  2   5
+ / \   \
+3   4   6
+将其展开为：
+
+1
+ \
+  2
+   \
+    3
+     \
+      4
+       \
+        5
+         \
+          6
+思路：与迭代前序遍历类似，用栈，先设置一个零标负责是根节点排好，
+根节点先进栈，放在零标节点的right上
+之后先看有无右子节点，有就进栈，没有再看有无左子节点，有就进栈，同时将对应节点变为NULL
+每次取一个头节点遍历，没有孩子就继续输出（直至指向上一个有右孩子的节点）继续操作即可
+难点在于一棵树指针的变换（无奈......）
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    void flatten(TreeNode* root) {
+        if(root==NULL) {
+            return;
+        }
+        vector<TreeNode*> nodes;
+        TreeNode dummy(0);
+        TreeNode* n = &dummy;
+        nodes.push_back(root);
+        while(!nodes.empty()) {
+            TreeNode* p = nodes.back();
+            nodes.pop_back();
+            //挂载到右子树
+            n->right = p;
+            n = p;
+            if(p->right) {      //右子树压栈
+                nodes.push_back(p->right);
+                p->right = NULL;
+            }
+            if(p->left) {       //左子树压栈
+                nodes.push_back(p->left);
+                p->left = NULL;
+            }
+        }
+    }
+};

@@ -1,0 +1,115 @@
+题目难度：HARD
+二叉搜索树中的两个节点被错误地交换。
+
+请在不改变其结构的情况下，恢复这棵树。
+
+示例 1:
+
+输入: [1,3,null,null,2]
+
+   1
+  /
+ 3
+  \
+   2
+
+输出: [3,1,null,null,2]
+
+   3
+  /
+ 1
+  \
+   2
+示例 2:
+
+输入: [3,1,4,null,null,2]
+
+  3
+ / \
+1   4
+   /
+  2
+
+输出: [2,1,4,null,null,3]
+
+  2
+ / \
+1   4
+   /
+  3
+进阶:
+
+使用 O(n) 空间复杂度的解法很容易实现。
+你能想出一个只使用常数空间的解决方案吗？
+
+思路：由于递归需要用额外的栈空间，所以无论如何空间复杂度都是O(N)，
+所以对于进阶，这里要使用 Morris Traversal中序遍历 进行操作，
+对于中序遍历，就可以仅仅考虑前一个节点precur是否大于后一个节点cur，
+大于就将这两个节点记录到p1和p2中，在程序最后交换其值。
+可实现呢只使用常数空间
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    void recoverTree(TreeNode* root) {
+        TreeNode* cur = 0;
+        TreeNode* pre = 0;
+        TreeNode* p1 = 0;
+        TreeNode* p2 = 0;
+        TreeNode* precur = 0;
+        bool found = false;
+        if(!root) {
+            return;
+        }
+        cur = root;
+        while(cur) {
+            if(!cur->left) {
+                if(precur && precur->val > cur->val) {//判断右子节点是否小于其父亲节点
+                    if(!found) {                      //小于就找到这两个节点
+                        p1 = precur;                  //分别记录到p1和p2中
+                        found = true;
+                    }
+                    p2 = cur;
+                }
+                precur = cur;
+                cur = cur->right;
+            }
+            else {
+                pre = cur->left;
+                while(pre->right && pre->right != cur) {//看cur对应的中序遍历的上一个节点是pre还是pre的右子节点
+                    pre = pre->right;
+                }
+                if(!pre->right) {           //cur的中序遍历前驱节点为pre
+                    pre->right = cur;       //cur设置为pre的右孩子
+                    cur = cur->left;
+                }
+                else {
+                    if(precur->val > cur->val) {
+                        if(!found) {
+                            p1 = precur;
+                            found = true;
+                        }
+                        p2 = cur;
+                    }
+                    precur = cur;
+                    pre->right = NULL;
+                    cur = cur->right;
+                }
+            }
+        }
+        if(p1 && p2) {                      //将两个异常节点数值交换
+            int t = p1->val;
+            p1->val = p2->val;
+            p2->val = t;
+        }
+    }
+};

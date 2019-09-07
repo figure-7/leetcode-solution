@@ -1,0 +1,70 @@
+给定一个二叉树和一个目标和，找到所有从根节点到叶子节点路径总和等于给定目标和的路径。
+
+说明: 叶子节点是指没有子节点的节点。
+
+示例:
+给定如下二叉树，以及目标和 sum = 22，
+
+              5
+             / \
+            4   8
+           /   / \
+          11  13  4
+         /  \    / \
+        7    2  5   1
+返回:
+
+[
+   [5,4,11,2],
+   [5,8,4,5]
+]
+
+思路：一边遍历一边累加值，每次遍历都把值放到中间数组中
+累加值等于目标值并且是叶子结点就把中间数组对应值放到目标数组中最后输出返回即可
+（注意这里调用递归时实际上就等同于把中间数组分裂为多个数组，不用考虑怎么去用一个数组记录多组值：想了半天没想出来......没有必要）
+标准答案还是太弱了。。。。
+执行用时 : 36 ms, 在Path Sum II的C++提交中击败了64.44% 的用户（已加去流操作）
+内存消耗 : 38.4 MB, 在Path Sum II的C++提交中击败了5.57% 的用户
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+static const int _ = [](){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    return 0;
+}();
+class Solution {
+public:
+    vector<vector<int>> pathSum(TreeNode* root, int sum) {
+        vector<vector<int>> ret;
+        if(root==NULL) {
+            return ret;
+        }
+        vector<int> curr;
+        DFS(ret, curr, sum, 0, root);
+        return ret;
+    }
+    void DFS(vector<vector<int>>& ret, vector<int> curr, int sum, int tmpsum, TreeNode* root) {
+        if(root==NULL) {
+            return;
+        }
+        tmpsum+=root->val;
+        curr.push_back(root->val);
+        if(tmpsum == sum)
+        {
+            if(!root->left && !root->right) {
+                ret.push_back(curr);
+                return;
+            }
+        }
+        DFS(ret,curr,sum,tmpsum,root->left);
+        DFS(ret,curr,sum,tmpsum,root->right);
+    }
+};
