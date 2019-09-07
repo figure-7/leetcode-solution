@@ -1,0 +1,133 @@
+题目难度：HARD
+
+给定一个非空字符串 s 和一个包含非空单词列表的字典 wordDict，在字符串中增加空格来构建一个句子，使得句子中所有的单词都在词典中。
+返回所有这些可能的句子。
+
+
+
+说明：
+
+分隔时可以重复使用字典中的单词。
+
+你可以假设字典中没有重复的单词。
+
+
+示例 1：
+
+
+输入:
+s = "catsanddog"
+wordDict = ["cat", "cats", "and", "sand", "dog"]
+
+输出:
+[
+? "cats and dog",
+? "cat sand dog"
+]
+
+
+示例 2：
+
+
+输入:
+s = "pineapplepenapple"
+wordDict = ["apple", "pen", "applepen", "pine", "pineapple"]
+
+输出:
+[
+? "pine apple pen apple",
+? "pineapple pen apple",
+? "pine applepen apple"
+]
+
+解释: 注意你可以重复使用字典中的单词。
+
+
+示例?3：
+
+
+输入:
+s = "catsandog"
+wordDict = ["cats", "dog", "sand", "and", "cat"]
+
+输出:
+[]
+
+
+
+执行用时 :
+48 ms
+, 在所有 C++ 提交中击败了
+39.43%
+的用户
+内存消耗 :
+19.2 MB
+, 在所有 C++ 提交中击败了
+9.69%
+的用户
+
+思路：
+因为需要输出多种情况，还是子串数组类型问题，所以用dp+DFS实现
+分三种情况，首先设置dp【i】【j】，起始索引i，长度j，看其是否能被切分
+1.dp【i】【j】=true，（可以实现子串操作）dp【i】【j】 in dict，（子串数组中有该串）这种情况这个子串直接在字典中，赋值1
+2.dp【i】【j】=true，（可以实现子串操作）dp【i】【j】 not in dict，（子串数组中没有该串，但是他的子串在子串数组中），赋值2
+这种情况这个子串不在字典中，但是他能切分为更小的子串，而这些字串在数组中
+3.dp【i】【j】=false，子串不能被划分
+接下来做DFS深度遍历，找到值为一的dp就写入字符串，并判断之前有无字符串，有就加上一个空格隔开再放入该字符串
+放入一个就调用一次DFS，最后输出数组即可
+
+上代码：
+class Solution {
+public:
+    vector<vector<char>> dp;
+    vector<string> vals;
+    string val;
+    vector<string> wordBreak(string s, vector<string>& wordDict) {
+        unordered_set<string> dict(wordDict.begin(), wordDict.end());
+        int len = s.size();
+        dp.resize(len);
+        for(int i = 0; i < len; i++) {
+            dp[i].resize(len+1, 0);
+        }
+        for(int i = 1; i <= len; i++) {
+            for(int j = 0; j < len - i + 1; j++) {
+                //直接存在于字典中，是第一种情况
+                if(dict.find(s.substr(j, i)) != dict.end()) {
+                    dp[j][i] = 1;
+                    continue;
+                }
+                //如果不存在，则看子串是不是能被切分，这是第二种
+                for(int k = 1; k < i && k< len - j; k++) {
+                    if(dp[j][k] && dp[j + k][i - k]) {
+                        dp[j][i] = 2;
+                        break;
+                    }
+                }
+            }
+        }
+        if(dp[0][len] == 0) {
+            return vals;
+        }
+        DFS(s, 0);
+        return vals;
+    }
+    void DFS(string s, int start) {
+        int len = s.size();
+        if(start == len) {
+            vals.push_back(val);
+            return;
+        }
+        for(int i = 1; i <= len - start; i++) {
+            if(dp[start][i] == 1) {
+                int oldLen = val.size();
+                if(oldLen != 0) {
+                    val.append(" ");
+                }
+                val.append(s.substr(start, i));
+                //我们从start+i开始继续DFS
+                DFS(s, start + i);
+                val.erase(oldLen, string::npos);
+            }
+        }
+    }
+};

@@ -1,0 +1,26 @@
+思路：把每种分配情况放入数组中，然后排序
+放入数组方法如下（Python）
+
+import math
+import operator
+
+num = int(input("输入托盘数量:"))
+list=[]
+for a in range(0, math.ceil(num / 40) + 1):
+    for b in range(0, math.ceil(num / 24) + 1):
+        for c in range(0, math.ceil(num / 10) + 1):
+            if a == 0 and b == 0 and c == 0:
+                continue
+            if a * 40 + b * 24 + c * 10 >= num:
+                list.append({
+                    "car_1": a,
+                    "car_2": b,
+                    "car_3": c,
+                    "price": a*12000 + b*8400 + c*4000
+                })
+list = sorted(list, key=operator.itemgetter("price"))
+one = list[0]
+print("大型车%d辆" % (one["car_1"]))
+print("中型车%d辆" % (one["car_2"]))
+print("小型车%d辆" % (one["car_3"]))
+print("总费用%d元" % (one["price"]))
