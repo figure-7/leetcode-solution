@@ -1,0 +1,15 @@
+1.哈希表的建立函数
+unordered_map<类型,类型> 表名
+
+2.哈希表的查找
+表名.count(查找值)
+
+3.哈希表删值
+表名.remove（所删值）java是这样的，C++有待认证
+
+4.高级表设置汇总：
+map<string, set<pair<int, string> > > v;
+这里值是字符串类型，下标是pair类型（对类型，见通用操作里的文件有解释）
+v[user[i]].insert(make_pair(time[i], web[i]));
+插入这样插
+注意用auto形式遍历值的时候如果是pair类型或多值对类型要用指针

@@ -1,0 +1,1 @@
+memcpy(sum[i],sum[i-1],sizeof(sum[i]));

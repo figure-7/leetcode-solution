@@ -1,0 +1,76 @@
+1：字符数组换为字符串
+
+见代码
+
+#include <iostream>
+#include <string>
+using namespace std;
+ 
+int main(){
+	char a[10]="aaaabbbba";
+	string s(&a[0],&a[strlen(a)]);
+	cout<<s<<endl;
+	system("pause");
+}
+2：把字符串转换为字符数组
+
+见代码：
+
+#include <iostream>
+#include <string>
+using namespace std;
+ 
+int main(){
+	string s="aaaavvva";
+	char a[10];
+	strncpy(a,s.c_str(),s.length()+1);//必须加1，\0还占一个位置
+	
+	for(int i=0;i<10;i++)
+		cout<<a[i]<<" ";
+	cout<<endl;
+	system("pause");
+}
+ 
+
+3：把字符串转换为数字
+
+#include<iostream>
+using namespace std;
+ 
+int main()
+{
+ char a='1';
+ int x;
+ x=atoi(a);  
+ 
+ cout<<x<<endl;
+ getchar();
+ return 0;
+}
+
+4：字符转数字类型：
+string digits = "123456";
+int index = digits[0]-'0';
+
+5.数字转字符串，int float类型 同理
+
+
+#include <string>
+
+#include <sstream>
+
+
+int main(){
+    
+double a = 123.32;
+    
+string res;
+    
+stringstream ss;
+    
+ss << a;
+    
+ss >> res;//或者 res = ss.str();
+    
+return 0;
+}

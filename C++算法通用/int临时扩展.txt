@@ -1,0 +1,1 @@
+int a = (long long)b

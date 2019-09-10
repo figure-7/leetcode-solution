@@ -1,0 +1,3 @@
+for(int i = 1; i <= zhi; i++){
+            res = (long long)res*i%(1000000007); 
+        }

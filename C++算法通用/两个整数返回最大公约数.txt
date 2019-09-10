@@ -1,0 +1,5 @@
+GCD(number1,number2, ...)
+
+Number1, number2, ... 为 1 至 255 个数值，如果参数为非整数，则截尾取整。
+
+折叠

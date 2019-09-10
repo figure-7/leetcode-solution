@@ -1,0 +1,3 @@
+n=unique(ans.begin(),ans.end())-ans.begin();
+        while(ans.size()>n)ans.pop_back();
+//unique返回的是无重复数值的个数，多余的排在后面，之后从后面删除即可

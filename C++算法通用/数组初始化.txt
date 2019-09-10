@@ -1,0 +1,2 @@
+memset(shuzu,0,sizeof(shuzu));
+//即对数组初始化为0

@@ -1,0 +1,6 @@
+strStr(str1, str2)
+例：
+strstr("Helloworld!","world");
+输出：
+world!
+只针对char类型字符串

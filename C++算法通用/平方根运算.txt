@@ -1,0 +1,2 @@
+int n
+sqrt(n) n的平方根

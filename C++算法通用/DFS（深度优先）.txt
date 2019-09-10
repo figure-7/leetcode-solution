@@ -1,0 +1,11 @@
+1.去二维数组连续最大长度
+void dfs(int x)
+    {
+        f[x]=1;
+        v[x]=1;
+        for(int i=0;i<n;i++)if(g[x][i])         //DFS深度优先遍历二维数组
+        {
+            if(!v[i])dfs(i);
+            f[x]=max(f[x],f[i]+1);              //有连着的就加一，取最大。
+        }
+    }

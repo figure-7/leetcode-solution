@@ -1,0 +1,5 @@
+删除vector指定位置的元素：
+	vector<int> vec;
+	......(赋值操作);
+	vector<int>::iterator it = vec.begin()+10;（下标10对应数值删除，包括空间也减1）
+    	vec.erase(it);

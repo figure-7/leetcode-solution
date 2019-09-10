@@ -1,0 +1,6 @@
+1. s.clear()
+
+
+2. npos可以表示string的结束位子，是string::type_size 类型的，
+val.erase(oldLen, string::npos);将oldLen完全删除，比上面的方法更保险
+（虽然不知道为什么。。。）

@@ -1,0 +1,19 @@
+堆建立：queue<>big_heap	//默认最大堆
+	queue<int, vector<int>, greater<int>> Q	//构造最大堆
+	queue<int, vector<int>, less<int>> Q	//构造最小堆
+
+入堆：.push()
+
+出堆：.pop()
+
+堆顶：.top()
+
+堆长度：.size()
+
+堆原理：	最大堆					   	最小堆
+		  99				 	      	  1
+	     /	        \                                    /           \
+	10		     33				4		    99
+    /	    \		  /      \		    /	    \			
+6		7	1	   4		6		7
+	

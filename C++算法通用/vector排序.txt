@@ -1,0 +1,17 @@
+sort(aim.begin(), aim.end());
+
+sort扩展，可按指定内容排序，通常用于二维数组
+bool cmp1(int a,int b)//int为数组数据类型
+{
+    return a>b;//降序排列
+    //return a<b;//默认的升序排列
+}
+sort(A,A+100,cmp1);
+
+
+bool cmp2(Student a,Student b)
+{
+    return a.id>b.id;//按照学号降序排列
+    //return a.id<b.id;//按照学号升序排列
+}
+sort(Stu,Stu+100,cmp2);
