@@ -1,0 +1,104 @@
+题目难度：EASY
+
+给定一个只包括 '('，')'，'{'，'}'，'['，']' 的字符串，判断字符串是否有效。
+
+有效字符串需满足：
+
+左括号必须用相同类型的右括号闭合。
+左括号必须以正确的顺序闭合。
+注意空字符串可被认为是有效字符串。
+
+示例 1:
+
+输入: "()"
+输出: true
+示例 2:
+
+输入: "()[]{}"
+输出: true
+示例 3:
+
+输入: "(]"
+输出: false
+示例 4:
+
+输入: "([)]"
+输出: false
+示例 5:
+
+输入: "{[]}"
+输出: true
+
+思路：用栈，第一个元素先进栈，之后依次遍历后面的元素
+为前括号直接进栈，为后括号就判断栈顶元素是否与其对应，对应栈顶元素就出栈，不对应就false
+最后判断栈是都为空即可
+
+我的提交执行用时
+已经战胜 100.00 % 的 cpp 提交记录
+
+上代码：
+class Solution {
+public:
+    bool isValid(string s) {
+        if(s.size() == 0) {
+            return true;
+        }
+        stack<char> c;
+        if(s.at(0)=='{') {
+            c.push('{');
+        }
+        else if(s.at(0)=='[') {
+            c.push('[');
+        }
+        else if(s.at(0)=='(') {
+            c.push('(');
+        }
+        else {
+            return false;
+        }
+        for(int i = 1; i < s.size(); i++) {
+            if(s.at(i)=='{') {
+                c.push('{');
+            }
+            else if(s.at(i)=='[') {
+                c.push('[');
+            }
+            else if(s.at(i)=='(') {
+                c.push('(');
+            }
+            else if(c.size() > 0) {
+                if(s.at(i)=='}') {
+                    if(c.top() == '{') {
+                        c.pop();
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                if(s.at(i)==']') {
+                    if(c.top() == '[') {
+                        c.pop();
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                if(s.at(i)==')') {
+                    if(c.top() == '(') {
+                        c.pop();
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
+            else {
+                return false;   
+            }
+        }
+        if(c.empty()) {
+            return true;
+        }
+        return false;
+    }
+};

@@ -1,0 +1,76 @@
+题目难度：EASY
+
+给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。
+
+如果你最多只允许完成一笔交易（即买入和卖出一支股票），设计一个算法来计算你所能获取的最大利润。
+
+注意你不能在买入股票前卖出股票。
+
+示例 1:
+
+输入: [7,1,5,3,6,4]
+输出: 5
+解释: 在第 2 天（股票价格 = 1）的时候买入，在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。
+     注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格。
+示例 2:
+
+输入: [7,6,4,3,1]
+输出: 0
+解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。
+
+个人思路 ：两两比较去最大值返回即可，然而太慢了。。。
+
+执行用时 : 1300 ms, 在Best Time to Buy and Sell Stock的C++提交中击败了10.63% 的用户
+内存消耗 : 9.5 MB, 在Best Time to Buy and Sell Stock的C++提交中击败了48.69% 的用户
+
+上代码：class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int aim = 0;
+        int sum = 0;
+        if(prices.size()==0) {
+            return 0;
+        }
+        if(prices.size()==1) {
+            return 0;
+        }
+        for(int i=0; i<prices.size() - 1; i++) {
+            for(int j=i+1; j<prices.size(); j++) {
+                aim = prices[j] - prices[i];
+                if(aim>sum) {
+                    sum = aim;
+                }
+            }
+        }
+        if(sum < 0) {
+            return 0;
+        }
+        return sum;
+    }
+};
+
+标准答案思路：一次循环，每次记录前面的最小值和利润的最大值，最后返回即可
+（不过内存比我高了一点点233）
+
+执行用时 : 8 ms, 在Best Time to Buy and Sell Stock的C++提交中击败了97.89% 的用户
+内存消耗 : 9.5 MB, 在Best Time to Buy and Sell Stock的C++提交中击败了37.14% 的用户
+
+代码：
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        if(prices.size()<=1) {
+            return 0;
+        }
+        int minp = prices[0];
+        int profit =  prices[1] - prices[0];
+        for(int i=2; i<prices.size(); i++) {
+            minp = min(prices[i-1], minp);
+            profit = max(profit, prices[i] - minp);
+        }
+        if(profit < 0) {
+            return 0;
+        }
+        return profit;
+    }
+};

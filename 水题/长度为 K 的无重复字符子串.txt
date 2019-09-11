@@ -1,0 +1,50 @@
+题目难度：MEDIUM
+
+给你一个字符串 S，找出所有长度为 K 且不含重复字符的子串，请你返回全部满足要求的子串的 数目。
+
+ 
+
+示例 1：
+
+输入：S = "havefunonleetcode", K = 5
+输出：6
+解释：
+这里有 6 个满足题意的子串，分别是：'havef','avefu','vefun','efuno','etcod','tcode'。
+示例 2：
+
+输入：S = "home", K = 5
+输出：0
+解释：
+注意：K 可能会大于 S 的长度。在这种情况下，就无法找到任何长度为 K 的子串。
+
+思路：从头开始遍历字符串，对从遍历字符串的指针开始，分别对其加K个字符长度内各个字符作比较
+若果有重复字符就退出内循环，累加 1，直到结束输出字符串-累加值+1即可
+注意：S.size()<K，返回0
+
+上代码：
+class Solution {
+public:
+    int numKLenSubstrNoRepeats(string S, int K) {
+        if(K > S.size()) {
+            return 0;
+        }
+        int sum = 0;
+        bool flag = true;
+        int num = S.size() - K;
+        for(int i = 0; i < S.size() - K + 1; i++) {
+            for(int j = i; j < i + K - 1; j++) {
+                for(int k = j + 1; k < i + K; k++) {
+                    //printf("%c",S.at(j));
+                    if(S.at(j) == S.at(k)) {
+                        printf("%c",S.at(j));
+                        sum++;
+                        flag = false;
+                        k = 10000;
+                        j = 10000;
+                    }
+                }
+            }
+        }
+        return num - sum + 1;
+    }
+};

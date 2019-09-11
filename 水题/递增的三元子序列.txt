@@ -1,0 +1,59 @@
+题目难度：MEDIUM
+
+给定一个未排序的数组，判断这个数组中是否存在长度为 3 的递增子序列。
+
+数学表达式如下:
+
+如果存在这样的 i, j, k,  且满足 0 ≤ i < j < k ≤ n-1，
+使得 arr[i] < arr[j] < arr[k] ，返回 true ; 否则返回 false 。
+说明: 要求算法的时间复杂度为 O(n)，空间复杂度为 O(1) 。
+
+示例 1:
+
+输入: [1,2,3,4,5]
+输出: true
+示例 2:
+
+输入: [5,4,3,2,1]
+输出: false
+
+思路：时间：O（N），空间O（1），原地，那么就一次遍历，先找相邻符合递增条件的一对，作为最大最小值
+之后入局哦没用找到比最大值大的，反而找到新的符合条件的一对数，就判断是否更新最大最小值
+之后直至遍历结束返回合理结果即可
+
+执行用时 :
+8 ms
+, 在所有 C++ 提交中击败了
+94.44%
+的用户
+内存消耗 :
+8.9 MB
+, 在所有 C++ 提交中击败了
+84.99%
+的用户
+
+上代码：
+class Solution {
+public:
+    bool increasingTriplet(vector<int>& nums) {
+        if(nums.size() < 3) {
+            return false;
+        }
+        int sum = 0;
+        int mina = 2147483647;
+        int maxa = 2147483647;
+        for(int i = 1; i < nums.size(); i++) {
+            if(nums[i] > maxa) {
+                return true;
+            }
+            if(nums[i] > nums[i-1]) {
+                mina = min(nums[i-1],mina);
+                maxa = min(nums[i],maxa);
+            }
+            else if(nums[i] < maxa && nums[i] > mina) {
+                maxa = nums[i];
+            }
+        }
+        return false;
+    }
+};

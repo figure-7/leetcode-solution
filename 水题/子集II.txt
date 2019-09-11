@@ -1,0 +1,105 @@
+题目难度：MEDIUM
+
+给定一个可能包含重复元素的整数数组 nums，返回该数组所有可能的子集（幂集）。
+
+说明：解集不能包含重复的子集。
+
+示例:
+输入: [1,2,2]
+输出:
+[
+  [2],
+  [1],
+  [1,2,2],
+  [2,2],
+  [1,2],
+  []
+]
+
+思路：还是回溯算法+DFS，注意去重复时需要排序，
+再将重复的项删除即可（vector删除这里弄了很久，具体做法可以看文档集通用操作里的对应文档）
+
+执行用时 :
+68 ms
+, 在所有C++提交中击败了
+6.78%
+的用户
+内存消耗 :
+10.1 MB
+, 在所有C++提交中击败了
+26.31%
+的用户
+（真·惨不忍睹）
+
+上代码：
+class Solution {
+public:
+    vector<vector<int>> subsetsWithDup(vector<int>& nums) {
+        vector<vector<int>> tmp;
+        if(nums.size()==0) {
+            return tmp;
+        }
+        int size = nums.size();
+        vector<int> cur;
+        DFS(tmp,cur,nums,size,0);
+        sort(tmp.begin(), tmp.end());
+        for(int i = 0; i < tmp.size()-1; i++) {
+            if(tmp[i] == tmp[i+1]) {
+                vector<vector<int>>::iterator it = tmp.begin()+i;
+                tmp.erase(it);
+                i--;
+            }
+        }
+        return tmp;
+    }
+    void DFS(vector<vector<int>>& ret, vector<int> curr, vector<int>& nums, int n, int level) {
+        sort(curr.begin(), curr.end());
+        ret.push_back(curr);
+        for(int i = level; i < n; i++) {
+            curr.push_back(nums[i]);
+            DFS(ret,curr,nums,n,i+1);
+            curr.pop_back();
+        }
+    }
+};
+
+还有一种更好的解法，思路同上，但是去重复的时候比较简单，
+（反正没太弄懂.....菜）代码如下：
+
+执行用时 :
+20 ms
+, 在所有C++提交中击败了
+61.50%
+的用户
+内存消耗 :
+9.6 MB
+, 在所有C++提交中击败了
+40.94%
+的用户
+
+上代码：
+class Solution {
+public:
+    vector<vector<int>> subsetsWithDup(vector<int>& nums) {
+        vector<vector<int>> tmp;
+        if(nums.size()==0) {
+            return tmp;
+        }
+        sort(nums.begin(), nums.end());
+        int size = nums.size();
+        vector<int> cur;
+        DFS(tmp,cur,nums,size,0);
+        return tmp;
+    }
+    void DFS(vector<vector<int>>& ret, vector<int> curr, vector<int>& nums, int n, int level) {
+        ret.push_back(curr);
+        for(int i = level; i < n; i++) {
+            curr.push_back(nums[i]);
+            DFS(ret,curr,nums,n,i+1);
+            curr.pop_back();
+            while(i < n - 1 && nums[i] == nums[i + 1]) {
+                i++;
+            }
+        }
+    }
+};

@@ -1,0 +1,49 @@
+题目难度：EASY
+
+给定一个大小为 n 的数组，找到其中的众数。众数是指在数组中出现次数大于 ? n/2 ? 的元素。
+
+你可以假设数组是非空的，并且给定的数组总是存在众数。
+
+示例 1:
+
+输入: [3,2,3]
+输出: 3
+示例 2:
+
+输入: [2,2,1,1,1,2,2]
+输出: 2
+
+思路：先排序，依次查找即可
+
+执行用时 :
+60 ms
+, 在所有 C++ 提交中击败了
+10.26%
+的用户
+内存消耗 :
+11 MB
+, 在所有 C++ 提交中击败了
+83.58%
+的用户
+
+上代码：
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        if(nums.size() == 1) {
+            return nums[0];
+        }
+        int n = nums.size();
+        int sum = 1;
+        sort(nums.begin(), nums.end());
+        for(int i = 0; i < nums.size(); i++) {
+            if(nums[i] == nums[i+1]) {
+                sum++;
+            }
+            if(sum > n/2) {
+                return nums[i];
+            }
+        }
+        return 0;
+    }
+};

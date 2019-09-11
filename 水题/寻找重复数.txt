@@ -1,0 +1,77 @@
+题目难度：MEDIUM
+
+思路：依照题意，不改数组就不能排序了，空间O(1)，不能使用哈希表，时间O(N^2)很充足，即两次遍历，所以简单思路两次遍历直接比较即可 
+效率是真TM低，见下面
+
+执行用时 :
+820 ms
+, 在所有 C++ 提交中击败了
+6.41%
+的用户
+内存消耗 :
+9.8 MB
+, 在所有 C++ 提交中击败了
+60.13%
+的用户
+
+上代码：
+class Solution {
+public:
+    int findDuplicate(vector<int>& nums) {
+        for(int i = 0; i < nums.size()-1; i++) {
+            for(int j = i+1; j < nums.size(); j++) {
+                if(nums[i] == nums[j]) {
+                    return nums[j];
+                }
+            }
+        }
+        return -1;
+    }
+};
+
+好思路：看到题解区大佬解答，二分法（根据题意对数组的值进行二分，不是下标，如下）
+这道题的关键是对要定位的“数”做二分，而不是对数组的索引做二分。
+要定位的“数”根据题意在 11 和 nn 之间，每一次二分都可以将搜索区间缩小一半。
+
+
+以 [1, 2, 2, 3, 4, 5, 6, 7] 为例，一共有 88 个数，每个数都在 11 和 77 之间。
+11 和 77 的中位数是 44，遍历整个数组，统计小于 44 的整数的个数，至多应该为 33 个，如果超过 33 个就说明重复的数存在于区间 [1,4)[1,4) （注意：左闭右开）中；
+否则，重复的数存在于区间 [4,7][4,7]（注意：左右都是闭）中。
+这里小于 44 的整数有 44 个（它们是 1, 2, 2, 3），因此砍掉右半区间，连中位数也砍掉。
+以此类推，最后区间越来越小，直到变成 11 个整数，这个整数就是我们要找的重复的数。
+
+执行用时 :
+20 ms
+, 在所有 C++ 提交中击败了
+48.54%
+的用户
+内存消耗 :
+9.7 MB
+, 在所有 C++ 提交中击败了
+79.11%
+的用户
+
+上代码：
+class Solution {
+public:
+    int findDuplicate(vector<int>& nums) {
+        int len = nums.size();
+        int left = 1;
+        int right = len - 1;
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            int counter = 0;
+            for (int num : nums) {
+                if (num <= mid) {
+                    counter += 1;
+                }
+            }
+            if (counter > mid) {
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return left;
+    }
+};

@@ -1,0 +1,75 @@
+题目难度：EASY
+
+两个整数之间的汉明距离指的是这两个数字对应二进制位不同的位置的数目。
+
+给出两个整数 x 和 y，计算它们之间的汉明距离。
+
+注意：
+0 ≤ x, y < 231.
+
+示例:
+
+输入: x = 1, y = 4
+
+输出: 2
+
+解释:
+1   (0 0 0 1)
+4   (0 1 0 0)
+       ↑   ↑
+
+上面的箭头指出了对应二进制位不同的位置。
+
+思路：先把两个数转化为二进制形式，然后进行从后向前按位遍历即可。
+
+我的提交执行用时
+已经战胜 93.02 % 的 cpp 提交记录
+
+上代码：
+class Solution {
+public:
+    int hammingDistance(int x, int y) {
+        uint32_t a = x;
+        uint32_t b = y;
+        int i = 0;
+        while(a>0 && b>0) {
+            if(a%2==0 && b%2!=0) {
+                i++;
+            }
+            if(a%2!=0 && b%2==0) {
+                i++;
+            }
+            a >>= 1;
+            b >>= 1;
+        }
+        while(a > 0) {
+            if(a&1) {
+                i++;
+            }
+            a >>= 1;
+        }
+        while(b > 0) {
+            if(b&1) {
+                i++;
+            }
+            b >>= 1;
+        }
+        return i;
+    }
+};
+
+优化版：
+
+class Solution {
+public:
+    int hammingDistance(int x, int y) {
+        int t = x ^ y;
+        int counts = 0;
+        
+        while (t != 0) {
+            ++counts;
+            t = t & (t - 1);
+        }
+        return counts;
+    }
+};

@@ -1,0 +1,105 @@
+题目难度：MEDIUM
+
+我们从一块字母板上的位置 (0, 0) 出发，该坐标对应的字符为 board[0][0]。
+
+在本题里，字母板为board = ["abcde", "fghij", "klmno", "pqrst", "uvwxy", "z"].
+
+我们可以按下面的指令规则行动：
+
+如果方格存在，'U' 意味着将我们的位置上移一行；
+如果方格存在，'D' 意味着将我们的位置下移一行；
+如果方格存在，'L' 意味着将我们的位置左移一列；
+如果方格存在，'R' 意味着将我们的位置右移一列；
+'!' 会把在我们当前位置 (r, c) 的字符 board[r][c] 添加到答案中。
+返回指令序列，用最小的行动次数让答案和目标 target 相同。你可以返回任何达成目标的路径。
+
+ 
+
+示例 1：
+
+输入：target = "leet"
+输出："DDR!UURRR!!DDD!"
+示例 2：
+
+输入：target = "code"
+输出："RR!DDRR!UUL!R!"
+ 
+
+提示：
+
+1 <= target.length <= 100
+target 仅含有小写英文字母。
+
+思路：这题因为是每个字母在board中都出现且仅出现一次，所以最小的行动次数就是找位置就完了，不是贪心也不是什么（干找）
+先将board设置好（这里居然让自己在题中再写一遍，没见过这样的......）
+之后就进行遍历board按次序查找target中的每个字符。找到了就记录一下跟上一个位置的坐标（初值为（0，0））的差，转换为字符表示
+然后出现了一个问题，当我们走到z时，会发现按顺序先下移时，z那行长度为一，不能够一直右移（D）（理论上越界）
+所以必须先减去一次右移（D），再把下移总数个（R）放入，之后补上一个右移（D），最后加上！，才是正确答案（贼抠脚，好在考虑过后实现了hhh）
+
+上代码：
+class Solution {
+public:
+    string alphabetBoardPath(string target) {
+        string s = "";
+        int a = 0;
+        int aim = 0;
+        int b = 0;
+        vector<string> board;
+        board.push_back("abcde");
+        board.push_back("fghij");
+        board.push_back("klmno");
+        board.push_back("pqrst");
+        board.push_back("uvwxy");
+        board.push_back("z");
+        for(int i = 0; i < target.length(); i++) {
+            for(int j = 0; j < board.size(); j++) {
+                for(int k = 0; k < board[j].length(); k++) {
+                    if(board[j].at(k) == target.at(i)) {
+                        if(j>a) {
+                            for(int q = a; q < j; q++) {
+                                s+='D';
+                            }
+                        }
+                        else {
+                            for(int q = j; q < a; q++) {
+                                s+='U';
+                            }
+                        }
+                        int len = s.length();
+                        if(target.at(i)=='z') {
+                            if(i==0) {
+                                s.erase(len-1,1);
+                                aim = 1;
+                            }
+                            else {
+                                if(target.at(i-1)!='z') {
+                                    s.erase(len-1,1);
+                                    aim = 1;
+                                }
+                            }
+                        }
+                        if(k>b) {
+                            for(int q = b; q < k; q++) {
+                                s+='R';
+                            }
+                        }
+                        else {
+                            for(int q = k; q < b; q++) {
+                                s+='L';
+                            }
+                        }
+                        if(aim==1) {
+                            s+='D';
+                            aim=0;
+                        }
+                        s+='!';
+                        a = j;
+                        b = k;
+                        break;
+                    }
+                }
+            }
+        }
+        return s;
+    }
+};

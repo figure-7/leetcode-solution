@@ -1,0 +1,95 @@
+题目难度：EASY
+
+给你一个按 YYYY-MM-DD 格式表示日期的字符串 date，请你计算并返回该日期是当年的第几天。
+
+通常情况下，我们认为 1 月 1 日是每年的第 1 天，1 月 2 日是每年的第 2 天，依此类推。每个月的天数与现行公元纪年法（格里高利历）一致。
+
+ 
+
+示例 1：
+
+输入：date = "2019-01-09"
+输出：9
+示例 2：
+
+输入：date = "2019-02-10"
+输出：41
+示例 3：
+
+输入：date = "2003-03-01"
+输出：60
+示例 4：
+
+输入：date = "2004-03-01"
+输出：61
+ 
+
+提示：
+
+date.length == 10
+date[4] == date[7] == '-'，其他的 date[i] 都是数字。
+date 表示的范围从 1900 年 1 月 1 日至 2019 年 12 月 31 日。
+
+思路：先看是否是闰年，然后累加即可，注意一下各种类型转换即可
+
+上代码：
+class Solution {
+public:
+    int ordinalOfDate(string date) {
+        string a = date.substr(0, 4);
+        printf("%s",&a);
+        string b = date.substr(5, 2);
+        string c = date.substr(8, 2);
+        stringstream sstra(a);
+        stringstream sstrb(b);
+        stringstream sstrc(c);
+        int year;
+        int month;
+        int day;
+        sstra >> year;
+        sstrb >> month;
+        sstrc >> day;
+        if(month==1) {
+            day = day;
+        }
+        else if(month==2){
+            day = day+31;
+        }
+        else if(month==3){
+            day = day+59;
+        }
+        else if(month==4){
+            day = day+90;
+        }
+        else if(month==5){
+            day = day+120;
+        }
+        else if(month==6){
+            day = day+151;
+        }
+        else if(month==7){
+            day = day+181;
+        }
+        else if(month==8){
+            day = day+212;
+        }
+        else if(month==9){
+            day = day+243;
+        }
+        else if(month==10){
+            day = day+273;
+        }
+        else if(month==11){
+            day = day+304;
+        }
+        else{
+            day = day+334;
+        }
+        if((year%100!=0&&year%4==0)||(year%400 == 0)) {
+            if(month>2) {
+                day++;
+            }
+        }
+        return day;
+    }
+};

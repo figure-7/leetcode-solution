@@ -1,0 +1,84 @@
+题目难度：HARD
+
+给定一个非负整数数组，你最初位于数组的第一个位置。
+
+
+数组中的每个元素代表你在该位置可以跳跃的最大长度。
+
+
+你的目标是使用最少的跳跃次数到达数组的最后一个位置。
+
+
+
+输入: [2,3,1,1,4]
+
+
+输出: 2
+
+
+解释: 跳到最后一个位置的最小跳跃数是 2。
+?    
+	从下标为 0 跳到下标为 1 的位置，跳?1?步，然后跳?3?步到达数组的最后一个位置。
+
+
+说明:
+
+假设你总是可以到达数组的最后一个位置。
+
+思路：贪心，先取最佳的值，在其所能触及的后面连续几个下标对应值中找出最佳值（最大值），然后更新初值
+	中间还要在设置一个变量resex进行最大值的更替，res用来保存结果，下标同时也要更新start，
+	作为接下来开始的位置，同时付给i，否则会重复判断，最后再开始进行对最大值与剩余数组长度的判断即可
+PS：人生中第一道通过的HARD,执行用时内存效率也很高，纪念！！！
+
+执行用时 :
+16 ms
+, 在所有C++提交中击败了
+85.67%
+的用户
+内存消耗 :
+10 MB
+, 在所有C++提交中击败了
+92.62%
+的用户
+
+上代码：
+class Solution {
+public:
+    int jump(vector<int>& nums) {
+        int sum = 1;
+        int start = 0;
+        int aim = nums[0];
+        int si = 0;
+        if(nums.size() == 0) {
+            return 1;
+        }
+        if(nums.size() == 1) {
+            return 0;
+        }
+        int res = nums[0];
+        int resex = nums[0];
+        for(int i = 0; i < nums.size() - 1; i++) {
+            if(aim >= nums.size() - i - 1) {     //判断是否走完
+                return sum;
+            }
+            for(int j = start; j < aim+start; j++) {
+                if(resex <= nums[j+1]) {
+                    si = j+1;                   //记录最大下标
+                    if(j==start && nums[j] > nums[j+1]) {
+                    }
+                    else{
+                        resex = nums[j+1];
+                        res = max(nums[j]-1, nums[j+1]);
+                    }
+                }
+                resex--;
+            }
+            start = si;
+            i = si-1;                           //下一次开始的下标
+            aim = res;
+            resex = res;
+            sum++;
+        }
+        return sum;
+    }
+};

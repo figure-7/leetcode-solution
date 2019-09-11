@@ -1,0 +1,41 @@
+题目难度：MIDIUM
+题目要求如题
+递归没啥说的只接代码，水。。。。
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> preorderTraversal(TreeNode* root) {
+        vector<int> stack;
+        if(root==NULL) {
+            return stack;
+        }
+        Traversal(root,stack);
+        return stack;
+    }
+    void Traversal(TreeNode* node, vector<int>& stackex) {
+        if(node->left && node->right) {
+            stackex.push_back(node->val);
+            Traversal(node->left, stackex);
+            Traversal(node->right,stackex);
+        }
+        else if(node->left) {
+            stackex.push_back(node->val);
+            Traversal(node->left, stackex);
+        }
+        else if(node->right) {
+            stackex.push_back(node->val);
+            Traversal(node->right,stackex);
+        }
+        else{
+            stackex.push_back(node->val);
+        }
+    }
+};

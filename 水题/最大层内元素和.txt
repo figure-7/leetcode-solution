@@ -1,0 +1,66 @@
+题目难度：MEDIUM
+
+给你一个二叉树的根节点 root。设根节点位于二叉树的第 1 层，而根节点的子节点位于第 2 层，依此类推。
+
+请你找出层内元素之和 最大 的那几层（可能只有一层）的层号，并返回其中 最小 的那个。
+
+ 
+
+示例：
+
+
+
+输入：[1,7,0,7,-8,null,null]
+输出：2
+解释：
+第 1 层各元素之和为 1，
+第 2 层各元素之和为 7 + 0 = 7，
+第 3 层各元素之和为 7 + -8 = -1，
+所以我们返回第 2 层的层号，它的层内元素之和最大。
+ 
+
+提示：
+
+树中的节点数介于 1 和 10^4 之间
+-10^5 <= node.val <= 10^5
+
+思路：很简单的一题，直接遍历并且记录层数
+把层数对应下标的数组值累加上该节点的值，最后取最大值即可
+这题出了点小问题，执行结果都对，提交结果就不对了，应该是存在数组命名冲突
+把数组取消，另外一个设为全局就OK了
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+    int curr[50000];
+public:
+    int maxLevelSum(TreeNode* root) {
+        int resul=0;
+        int da=-10000000;
+        DFS(0,root);
+        for(int i=0; i < 10000; i++) {
+            if(curr[i] > da) {
+                da = max(curr[i], resul);
+                resul = i;
+                printf("%d\n",resul);
+            }
+        }
+        return resul+1;
+    }
+    void DFS(int level, TreeNode* root) {
+        if(root==NULL) {
+            return;
+        }
+        curr[level]+=root->val;
+        DFS(level+1,root->left);
+        DFS(level+1,root->right);
+    }
+};

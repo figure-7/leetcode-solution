@@ -1,0 +1,61 @@
+题目难度：EASY
+
+给你一个字符串 S，返回只含 单一字母 的子串个数。
+
+示例 1：
+
+输入： "aaaba"
+输出： 8
+解释： 
+只含单一字母的子串分别是 "aaa"， "aa"， "a"， "b"。
+"aaa" 出现 1 次。
+"aa" 出现 2 次。
+"a" 出现 4 次。
+"b" 出现 1 次。
+所以答案是 1 + 2 + 4 + 1 = 8。
+示例 2:
+
+输入： "aaaaaaaaaa"
+输出： 55
+ 
+
+提示：
+
+1 <= S.length <= 1000
+S[i] 仅由小写英文字母组成。
+
+思路：先找连续相同字符，然后用阶乘方式求（阶加）：（不知道怎么说）
+注意到最后要进行越界判断以及是否存在结尾连续判断，然后（阶加）
+
+上代码：
+class Solution {
+public:
+    int res = 0;
+    int countLetters(string S) {
+        int r = 1;
+        for(int i = 0; i < S.length() - 1; i++) {
+            if(S.at(i) == S.at(i+1)) {
+                r++;
+            }
+            else {
+                int curr=0;
+                for(int j = 1; j <= r; j++) {
+                    curr = curr+j; 
+                }
+                res+=curr;
+                r = 1;
+            }
+            if(i == S.length()-2 && r > 1) {
+                int curr=1;
+                for(int j = 1; j <= r; j++) {
+                    curr = curr+j; 
+                }
+                res+=curr;
+                r = 1;
+                res -= 2;
+            }
+        }
+        res++;
+        return res;
+    }
+};

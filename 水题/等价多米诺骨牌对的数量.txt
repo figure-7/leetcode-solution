@@ -1,0 +1,48 @@
+题目难度：EASY
+
+给你一个由一些多米诺骨牌组成的列表 dominoes。
+
+如果其中某一张多米诺骨牌可以通过旋转 0 度或 180 度得到另一张多米诺骨牌，我们就认为这两张牌是等价的。
+
+形式上，dominoes[i] = [a, b] 和 dominoes[j] = [c, d] 等价的前提是 a==c 且 b==d，或是 a==d 且 b==c。
+
+在 0 <= i < j < dominoes.length 的前提下，找出满足 dominoes[i] 和 dominoes[j] 等价的骨牌对 (i, j) 的数量。
+
+ 
+
+示例：
+
+输入：dominoes = [[1,2],[2,1],[3,4],[5,6]]
+输出：1
+ 
+
+提示：
+
+1 <= dominoes.length <= 40000
+1 <= dominoes[i][j] <= 9
+
+思路：第一次正常二重遍历，超时不解释......
+后来思考了下，改变了算法，利用先将数组进行排序，再进行比较可以实现一次遍历。（就是括号问题搞了半天，我真的是服。。）
+
+上代码：
+class Solution {
+public:
+    int numEquivDominoPairs(vector<vector<int>>& dominoes) {
+        int aim = 0;
+        int sum = 0;
+        for(int i = 0; i < dominoes.size(); i++) {
+            sort(dominoes[i].begin(), dominoes[i].end());
+        }
+        sort(dominoes.begin(), dominoes.end());
+        for(int i = 0; i < dominoes.size()-1; i++) {
+            if(dominoes[i] == dominoes[i+1]) {
+                aim++;
+                sum+= aim;
+            }
+            else {
+                aim = 0;
+            }
+        }
+        return sum;
+    }
+};

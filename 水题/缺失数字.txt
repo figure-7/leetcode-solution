@@ -1,0 +1,32 @@
+题目难度：easy
+给定一个包含 0, 1, 2, ..., n 中 n 个数的序列，找出 0 .. n 中没有出现在序列中的那个数。
+
+示例 1:
+
+输入: [3,0,1]
+输出: 2
+示例 2:
+
+输入: [9,6,4,2,3,5,7,0,1]
+输出: 8
+说明:
+你的算法应具有线性时间复杂度（N*O(N)）。你能否仅使用额外常数空间来实现?
+算法：把数组中的数全加起来，再把N以内所有数加起来，
+差值即为所缺元素。
+上代码：
+class Solution {
+public:
+    int missingNumber(vector<int>& nums) {
+        int sum = 0;
+        int aim = 0;
+        int n = nums.size();
+        for(int i=0; i<=n-1; ++i) {
+            sum+=nums[i]; 
+        }
+        for(int j=1; j<=n; ++j) {
+            aim += j;
+        }
+        return aim - sum;
+    }
+};
+算法分析：时间复杂度O(N),空间复杂度O(1)

@@ -1,0 +1,51 @@
+题目难度：EASY
+
+给定一个非负整数 numRows，生成杨辉三角的前 numRows 行。
+
+
+
+在杨辉三角中，每个数是它左上方和右上方的数的和。
+
+示例:
+
+输入: 5
+输出:
+[
+     [1],
+    [1,1],
+   [1,2,1],
+  [1,3,3,1],
+ [1,4,6,4,1]
+]
+
+思路：先将三角形边界上的值全部赋值为1
+然后用dp公式:dp[i][j] = dp[i-1][j] + dp[i-1][j-1]即可
+
+执行用时 : 8 ms, 在Pascal's Triangle的C++提交中击败了90.47% 的用户
+内存消耗 : 8.8 MB, 在Pascal's Triangle的C++提交中击败了13.95% 的用户
+（中途因为vector的内存空间需自己设置的原因耽误了一定时间，也就是说vector实现每行空间不一致的问题
+所以就又开辟了一个新的vector来保存结果，空间复杂度很高）
+
+上代码：
+class Solution {
+public:
+    vector<vector<int>> generate(int numRows) {
+        vector<vector<int>> tri(numRows, vector<int>(numRows));
+        for(int i = 0; i < numRows; i++) {
+            tri[i][i] = 1;
+            tri[i][0] = 1;
+        }
+        for(int j = 2; j < numRows; j++) {
+            for(int k = 1; k < j; k++) {
+                tri[j][k] = tri[j-1][k] + tri[j-1][k-1];
+            }
+        }
+        vector<vector<int>> triangle(numRows);
+        for(int k = 0; k < numRows; k++) {
+            for(int a = 0; a < k + 1; a++) {
+                triangle[k].push_back(tri[k][a]);
+            }
+        }
+        return triangle;
+    }
+};

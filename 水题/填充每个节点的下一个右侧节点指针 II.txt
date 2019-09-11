@@ -1,0 +1,140 @@
+题目难度：MEDIUM
+（UNLOCK）
+给定一个二叉树
+
+struct Node {
+  int val;
+  Node *left;
+  Node *right;
+  Node *next;
+}
+填充它的每个 next 指针，让这个指针指向其下一个右侧节点。如果找不到下一个右侧节点，则将 next 指针设置为 NULL。
+
+初始状态下，所有 next 指针都被设置为 NULL。
+
+ 
+
+示例：
+
+
+
+输入：{"$id":"1","left":{"$id":"2","left":{"$id":"3","left":null,"next":null,"right":null,"val":4},"next":null,"right":{"$id":"4","left":null,"next":null,"right":null,"val":5},"val":2},"next":null,"right":{"$id":"5","left":null,"next":null,"right":{"$id":"6","left":null,"next":null,"right":null,"val":7},"val":3},"val":1}
+
+输出：{"$id":"1","left":{"$id":"2","left":{"$id":"3","left":null,"next":{"$id":"4","left":null,"next":{"$id":"5","left":null,"next":null,"right":null,"val":7},"right":null,"val":5},"right":null,"val":4},"next":{"$id":"6","left":null,"next":null,"right":{"$ref":"5"},"val":3},"right":{"$ref":"4"},"val":2},"next":null,"right":{"$ref":"6"},"val":1}
+
+解释：给定二叉树如图 A 所示，你的函数应该填充它的每个 next 指针，以指向其下一个右侧节点，如图 B 所示。
+ 
+
+提示：
+
+你只能使用常量级额外空间。
+使用递归解题也符合要求，本题中递归程序占用的栈空间不算做额外的空间复杂度。
+
+思路：需要设三个节点，first记录每行的第一个节点，pre记录该行连接到的最新节点，p负责遍历上一行的所有节点（最初为根节点）
+先遍历p节点的情况，若有子节点就把子节点的最右边那个给pre，如果没有子节点就看是否有next节点（遍历这一行的的所有节点），
+如果有next节点就再继续判断，更新pre的位置，直至该行遍历结束，
+结束就把first给p，转到下一行继续遍历，
+若果没有下一行了，就直接结束。
+
+用时接近两小半时，无数次改BUG，终于成功了！！！！！而且
+执行用时 : 592 ms, 在Populating Next Right Pointers in Each Node II的C++提交中击败了93.96% 的用户
+内存消耗 : 66.6 MB, 在Populating Next Right Pointers in Each Node II的C++提交中击败了84.39% 的用户
+没什么能说的：就是NB！！
+
+有请代码参上！！！！（自创）：
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    Node* left;
+    Node* right;
+    Node* next;
+
+    Node() {}
+
+    Node(int _val, Node* _left, Node* _right, Node* _next) {
+        val = _val;
+        left = _left;
+        right = _right;
+        next = _next;
+    }
+};
+*/
+class Solution {
+public:
+    Node* connect(Node* root) {
+        if(!root) {
+            return NULL;
+        }
+        Node* p = root;         //移动靶
+        Node* first = NULL;     //记录每行的第一个节点
+        Node* pre = NULL;       //移动靶2
+        while(p) {
+            if(!first) {
+                int i=0;            //记录是否算完
+                while(p && i!=2) {
+                    if(p->left) {
+                        first = p->left;
+                        i = 2;
+                    }
+                    else if(p->right) {
+                        first = p->right;
+                        i = 2;
+                    }
+                    else {
+                        p = p->next;
+                    }
+                }
+                if(i==0) {
+                    break;
+                }
+                else {
+                    i = 0;
+                }
+            }
+            if(p->left && p->right) {
+                p->left->next = p->right;   //一个父亲的左右节点用next连接
+                pre = p->right;
+            }
+            else if(p->left) {
+                pre = p->left;              //移动靶2指向一行最新的节点
+            }
+            else if(p->right) {
+                pre = p->right;
+            }
+            else {
+                pre = pre;
+            }
+            if(p->next) {
+                if(p->next->left && p->next->right) {
+                    pre->next = p->next->left;//一行的非相同父亲节点用next连接
+                    pre = p->next->left;            //移动靶2指向一行最新的节点
+                    pre->next = p->next->right;//一行的非相同父亲节点用next连接
+                    pre = p->next->right;           //移动靶2指向一行最新的节点
+                    p = p->next;                    //移动靶指向该节点的next节点
+                }
+                else if(p->next->left) {
+                    pre->next = p->next->left;//一行的非相同父亲节点用next连接
+                    pre = p->next->left;            //移动靶2指向一行最新的节点
+                    p = p->next;                    //移动靶指向该节点的next节点
+                }
+                else if(p->next->right) {
+                    pre->next = p->next->right;//一行的非相同父亲节点用next连接
+                    pre = p->next->right;           //移动靶2指向一行最新的节点
+                    p = p->next;                    //移动靶指向该节点的next节点
+                }
+                else {
+                    p = p->next;                    //移动靶指向该节点的next节点
+                }
+                continue;                       //继续上述while循环里的操作
+            }
+            else {
+                p = first;                     //移动靶指向下一行的首个节点
+                first = NULL;
+                pre = NULL;
+            }
+        }
+        return root;
+    }
+};

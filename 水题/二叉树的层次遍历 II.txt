@@ -1,0 +1,115 @@
+题目难度：EASY
+给定一个二叉树，返回其节点值自底向上的层次遍历。 （即按从叶子节点所在层到根节点所在的层，逐层从左向右遍历）
+
+例如：
+给定二叉树 [3,9,20,null,null,15,7],
+
+    3
+   / \
+  9  20
+    /  \
+   15   7
+返回其自底向上的层次遍历为：
+
+[
+  [15,7],
+  [9,20],
+  [3]
+]
+算法：直接仿照层次遍历1里的代码，
+另外设一个二维数组，
+按反向输出原数组即可，
+（不能识别两个二维数组间用一个地址的转换，，，）
+代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    int num=0;
+    vector<vector<int>> levelOrderBottom(TreeNode* root) {
+        vector<vector<int>> a;
+        if(!root) {
+            return a;
+        }
+        traval(root,1);
+        vector<vector<int>> m(num);
+        vector<vector<int>> res;
+        getsolution(m,root,0);
+        for(int i=m.size()-1; i>=0; i--) {
+            res.push_back(m[i]);
+        }
+        return res;
+    }
+    void getsolution(vector<vector<int>>& ret, TreeNode* root, int level) {
+        if(root == NULL) {
+            return ;
+        }
+        ret[level].push_back(root->val);
+        getsolution(ret,root->left,level+1);
+        getsolution(ret,root->right,level+1);
+    }
+    void traval(TreeNode *node, int level) {
+        if(node->left) {
+            traval(node->left,level+1);
+        }
+        if(node->right) {               //注意这里不能用else判断，因为递归
+            traval(node->right,level+1);//不能被全部执行
+        }
+        if(!node->left && !node->right) {
+            num = max(num,level);
+            return ;			//减少程序耗时
+        }
+    }
+};
+用DFS深度优先遍历时间空间上能够简化
+代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    int num=0;
+    vector<vector<int>> levelOrderBottom(TreeNode* root) {
+        vector<vector<int>> a;
+        if(!root) {
+            return a;
+        }
+        traval(root,1);
+        vector<vector<int>> m(num);
+        DFS(m,root,num-1);
+        return m;
+    }
+    void DFS(vector<vector<int>>& ret, TreeNode* root, int level) {
+        if(root == NULL) {
+            return ;
+        }
+        ret[level].push_back(root->val);
+        DFS(ret,root->left,level-1);
+        DFS(ret,root->right,level-1);
+    }
+    void traval(TreeNode *node, int level) {
+        if(node->left) {
+            traval(node->left,level+1);
+        }
+        if(node->right) {               //注意这里不能用else判断，因为递归
+            traval(node->right,level+1);//不能被全部执行
+        }
+        if(!node->left && !node->right) {
+            num = max(num,level);
+            return ;			//减少程序耗时
+        }
+    }
+};

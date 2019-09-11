@@ -1,0 +1,162 @@
+题目难度：easy
+给定一个二叉树，判断它是否是高度平衡的二叉树。
+
+本题中，一棵高度平衡二叉树定义为：
+
+一个二叉树每个节点 的左右两个子树的高度差的绝对值不超过1。
+
+示例 1:
+
+给定二叉树 [3,9,20,null,null,15,7]
+
+    3
+   / \
+  9  20
+    /  \
+   15   7
+返回 true 。
+
+示例 2:
+
+给定二叉树 [1,2,2,3,3,null,null,4,4]
+
+       1
+      / \
+     2   2
+    / \
+   3   3
+  / \
+ 4   4
+返回 false 。
+简单递归代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    int level = 1;
+    int num = 0;
+    int i=0;
+    bool flag =true;
+    bool isBalanced(TreeNode* root) {
+        if(root==NULL) {
+            return true;
+        }
+        int isBalanced = getHeight(root);
+        if(isBalanced != -1)
+            return true;
+        else
+            return false;
+    }
+    int getHeight(TreeNode* root) {
+        if(root==NULL) {
+            return true;
+        }
+        int leftheight = getHeight(root->left);
+        if(leftheight == -1) {
+            return -1;
+        }
+        int rightheight = getHeight(root->right);
+        if(rightheight == -1) {
+            return -1;
+        }
+        int diffHeight = rightheight > leftheight?rightheight-leftheight:leftheight-rightheight;
+        if(diffHeight > 1)
+            return -1;
+        else
+            return diffHeight = (rightheight>leftheight?rightheight:leftheight)+1;
+    }
+};
+笨方法不解释，可以通过但是编译器有BUG。。。
+代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    int level = 1;
+    int num = 0;
+    int i=0;
+    bool flag =true;
+    bool isBalanced(TreeNode* root) {
+        if(root==NULL) {
+            return true;
+        }
+        if(root->left==NULL && root->right==NULL) {
+            return true;
+        }
+        bool as[10000];
+        isLike(root,as);
+        if(as[0]) {
+            return false;
+        }
+        return true;
+    }
+    void isLike(TreeNode* a,bool asd[10000]) {
+        int number=0;
+        if(a->left && a->right) {
+            traval(a->left, number);
+            int numbera = num;
+            num = 0;
+            traval(a->right, number);
+            int numberb = num;
+            num = 0;
+            int cha = numbera - numberb;
+            if(cha > 1) {
+                asd[i] = true;
+                i++;
+            }
+        }
+        else if(a->left) {
+            traval(a->left, number);
+            int numbera = num;
+            num = 0;
+            int cha = numbera;
+            if(cha > 1) {
+                asd[i] = true;
+                i++;
+            }
+        }
+        else if(a->right) {
+            traval(a->right, number);
+            int numberb = num;
+            num = 0;
+            int cha = numberb;
+            if(cha > 1) {
+                asd[i] = true;
+                i++;
+            }
+        }
+        else{
+        }
+        if(a->left) {
+            isLike(a->left,asd);
+        }
+        if(a->right) {
+            isLike(a->right,asd);
+        }
+    }
+    void traval(TreeNode *node, int level) {
+        if(node->left) {
+            traval(node->left,level+1);
+        }
+        if(node->right) {               //注意这里不能用else判断，因为递归
+            traval(node->right,level+1);//不能被全部执行
+        }
+        if(!node->left && !node->right){
+            num = max(num,level);
+        }
+    }
+};

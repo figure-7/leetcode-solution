@@ -1,0 +1,78 @@
+题目难度：MEDIUM
+
+给定一个大小为?n?的数组，找出其中所有出现超过?? n/3 ??次的元素。
+
+
+说明: 要求算法的时间复杂度为 O(n)，空间复杂度为 O(1)。
+
+
+示例?1:
+
+输入: [3,2,3]
+输出: [3]
+
+示例 2:
+
+输入: [1,1,1,3,3,2,2,2]
+输出: [1,2]
+
+
+
+思路：先排序，记录每个元素出现次数，
+如果次数大于N/3，就进数组，并且不让接下来的相同值进入（建立flag）
+注意两个数和一个数以及数组为空的情况即可
+
+执行用时 :
+20 ms
+, 在所有 C++ 提交中击败了
+81.62%
+的用户
+内存消耗 :
+10.7 MB
+, 在所有 C++ 提交中击败了
+8.72%
+的用户
+
+上代码：
+class Solution {
+public:
+    vector<int> majorityElement(vector<int>& nums) {
+        vector<int> res;
+        bool flag = true;
+        if(nums.size() == 0) {
+            return res;
+        }
+        if(nums.size() == 1) {
+            res.push_back(nums[0]);
+            return res;
+        }
+        if(nums.size() == 2) {
+            if(nums[0] == nums[1]) {
+                res.push_back(nums[0]);
+                return res;
+            }
+            else {
+                res.push_back(nums[0]);
+                res.push_back(nums[1]);
+                return res;
+            }
+        }
+        int n = nums.size();
+        int sum = 1;
+        sort(nums.begin(), nums.end());
+        for(int i = 0; i < nums.size()-1; i++) {
+            if(nums[i] == nums[i+1]) {
+                sum++;
+            }
+            else {
+                sum = 1;
+                flag = true;
+            }
+            if(flag && sum > n/3) {
+                res.push_back(nums[i]);
+                flag = false;
+            }
+        }
+        return res;
+    }
+};

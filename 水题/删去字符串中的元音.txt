@@ -1,0 +1,37 @@
+题目难度：EASY 
+
+给你一个字符串 S，请你删去其中的所有元音字母（ 'a'，'e'，'i'，'o'，'u'），并返回这个新字符串。
+
+ 
+
+示例 1：
+
+输入："leetcodeisacommunityforcoders"
+输出："ltcdscmmntyfrcdrs"
+示例 2：
+
+输入："aeiou"
+输出：""
+ 
+
+提示：
+
+S 仅由小写英文字母组成。
+1 <= S.length <= 1000
+
+思路：也没啥太好说的，就是先用at()函数对每个字符遍历做判断。
+然后调用erase()方法实现对于元音字符的删除即可
+
+上代码：
+class Solution {
+public:
+    string removeVowels(string S) {
+        for(int i = 0; i < S.length(); i++) {
+            if(S.at(i)=='a' || S.at(i)=='e' || S.at(i)=='i' || S.at(i)=='o' || S.at(i)=='u') {
+                S.erase(i,1);
+                i--;
+            }
+        }
+        return S;
+    }
+};
