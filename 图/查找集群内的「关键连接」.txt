@@ -1,0 +1,73 @@
+题目难度：HARD
+
+力扣数据中心有 n 台服务器，分别按从 0 到 n-1 的方式进行了编号。
+
+它们之间以「服务器到服务器」点对点的形式相互连接组成了一个内部集群，其中连接 connections 是无向的。
+
+从形式上讲，connections[i] = [a, b] 表示服务器 a 和 b 之间形成连接。任何服务器都可以直接或者间接地通过网络到达任何其他服务器。
+
+「关键连接」是在该集群中的重要连接，也就是说，假如我们将它移除，便会导致某些服务器无法访问其他服务器。
+
+请你以任意顺序返回该集群内的所有 「关键连接」。
+
+ 
+
+示例 1：
+
+
+
+输入：n = 4, connections = [[0,1],[1,2],[2,0],[1,3]]
+输出：[[1,3]]
+解释：[[3,1]] 也是正确的。
+ 
+
+提示：
+
+1 <= n <= 10^5
+n-1 <= connections.length <= 10^5
+connections[i][0] != connections[i][1]
+不存在重复的连接
+
+思路：应用targan算法（DFS），可以实现取得非强连通的各个节点，然后分别存到数组中即可。
+算法见通用操作文件夹targan算法
+
+上代码：
+class Solution {
+public:
+    vector<vector<int>> v;
+    vector<int> dfn, low;
+    int times;
+    vector<vector<int>> ret;
+    
+    void tarjan(int x, int p)
+    {
+        dfn[x] = low[x] = ++ times;
+        for (auto y : v[x])
+        {
+            if (y == p) continue;
+            if (!dfn[y])
+            {
+                tarjan(y, x);
+                low[x] = min(low[x], low[y]);
+                if (low[y] > dfn[x]) ret.push_back({x, y});
+            }
+            else
+                low[x] = min(low[x], dfn[y]);
+        }
+    }
+    
+    vector<vector<int>> criticalConnections(int n, vector<vector<int>>& connections) {
+        v = vector<vector<int>>(n);
+        dfn = low = vector<int>(n);
+        times = 0;
+        ret.clear();
+        for (auto e : connections)
+        {
+            v[e[0]].push_back(e[1]);
+            v[e[1]].push_back(e[0]);
+        }
+        for (int i = 0; i < n; ++ i)
+            if (!dfn[i]) tarjan(i, -1);
+        return ret;
+    }
+};
