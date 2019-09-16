@@ -1,0 +1,4 @@
+vector<string> v(1)；
+这个（1）就类似栈里的零标
+还是push_back(),和pop_bcak()放入取出
+back()获取栈顶元素
