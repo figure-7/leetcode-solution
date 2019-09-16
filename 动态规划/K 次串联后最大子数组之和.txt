@@ -1,0 +1,91 @@
+题目难度：MEDIUM
+
+给你一个整数数组 arr 和一个整数 k。
+
+首先，我们要对该数组进行修改，即把原数组 arr 重复 k 次。
+
+举个例子，如果 arr = [1, 2] 且 k = 3，那么修改后的数组就是 [1, 2, 1, 2, 1, 2]。
+
+然后，请你返回修改后的数组中的最大的子数组之和。
+
+注意，子数组长度可以是 0，在这种情况下它的总和也是 0。
+
+由于 结果可能会很大，所以需要 模（mod） 10^9 + 7 后再返回。 
+
+ 
+
+示例 1：
+
+输入：arr = [1,2], k = 3
+输出：9
+示例 2：
+
+输入：arr = [1,-2,1], k = 5
+输出：2
+示例 3：
+
+输入：arr = [-1,-2], k = 7
+输出：0
+ 
+
+提示：
+
+1 <= arr.length <= 10^5
+1 <= k <= 10^5
+-10^4 <= arr[i] <= 10^4
+
+这道题目和最大子序和非常相似，只需要在此基础上，寻找循环所触发的规律并进行总结，就可以顺利地解决这道题目。
+首先，我们考虑 k = 1 的情况，则只需保存之前子数组最大值，然后遍历数组中的元素时，判断之前子数组是否大于 0，如果大于 0 则加上当前元素。不断找到当前元素结尾的最大值，并更新最终结果。
+
+
+然后，我们考虑 k = 2 的情况，则可能出现一个新的最大值，这个最大值因为两个数组的拼接产生，即由第一个数组的后缀和第二个数组的前缀组合形成。
+此时，我们只需要计算数组的最大前缀和以及最大后缀和，二者相加，并和一个数组形成的最大值进行比较。
+
+
+进一步，我们考虑 k >= 2 的情况，则可能产生一个通过三个数组以上的拼接产生的最大值。
+
+
+假设数组的总和小于 0，则在三个数组以上拼接的情况下，因为中间的数组一定包含其中，所以可以把中间的每一个数组当做一个数字，由于数字小于 0，则会把整个数组和变小，这种情况肯定不是最大值。
+假设数组的总和大于 0，则在三个数组以上拼接的情况下，可以包含这些中间的数组，使得整体数组和变大，而中间数组的和是固定的，即 (k - 2) * sum，则剩下头和尾两数组，可以使用 k = 2 情况的方案进行相应的处理。
+
+上代码：（JAVA）
+public int kConcatenationMaxSum(int[] arr, int k) {
+    // 取模数字
+    int ck = (int)Math.pow(10, 9) + 7;
+    int len = arr.length;
+    // 计算单个数组的最大子序和
+    int ans = arr[0];
+    int cur = 0;
+    // maxPre 为最大前缀，maxSuf 为最大后缀
+    int maxPre = arr[0], maxSuf = arr[len - 1];
+    int pre = 0, suf = 0;
+    // 计算最大前缀和最大后缀，以及单数组最大子序和
+    for (int i = 0; i < len; i++) {
+        pre = (pre + arr[i]) % ck;
+        suf = (suf + arr[len - i - 1]) % ck;
+        cur = cur > 0 ? (cur + arr[i]) % ck : arr[i] % ck;
+        maxPre = Math.max(pre, maxPre);
+        maxSuf = Math.max(suf, maxSuf);
+        ans = Math.max(ans, cur);
+    }
+    // 根据题意，长度可以为 0，即结果为 0
+    maxPre = Math.max(0, maxPre);
+    maxSuf = Math.max(0, maxSuf);
+    ans = Math.max(0, ans);
+    
+    int sum = pre;
+    // k = 1，考虑单数组子序和
+    if (k == 1) {
+        return ans;
+    } else if (k == 2) {
+        return Math.max(ans, (maxPre + maxSuf) % ck);
+    } else {
+        if  (sum > 0) {
+            long ans2 = ((long)(k - 2) * sum % ck + maxPre + maxSuf) % ck;
+            return Math.max((int)ans2, ans);
+        } else {
+            return Math.max(ans, (maxPre + maxSuf) % ck);
+        }
+    }
+    
+}
