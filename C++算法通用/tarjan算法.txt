@@ -1,0 +1,26 @@
+
+算法详解见： https://www.cnblogs.com/shadowland/p/5872257.html
+
+ 1 void Tarjan ( int x ) {
+ 2          dfn[ x ] = ++dfs_num ;
+ 3          low[ x ] = dfs_num ;
+ 4          vis [ x ] = true ;//是否在栈中
+ 5          stack [ ++top ] = x ;
+ 6          for ( int i=head[ x ] ; i!=0 ; i=e[i].next ){
+ 7                   int temp = e[ i ].to ;
+ 8                   if ( !dfn[ temp ] ){
+ 9                            Tarjan ( temp ) ;
+10                            low[ x ] = gmin ( low[ x ] , low[ temp ] ) ;
+11                  }
+12                  else if ( vis[ temp ])low[ x ] = gmin ( low[ x ] , dfn[ temp ] ) ;
+13          }
+14          if ( dfn[ x ]==low[ x ] ) {//构成强连通分量
+15                   vis[ x ] = false ;
+16                   color[ x ] = ++col_num ;//染色
+17                   while ( stack[ top ] != x ) {//清空
+18                            color [stack[ top ]] = col_num ;
+19                            vis [ stack[ top-- ] ] = false ;
+20                  }
+21                  top -- ;
+22          }
+23 }

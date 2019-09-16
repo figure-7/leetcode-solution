@@ -1,0 +1,4 @@
+*max_element(aim.begin(), aim.end());
+取最大值
+*min_element(aim.begin(), aim.end());
+取最小值
