@@ -1,0 +1,77 @@
+题目难度：MEDIUM
+
+实现获取下一个排列的函数，算法需要将给定数字序列重新排列成字典序中下一个更大的排列。
+
+
+如果不存在下一个更大的排列，则将数字重新排列成最小的排列（即升序排列）。
+
+
+必须原地修改，只允许使用额外常数空间。
+
+
+
+以下是一些例子，输入位于左侧列，其相应输出位于右侧列。
+
+1,2,3 → 1,3,2
+
+3,2,1 → 1,2,3
+
+1,1,5 → 1,5,1
+
+
+执行用时 :
+20 ms
+, 在所有 C++ 提交中击败了
+28.03%
+的用户
+内存消耗 :
+8.7 MB
+, 在所有 C++ 提交中击败了
+78.10%
+的用户
+
+思路：从后向前遍历，找到第一个左边小于右边的值，记录该值下标，因为这个值位置一定会被交换
+然后从该值开始想右侧遍历，找到比他大并且差值最小的那个数，记录下标位置，即字典排序最小的交换到前面
+之后对在交换后左侧值后面的数进行范围排序即可
+
+上代码:
+class Solution {
+public:
+    int curr = 1000000;
+    bool flag = false;
+    int ans = -1;
+    int ansex = -1;
+    void nextPermutation(vector<int>& nums) {
+        for(int i = nums.size()-1; i > 0; i--) {
+            if(nums[i] > nums[i-1]) {
+                ans = i-1;
+                flag = true;
+                break;
+            }
+            else {
+                if(i-1 == 0) {
+                    sort(nums.begin(), nums.end());
+                }
+            }
+        }
+        if(flag) {
+            for(int i = ans+1; i < nums.size(); i++) {
+                if(nums[i] > nums[ans]) {
+                    int ret = nums[i] - nums[ans];
+                    if(ret < curr) {
+                        ansex = i;
+                    }
+                }
+            }
+            int temp = nums[ans];
+            nums[ans] = nums[ansex];
+            nums[ansex] = temp;
+            vector<int>::iterator left,right;
+            left = nums.begin();
+            left+=ans;
+            left++;
+            right = nums.end();
+            sort(left,right);
+        }
+    }
+};
