@@ -1,17 +1,28 @@
 sort(aim.begin(), aim.end());
 
-sortÀ©Õ¹£¬¿É°´Ö¸¶¨ÄÚÈİÅÅĞò£¬Í¨³£ÓÃÓÚ¶şÎ¬Êı×é
-bool cmp1(int a,int b)//intÎªÊı×éÊı¾İÀàĞÍ
+æŒ‰æŒ‡å®šèŒƒå›´æ’åºï¼ˆä¸€ä¸‹æ˜¯å®ç°ä»10åˆ°80ä¸ªæ•°çš„æ’åºï¼‰
+vector<int>::iterator left,right;
+left = right = vv.begin();
+for(i=1;i<10;i++){
+        left ++;
+    }
+    for(i=1;i<80;i++){
+        right ++;
+    }
+    sort(left,right);
+    
+sortæ‰©å±•ï¼Œå¯æŒ‰æŒ‡å®šå†…å®¹æ’åºï¼Œé€šå¸¸ç”¨äºäºŒç»´æ•°ç»„
+bool cmp1(int a,int b)//intä¸ºæ•°ç»„æ•°æ®ç±»å‹
 {
-    return a>b;//½µĞòÅÅÁĞ
-    //return a<b;//Ä¬ÈÏµÄÉıĞòÅÅÁĞ
+    return a>b;//é™åºæ’åˆ—
+    //return a<b;//é»˜è®¤çš„å‡åºæ’åˆ—
 }
 sort(A,A+100,cmp1);
 
 
 bool cmp2(Student a,Student b)
 {
-    return a.id>b.id;//°´ÕÕÑ§ºÅ½µĞòÅÅÁĞ
-    //return a.id<b.id;//°´ÕÕÑ§ºÅÉıĞòÅÅÁĞ
+    return a.id>b.id;//æŒ‰ç…§å­¦å·é™åºæ’åˆ—
+    //return a.id<b.id;//æŒ‰ç…§å­¦å·å‡åºæ’åˆ—
 }
 sort(Stu,Stu+100,cmp2);
