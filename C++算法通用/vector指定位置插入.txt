@@ -1,0 +1,2 @@
+digits.insert(digits.begin(), 1)
+开始位置插入1元素
