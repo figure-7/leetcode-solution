@@ -1,0 +1,56 @@
+题目难度：MEDIUM
+
+给定一个非空整数数组，除了某个元素只出现一次以外，其余每个元素均出现了三次。
+找出那个只出现了一次的元素。
+
+
+
+说明：
+
+你的算法应该具有线性时间复杂度。 
+你可以不使用额外空间来实现吗？
+
+
+
+示例 1:
+
+输入: [2,2,3,2]
+输出: 3
+
+
+示例?2:
+
+输入: [0,1,0,1,0,1,99]
+
+输出: 99
+
+
+思路：这题不让用额外空间，还要时间O（N）
+思路看下面注释，酸.,,
+
+执行用时 :
+8 ms
+, 在所有 C++ 提交中击败了
+98.76%
+的用户
+内存消耗 :
+9.8 MB
+, 在所有 C++ 提交中击败了
+12.12%
+的用户
+
+上代码：
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int ones = 0, twos = 0, threes = 0;
+        for (int num : nums) {
+            twos |= ones & num;//用Int32位任意一位出现了一次1的结果ones 和当期num与 则同一个位置出现两次的会是1合并到twos 出现一次的保持twos原先的位
+            ones ^= num;//一直异或num 则Int中的某一位出现一次1 ones为1 两次则异或成0 三次还是1 但是会被后续操作清零
+            threes = ones & twos;//ones和twos同时为1时 threes为1
+            ones &= ~threes;//threes对应的位置为1 取反为0 和ones与则将对应位清零
+            twos &= ~threes;
+        }
+        return ones;
+    }
+};
