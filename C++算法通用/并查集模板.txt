@@ -1,0 +1,28 @@
+const int MAXN=1e5+50;
+int fa[MAXN], siz[MAXN][26];
+int getFather(int x){
+    return fa[x]=(fa[x]==x?x:getFather(fa[x]));
+}
+inline void mergeFather(int x, int y){
+    int fx=getFather(x), fy=getFather(y);
+    if (fx==fy) return;
+    if (fx>fy) swap(fx, fy);
+    fa[fx]=fy;
+    for (int i=0; i<26; i++){
+        siz[fy][i]+=siz[fx][i];
+        siz[fx][i]=0;
+    }
+}
+MAXN可根据实际案例大小调整
+接下来主函数
+int n=s.length(), m=pairs.size();
+        for (int i=0; i<n; i++){
+            fa[i]=i;
+            memset(siz[i], 0, sizeof(siz[i]));
+            ++siz[i][s[i]-'a'];
+        }
+        
+        for (int i=0; i<m; i++){
+            int a=pairs[i][0], b=pairs[i][1];
+            mergeFather(a, b);
+        }
