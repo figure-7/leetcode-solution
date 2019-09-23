@@ -13,16 +13,20 @@ inline void mergeFather(int x, int y){
         siz[fx][i]=0;
     }
 }
-MAXN¿É¸ù¾İÊµ¼Ê°¸Àı´óĞ¡µ÷Õû
-½ÓÏÂÀ´Ö÷º¯Êı
+fa:å½“å‰ä½ç½®å±äºå“ªä¸ªå¹¶æŸ¥é›†
+getfatherï¼šåˆæˆå¹¶æŸ¥é›†
+mergefatherï¼šè¿è¾¹
+MAXNå¯æ ¹æ®å®é™…æ¡ˆä¾‹å¤§å°è°ƒæ•´
+æ¥ä¸‹æ¥ä¸»å‡½æ•°
 int n=s.length(), m=pairs.size();
         for (int i=0; i<n; i++){
             fa[i]=i;
             memset(siz[i], 0, sizeof(siz[i]));
             ++siz[i][s[i]-'a'];
         }
-        
+        //åˆå§‹åŒ–å¹¶æŸ¥é›†
         for (int i=0; i<m; i++){
             int a=pairs[i][0], b=pairs[i][1];
             mergeFather(a, b);
         }
+//è¿è¾¹
