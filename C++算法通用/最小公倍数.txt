@@ -1,0 +1,5 @@
+long long Gcd(long long a, long long b){
+        if (b==0) return a;
+        return Gcd(b, a%b);
+    }
+返回两个数的最小公倍数
