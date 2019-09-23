@@ -1,0 +1,63 @@
+题目难度：MEDIUM
+
+请你帮忙设计一个程序，用来找出第 n 个丑数。
+
+丑数是可以被 a 或 b 或 c 整除的 正整数。
+
+ 
+
+示例 1：
+
+输入：n = 3, a = 2, b = 3, c = 5
+输出：4
+解释：丑数序列为 2, 3, 4, 5, 6, 8, 9, 10... 其中第 3 个是 4。
+示例 2：
+
+输入：n = 4, a = 2, b = 3, c = 4
+输出：6
+解释：丑数序列为 2, 3, 4, 6, 8, 9, 12... 其中第 4 个是 6。
+示例 3：
+
+输入：n = 5, a = 2, b = 11, c = 13
+输出：10
+解释：丑数序列为 2, 4, 6, 8, 10, 11, 12, 13... 其中第 5 个是 10。
+示例 4：
+
+输入：n = 1000000000, a = 2, b = 217983653, c = 336916467
+输出：1999999984
+ 
+
+提示：
+
+1 <= n, a, b, c <= 10^9
+1 <= a * b * c <= 10^18
+本题结果在 [1, 2 * 10^9] 的范围内
+
+思路：看了视频，居然用的是二分，意思就是分别对ab，bc,ac,abc取最小公倍数(gcd)
+然后通过n/a+n/b+n/c-n/gcd(ab)-n/gcd(ac)-n/gcd(bc)+n/gcd(abc)可以得到小于n的所有丑数
+然后设置一个最大最小值，通过二分确定小于mid的丑数总数，大于等于n就向左缩短区间，小于则相反
+直至结束，这样可以避免超时，这题大佬都没做出来，我就算了。。。
+
+上代码：
+class Solution {
+public:
+    long long Gcd(long long a, long long b){
+        if (b==0) return a;
+        return Gcd(b, a%b);
+    }
+    int nthUglyNumber(int n, int a, int b, int c) {
+        long long left=1, right=2e9, ans=2e9+5;
+        long long ab=(long long)a/Gcd(a, b)*b, bc=(long long)b/Gcd(b, c)*c, ac=(long long)a/Gcd(a, c)*c;
+        long long abc=(long long)ab/Gcd(ab, bc)*bc;
+        while(left<=right){
+            long long mid=(left+right)/2;
+            long long cnt=mid/a+mid/b+mid/c-mid/ab-mid/bc-mid/ac+mid/abc;
+            if (cnt>=n){
+                ans=min(ans, mid);
+                right=mid-1;
+            }else left=mid+1;
+        }
+        
+        return ans;
+    }
+};
