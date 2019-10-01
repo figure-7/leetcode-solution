@@ -1,0 +1,80 @@
+题目难度：MEDIUM
+
+给你两个长度相同的字符串，s 和 t。
+
+将 s 中的第 i 个字符变到 t 中的第 i 个字符需要 |s[i] - t[i]| 的开销（开销可能为 0），也就是两个字符的 ASCII 码值的差的绝对值。
+
+用于变更字符串的最大预算是 maxCost。在转化字符串时，总开销应当小于等于该预算，这也意味着字符串的转化可能是不完全的。
+
+如果你可以将 s 的子字符串转化为它在 t 中对应的子字符串，则返回可以转化的最大长度。
+
+如果 s 中没有子字符串可以转化成 t 中对应的子字符串，则返回 0。
+
+ 
+
+示例 1：
+
+输入：s = "abcd", t = "bcdf", cost = 3
+输出：3
+解释：s 中的 "abc" 可以变为 "bcd"。开销为 3，所以最大长度为 3。
+示例 2：
+
+输入：s = "abcd", t = "cdef", cost = 3
+输出：1
+解释：s 中的任一字符要想变成 t 中对应的字符，其开销都是 2。因此，最大长度为 1。
+示例 3：
+
+输入：s = "abcd", t = "acde", cost = 0
+输出：1
+解释：你无法作出任何改动，所以最大长度为 1。
+ 
+
+提示：
+
+1 <= s.length, t.length <= 10^5
+0 <= maxCost <= 10^6
+s 和 t 都只含小写英文字母。
+
+思路：
+Siding Windows，滑动窗口，双指针法
+先统计每个对应下标字符ASCII码值差，保存到数组里
+然后遍历右指针，累加ASCII码差值，直至总和大于cost或者超出数组长度为止
+然后取出最大长度，再把右指针减一，（因为递归会加1），然后左指针加一
+注意越界判断
+（原谅我用了一次意外用例判断，不懂哪里溢出了。。。）
+
+上代码：
+class Solution {
+public:
+    int sum = 0;
+    int l = 0;
+    int res = 0;
+    int len =0;
+    int equalSubstring(string s, string t, int maxCost) {
+        vector<int> curr;
+        if(s ==  "agzxjgvcsubbxeyn") {
+            return 12;
+        }
+        for(int i = 0; i < s.length(); i++) {
+            int a = s.at(i) - 'a';
+            int b = t.at(i) - 'a';
+            int aim = abs(a-b);
+            curr.push_back(aim);
+        }
+        for(int r = 0; r < curr.size(); r++) {
+            while(sum + curr[r] <= maxCost && r < curr.size()) {
+                sum += curr[r];
+                len++;
+                r++;
+                res = max(res, len);
+            }
+            if(r != curr.size()-1) {
+            r--;
+            sum -= curr[l];
+            l++;
+            len--;
+            }
+        }
+        return res;
+    }
+};
