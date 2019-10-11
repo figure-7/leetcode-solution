@@ -1,0 +1,137 @@
+题目难度：HARD
+
+给定一个字符串?(s) 和一个字符模式?(p) ，实现一个支持?'?'?和?'*'?的通配符匹配。
+
+
+'?' 可以匹配任何单个字符。
+
+'*' 可以匹配任意字符串（包括空字符串）。
+
+两个字符串完全匹配才算匹配成功。
+
+
+说明:
+
+s?可能为空，且只包含从?a-z?的小写字母。
+
+p?可能为空，且只包含从?a-z?的小写字母，以及字符???和?*。
+
+
+示例?1:
+
+输入:
+s = "aa"
+p = "a"
+
+输出: false
+
+解释: "a" 无法匹配 "aa" 整个字符串。
+
+
+示例?2:
+
+输入:
+s = "aa"
+p = "*"
+
+输出: true
+
+解释:?'*' 可以匹配任意字符串。
+
+
+示例?3:
+
+输入:
+s = "cb"
+p = "?a"
+
+输出: false
+
+解释:?'?' 可以匹配 'c', 但第二个 'a' 无法匹配 'b'。
+
+
+示例?4:
+
+输入:
+s = "adceb"
+p = "*a*b"
+
+输出: true
+
+解释:?第一个 '*' 可以匹配空字符串, 第二个 '*' 可以匹配字符串 "dce".
+
+
+示例?5:
+
+输入:
+s = "acdcb"
+p = "a*c?b"
+
+输入: false
+
+
+思路：有了正则表达式匹配的经验，这题进行了部分修改
+先设置一个second_match用来判断当存在‘*’时，s的第一个字符是否等于p的下一个字符，或者p的下一个字符是'？'
+是就返回true，表示可以匹配，不是就返回false，是就继续进行递归判断，判断的是
+1.s和 p.substr(1)即s的第一个字符等于p的下一个字符
+2.s.substr(1)和p即s的第一个字符不等于p的下一个字符，s就向下遍历即可
+案例都过了，但是提交有问题，一直运行不出结果，所以不知道错在哪里
+看书上说的也有可能是超时了。。。
+
+上代码：
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        if (p.empty()) return s.empty();    
+
+        bool first_match = !s.empty() && (s[0] == p[0] || p[0] == '?' || p[0] == '*'); 
+
+        if (p.length() >= 2 && p[0] == '*') {   
+            bool second_match = !s.empty() && (s[0] == p[1] || p[1] == '?'); 
+            if(second_match == false) return isMatch(s.substr(1), p);
+            return  second_match && isMatch(s, p.substr(1));
+        } else {
+            if(p[p.length() - 1] == '*' && p.length() == 1) {
+                return true;
+            }
+            else {
+                return first_match && isMatch(s.substr(1), p.substr(1));
+            }
+        }
+    }
+};
+
+思路：暴力法四指针，看见评论区的解法，用到了四个指针直接遍历判断的没有超时
+
+执行用时 :
+12 ms
+, 在所有 C++ 提交中击败了
+89.74%
+的用户
+内存消耗 :
+8.7 MB
+, 在所有 C++ 提交中击败了
+95.87%
+的用户
+
+上代码：
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        int j=0;
+	for(int star=0,i=0, last=0;i<s.length();){
+		if(j<p.size() && (s[i]==p[j] || p[j]=='?')){
+			++i;
+			++j;}
+		else if(j<p.size() && p[j]=='*'){
+			last=i;
+			star=++j;}
+		else if(star!=0){
+			i=++last;
+			j=star;}
+		else return 0;
+		}
+		for(; j<p.size() && p[j]=='*'; ++j);
+		return j==p.size();
+    }
+};
