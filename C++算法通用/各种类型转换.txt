@@ -1,6 +1,6 @@
-1£º×Ö·ûÊı×é»»Îª×Ö·û´®
+1ï¼šå­—ç¬¦æ•°ç»„æ¢ä¸ºå­—ç¬¦ä¸²
 
-¼û´úÂë
+è§ä»£ç 
 
 #include <iostream>
 #include <string>
@@ -12,9 +12,9 @@ int main(){
 	cout<<s<<endl;
 	system("pause");
 }
-2£º°Ñ×Ö·û´®×ª»»Îª×Ö·ûÊı×é
+2ï¼šæŠŠå­—ç¬¦ä¸²è½¬æ¢ä¸ºå­—ç¬¦æ•°ç»„
 
-¼û´úÂë£º
+è§ä»£ç ï¼š
 
 #include <iostream>
 #include <string>
@@ -23,7 +23,7 @@ using namespace std;
 int main(){
 	string s="aaaavvva";
 	char a[10];
-	strncpy(a,s.c_str(),s.length()+1);//±ØĞë¼Ó1£¬\0»¹Õ¼Ò»¸öÎ»ÖÃ
+	strncpy(a,s.c_str(),s.length()+1);//å¿…é¡»åŠ 1ï¼Œ\0è¿˜å ä¸€ä¸ªä½ç½®
 	
 	for(int i=0;i<10;i++)
 		cout<<a[i]<<" ";
@@ -32,27 +32,13 @@ int main(){
 }
  
 
-3£º°Ñ×Ö·û´®×ª»»ÎªÊı×Ö
+3ï¼šæŠŠå­—ç¬¦ä¸²è½¬æ¢ä¸ºæ•°å­—
+int res = stoi(s);
 
-#include<iostream>
-using namespace std;
- 
-int main()
-{
- char a='1';
- int x;
- x=atoi(a);  
- 
- cout<<x<<endl;
- getchar();
- return 0;
-}
-
-4£º×Ö·û×ªÊı×ÖÀàĞÍ£º
-string digits = "123456";
+4ï¼šå­—ç¬¦è½¬æ•°å­—ç±»å‹ï¼š
 int index = digits[0]-'0';
 
-5.Êı×Ö×ª×Ö·û´®£¬int floatÀàĞÍ Í¬Àí
+5.æ•°å­—è½¬å­—ç¬¦ä¸²ï¼Œint floatç±»å‹ åŒç†
 
 
 #include <string>
@@ -70,7 +56,7 @@ stringstream ss;
     
 ss << a;
     
-ss >> res;//»òÕß res = ss.str();
+ss >> res;//æˆ–è€… res = ss.str();
     
 return 0;
 }
