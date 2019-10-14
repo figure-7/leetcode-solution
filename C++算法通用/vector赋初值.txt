@@ -1,2 +1,8 @@
 aim.resize(ratings.size(), 1);
-1Ϊ��ֵ
+1为初值
+
+二维初始化
+赋值：
+vector<vector<int> > newOne(r, vector<int>(c, 0));
+不赋值：
+vector<vector<int>> aim(110);
