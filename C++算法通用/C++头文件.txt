@@ -1,0 +1,6 @@
+#include<iostream>
+#pragma warning(disable:4996)
+#include<cstring>
+#include<cstdio>
+#include<algorithm>
+using namespace std;
