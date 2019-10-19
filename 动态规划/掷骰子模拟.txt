@@ -1,0 +1,52 @@
+题目难度：MEDIUM
+
+有一个骰子模拟器会每次投掷的时候生成一个 1 到 6 的随机数。
+
+不过我们在使用它时有个约束，就是使得投掷骰子时，连续 掷出数字 i 的次数不能超过 rollMax[i]（i 从 1 开始编号）。
+
+现在，给你一个整数数组 rollMax 和一个整数 n，请你来计算掷 n 次骰子可得到的不同点数序列的数量。
+
+假如两个序列中至少存在一个元素不同，就认为这两个序列是不同的。由于答案可能很大，所以请返回 模 10^9 + 7 之后的结果。
+
+思路：dp[i][j][k]三维dp
+i:一共有i+1个骰子
+j:j+1骰子的点数
+k:k+1点数结尾且该骰子连续的个数
+先初始化dp[0][0][0] = 1,一个一点骰子的个数为1
+dp表达式1：dp[i+1][t][k+1] += dp[i][j][k];dp[i+1][t][k+1] %= mod;
+当下一个骰子点数与上一个骰子点数相同，骰子个数加一，最后骰子点数为j(j==k),点数为j(k)的数目加一
+dp表达式2：dp[i+1][t][1] += dp[i][j][k];[i+1][t][1] %= mod;
+当下一个骰子点数与上一个骰子点数不相同，骰子个数加一，最后骰子点数为j(j！=k),点数为j的数目为一
+
+上代码：
+class Solution {
+public:
+    long long dp[5050][7][20];
+    int dieSimulator(int n, vector<int>& rollMax) {
+        const int mod = 1e9+7;
+        memset(dp,0,sizeof(dp));
+        dp[0][0][0] = 1;
+        for(int i=0;i<n;++i)
+        {
+            for(int j=0;j<=6;++j)
+            {
+                for(int k=0;k<=15;++k)
+                {
+                    for(int t=1;t<=6;++t) {
+                        if(j==t && k+1<=rollMax[t-1]) {
+                            dp[i+1][t][k+1] += dp[i][j][k];
+                            dp[i+1][t][k+1] %= mod;
+                        } else if(j!=t) {
+                            dp[i+1][t][1] += dp[i][j][k];
+                            dp[i+1][t][1] %= mod;
+                        }
+                    }
+                }
+            }
+        }
+        long long ans = 0;
+        for(int i=0;i<=6;++i) for(int j=0;j<=15;++j) ans+=dp[n][i][j];
+        ans%=mod;
+        return ans;
+    }
+};
