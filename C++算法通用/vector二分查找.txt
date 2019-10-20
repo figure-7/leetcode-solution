@@ -1,0 +1,7 @@
+auto it = lower_bound(folder.begin(), folder.end(), s);
+（与哈希表类似）可以用来查找有没有包含s子串的父串，也可以查找有没有大于等于s的数
+if (it != folder.end() && *it == s)
+可以判断查找结果（跟哈希表一样）
+
+upper_bound( begin,end,num)
+可以查找有没有大于s的数
