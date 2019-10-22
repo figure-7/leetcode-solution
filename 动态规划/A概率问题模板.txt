@@ -1,0 +1,15 @@
+dp[i][j]表示抛了前i枚硬币，有j枚朝上的概率是多少
+double[2][1000];
+for (int i = 0; i <= n; ++i) dp[0][i] = 0;
+        dp[0][0] = 1;
+        
+        for (int ii = 1; ii <= n; ++ii){
+            int i = ii&1;
+            int pi = i^1;
+            for (int j = 0; j <= n; ++j) dp[i][j] = 0;
+            for (int j = 0; j < n; ++j){
+                dp[i][j] += dp[pi][j] * (1.0 - prob[ii - 1]);
+                dp[i][j + 1] += dp[pi][j] * prob[ii - 1];
+            }
+        }
+return[n&1][1000];

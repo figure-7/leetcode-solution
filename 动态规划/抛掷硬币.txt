@@ -1,0 +1,34 @@
+题目难度：MEDIUM
+
+思路：第一次见概率dp，收货颇丰！
+dp表达式：dp[i][j] += dp[pi][j] * (1.0 - prob[ii - 1]);
+          dp[i][j + 1] += dp[pi][j] * prob[ii - 1];
+	  dp[i][j]表示抛了前i枚硬币，有j枚朝上的概率是多少
+注意三种情况初始化
+一下代码用到了滚动数组，ii&1代表ii的值大于滚动数组规定的下标存入，i^1代表i-1，剩下同理
+否则数组应该为dp[1050][1050]。
+
+
+上代码：
+double dp[2][1050];
+class Solution {
+public:
+    double probabilityOfHeads(vector<double>& prob, int target) {
+        int n = prob.size();
+        
+        for (int i = 0; i <= n; ++i) dp[0][i] = 0;
+        dp[0][0] = 1;
+        
+        for (int ii = 1; ii <= n; ++ii){
+            int i = ii&1;
+            int pi = i^1;
+            for (int j = 0; j <= n; ++j) dp[i][j] = 0;
+            for (int j = 0; j < n; ++j){
+                dp[i][j] += dp[pi][j] * (1.0 - prob[ii - 1]);
+                dp[i][j + 1] += dp[pi][j] * prob[ii - 1];
+            }
+        }
+        
+        return dp[n & 1][target];
+    }
+};
