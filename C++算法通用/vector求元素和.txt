@@ -1,0 +1,1 @@
+int sum = accumulate(vec.begin() , vec.end())
