@@ -1,0 +1,66 @@
+题目难度：MEDIUM
+
+给定一个字符串数组 arr，字符串 s 是将 arr 某一子序列字符串连接所得的字符串，如果 s 中的每一个字符都只出现过一次，那么它就是一个可行解。
+
+请返回所有可行解 s 中最长长度。
+
+ 
+
+示例 1：
+
+输入：arr = ["un","iq","ue"]
+输出：4
+解释：所有可能的串联组合是 "","un","iq","ue","uniq" 和 "ique"，最大长度为 4。
+示例 2：
+
+输入：arr = ["cha","r","act","ers"]
+输出：6
+解释：可能的解答有 "chaers" 和 "acters"。
+示例 3：
+
+输入：arr = ["abcdefghijklmnopqrstuvwxyz"]
+输出：26
+ 
+
+提示：
+
+1 <= arr.length <= 16
+1 <= arr[i].length <= 26
+arr[i] 中只含有小写英文字母
+
+思路：数据较弱，可以采用暴力回溯的方法
+每一个串的字符值对应数组下标加一，如果有一个值大于一就不符合
+为了避免类似"a","bc","cdefg"等12能连，123不能连，而13连才是结果的问题
+只需要在DFS中加一部不取该串时的递归即可，即单纯指针加一再递归（这步没想到啊）
+之后回溯把记录字符值数组归零即可
+
+上代码：
+class Solution {
+public:
+    
+    int ans = 0;
+    int cnt[30];
+    void dfs(vector<string>& arr, int i, int n, int len){
+        if (len > ans) ans = len;
+        if (i >= n) return;
+        
+        // Not 
+        dfs(arr, i + 1, n, len);
+        
+        // Choose
+        for (auto c: arr[i]) ++cnt[c - 'a'];
+        
+        bool flag = true;
+        for (int i = 0; i < 26 && flag; ++i) if (cnt[i] > 1) flag = false;
+        if (flag) dfs(arr, i + 1, n, len + arr[i].length());
+        
+        for (auto c: arr[i]) --cnt[c - 'a'];
+    }
+    
+    int maxLength(vector<string>& arr) {
+        int n = arr.size();
+        ans = 0; memset(cnt, 0, sizeof(cnt));
+        dfs(arr, 0, n, 0);
+        return ans;
+    }
+};
