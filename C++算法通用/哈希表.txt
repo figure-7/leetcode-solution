@@ -4,8 +4,8 @@ unordered_map<类型,类型> 表名
 unordered_set<int> numsSet(nums.begin(), nums.end());
 
 2.哈希表的查找
-表名.count(查找值)
-表名.find(查找下标)
+表名.count(查找下标出现个数)
+表名.find(同上)
 
 2.哈希表的遍历结束
 表名.end()已经查找完毕，没有所得值
