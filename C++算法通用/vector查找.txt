@@ -1,0 +1,1 @@
+find(v.begin(), v.end(), t) == v.end()
