@@ -1,0 +1,5 @@
+vector<vector<int> > g;
+g.assign(n,vector<int>());
+之后即可插入值，注意空间n足够大
+g[e[0]].push_back(e[1]);
+g[e[1]].push_back(e[0]);
