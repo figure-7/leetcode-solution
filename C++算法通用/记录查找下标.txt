@@ -1,0 +1,4 @@
+配合二分查找使用：
+取得某个数出现的空间
+左：distance(A, lower_bound(A, A + n, target))
+右：distance(A, prev(upper_bound(A, A + n, target)))
