@@ -1,0 +1,148 @@
+题目难度：HARD
+
+给定两个单词（beginWord 和 endWord）和一个字典 wordList，找出所有从 beginWord 到 endWord 的最短转换序列。
+转换需遵循如下规则：
+
+每次转换只能改变一个字母。
+
+转换过程中的中间单词必须是字典中的单词。
+
+
+说明:
+
+如果不存在这样的转换序列，返回一个空列表。
+
+所有单词具有相同的长度。
+
+所有单词只由小写字母组成。
+
+字典中不存在重复的单词。
+
+你可以假设 beginWord 和 endWord 是非空的，且二者不相同。
+
+
+示例 1:
+
+输入:
+beginWord = "hit",
+endWord = "cog",
+wordList = ["hot","dot","dog","lot","log","cog"]
+
+
+输出:
+[
+  ["hit","hot","dot","dog","cog"],
+? ["hit","hot","lot","log","cog"]
+]
+
+
+示例 2:
+
+输入:
+beginWord = "hit"
+endWord = "cog"
+wordList = ["hot","dot","dog","lot","log"]
+
+
+输出: []
+
+
+解释:?endWord "cog" 不在字典中，所以不存在符合要求的转换序列。
+
+
+
+思路：利用BFS+DFS+图论的方法Σ( ° △ °|||)
+首先把开始的单词放入给定数组后面，然后遍历查找单词表是否等于结束单词
+同时将所有差一个字符的单词下标利用二维数组连通起来，（也就是构图，函数sim）
+本次循环后判断单词表中是否有结束单词，若没有，返回空即可
+然后建立一个dfn用来保存路径的层数，并建立一个队列保存所有能连接的节点
+利用BFS单向封印的思想，遍历队列，每次判断哪些节点能够被取到，同时将节点对应下标的层数赋值
+之后将队列清空后再将新的能取到的节点放入队列循环直至队列最终为空
+再利用DFS深搜路径，每次把路径下标层数值减一，当层数值等于0，即已经遍历到最后的单词了
+并且DFS特性取到的肯定是路径最短的（最快）
+最后将所有节点存放的一维数反转放入结果二维数组中，注意要先把结果单词放入一维数组中
+最后返回二维数组即可
+（就是这个样子。。。好麻烦，不过属实只是麻烦，不是特别难(￣▽￣")）
+
+简单说如下面官方题解：
+先广度优先搜索找最短路径
+再深度优先找所有可能的路径
+
+执行用时 :
+640 ms
+, 在所有 cpp 提交中击败了
+42.86%
+的用户
+内存消耗 :
+16.2 MB
+, 在所有 cpp 提交中击败了
+70.46%
+的用户
+（效率一般~）
+
+上代码：
+class Solution {
+public:
+    bool sim(const string& s1, const string& s2) {
+        int diff = 0;
+        for (int i = 0; i < s1.size(); ++i) {
+            diff += s1[i] != s2[i];
+        }
+        return diff <= 1;
+    }
+    void dfs(const vector<vector<int> >& g, const vector<int>& dfn, const vector<string>& wordList,
+            int i, vector<string>& path, vector<vector<string> >& paths) {
+        if (dfn[i] == 0) {
+            vector<string> v(path);
+            reverse(v.begin(), v.end());
+            paths.push_back(v);
+            return;
+        }
+        for (auto j : g[i]) {
+            if (dfn[j] == dfn[i] - 1) {
+                path.push_back(wordList[j]);
+                dfs(g, dfn, wordList, j, path, paths);
+                path.pop_back();
+            }
+        }
+    }
+    vector<vector<string>> findLadders(string beginWord, string endWord, vector<string>& wordList) {
+        wordList.push_back(beginWord);
+        int N = wordList.size();
+        vector<vector<int> > g(N);
+        int endi = -1;
+        // 构图
+        for (int i = 0; i < N; ++i) {
+            if (wordList[i] == endWord)
+                endi = i;
+            for (int j = i + 1; j < N; ++j) {
+                if (sim(wordList[i], wordList[j])) {
+                    g[i].push_back(j);
+                    g[j].push_back(i);
+                }
+            }
+        }
+        if (endi == -1) return {};
+        // 层级编号
+        vector<int> dfn(N, -1);
+        queue<int> q;
+        q.push(N - 1);
+        dfn[N - 1] = 0;
+        while (!q.empty()) {
+            auto i = q.front();
+            q.pop();
+            for (auto j : g[i]) {
+                if (dfn[j] == -1) {
+                    dfn[j] = dfn[i] + 1;
+                    q.push(j);
+                }
+            }
+        }
+        if (dfn[endi] == -1) return {};
+        // 回溯路径
+        vector<string> path{endWord};
+        vector<vector<string> > paths;
+        dfs(g, dfn, wordList, endi, path, paths);
+        return paths;
+    }
+};
