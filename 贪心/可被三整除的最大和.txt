@@ -1,0 +1,86 @@
+题目难度：MEDIUM
+
+给你一个整数数组?nums，请你找出并返回能被三整除的元素最大和。
+
+?
+
+
+
+示例 1：
+
+输入：nums = [3,6,5,1,8]
+
+输出：18
+
+解释：选出数字 3, 6, 1 和 8，它们的和是 18（可被 3 整除的最大和）。
+
+
+示例 2：
+
+输入：nums = [4]
+
+输出：0
+
+解释：4 不能被 3 整除，所以无法选出数字，返回 0。
+
+
+示例 3：
+
+输入：nums = [1,2,3,4,4]
+
+输出：12
+
+解释：选出数字 1, 3, 4 以及 4，它们的和是 12（可被 3 整除的最大和）。
+?
+
+
+
+提示：
+
+1 <= nums.length <= 4 * 10^4
+1 <= nums[i] <= 10^4
+
+
+思路：贪心，先将能够除以三的数累加直接进结果
+然后将余1与余2的数分别放入两个数组中并排序
+首先判断两个数组的值个数是否能够正好配对，可以的话直接全部累加即可
+因为取值肯定是从大的数开始取，才能使结果最大，所以从前面遍历两个数组，作为排除的值
+之后贪心，循环范围为3，（1*3%3==0,2*3%3==0）
+向后遍历排除值，当剩余的值数正好能够匹配，分别循环两个数组的排除数的个数次将值排除
+遍历每种排除情况去最大结果返回即可
+
+上代码：
+class Solution {
+public:
+    int maxSumDivThree(vector<int>& nums) {
+        vector<int> sum(3,0);
+        vector<int> vec[3];
+        for(int i:nums)
+        {
+            sum[i%3]+=i;
+            vec[i%3].push_back(i);
+        }
+        sort(vec[0].begin(),vec[0].end());
+        sort(vec[1].begin(),vec[1].end());
+        sort(vec[2].begin(),vec[2].end());
+        int ans=sum[0];
+        if(vec[1].size()%3==vec[2].size()%3) return sum[0]+sum[1]+sum[2];
+        int cnt1=vec[1].size();
+        int cnt2=vec[2].size();
+        int alls=sum[0]+sum[1]+sum[2];
+        for(int i=0;i<3;i++)
+            for(int j=0;j<3;j++)
+            {
+                if(i>cnt1) continue;
+                if(j>cnt2) continue;
+                if(((cnt1-i)+(cnt2-j)*2)%3) continue;
+                int nans=alls;
+                for(int k=0;k<i;k++)
+                    nans-=vec[1][k];
+                for(int k=0;k<j;k++)
+                    nans-=vec[2][k];
+                ans=max(ans,nans);
+            }
+        return ans;
+    }
+};
