@@ -157,3 +157,40 @@ int main()
 	}
 	return 0;
 }
+
+模板3：判断两个字符串（节点）的最近祖先：
+上代码：
+class Solution {
+public:
+  map<string, int> id;
+  map<int, string> name;
+  vector<int> p;
+  int sz;
+  int getHight(int t) {
+    int h = 0;
+    while (t != -1)  h++, t=p[t];
+    return h;
+  }
+  string findSmallestRegion(vector<vector<string>>& regions, string region1, string region2) {
+    sz = 0;
+    for (auto rr: regions) {
+      for (auto r: rr) if (!id.count(r)) {
+        id[r] = sz;
+        name[sz] = r;
+        sz++;
+      }
+    }
+    p.resize(sz, -1);
+    for (auto rr: regions) {
+      for (int i = 1; i < rr.size(); i++) {
+        p[id[rr[i]]] = id[rr[0]];
+      }
+    }
+    int id1 = id[region1], id2 = id[region2];
+    int h1 = getHight(id1), h2 = getHight(id2);
+    while (h1 > h2) id1 = p[id1], h1--;
+    while (h2 > h1) id2 = p[id2], h2--;
+    while (id1 != id2) id1 = p[id1], id2 = p[id2];
+    return name[id1];
+  }
+};
