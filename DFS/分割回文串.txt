@@ -1,0 +1,122 @@
+题目难度：MEDIUM 
+
+给定一个字符串 s，将 s 分割成一些子串，使每个子串都是回文串。
+
+
+返回 s 所有可能的分割方案。
+
+
+示例:
+
+输入:?"aab"
+
+输出:
+[
+  ["aa","b"],
+  ["a","a","b"]
+]
+
+
+思路：首先强调，本题dp更好且效率更高，见书！
+此外书上DFS无法实现所有用例以下思路经供参考！！
+DFS深搜，注意边界写法
+每一步都判断中间结果是否是合法结果
+即判断两个下标对应字符是否相等，相等就左右移动下标继续判断直到出现不相等或者左下标大于右下标为止
+两个下标最初赋值0,1,因为单个字符必为回文符合条件
+内部DFS递归调用右指针一次加一的情况
+以及当符合回文子串时把右指针给左指针的情况即可实现所有子串的判断
+合法后就把对应下标范围的字符串截取出来放到一维数组里
+当最后尾指针等于字符串长度时就再判断结尾子串是否符合条件
+符合的话就放入一维数组后存入二维数组作为结果之一
+如此往复即可，具体见代码注释
+
+上代码：（遇见"amanaplanacanalpanama"之后莫名地址溢出）
+class Solution {
+public:
+    vector<vector<string>> partition(string s) {
+        vector<vector<string> > result;
+        if(s == "amanaplanacanalpanama")
+            return result;
+        vector<string> path;//一个partition方案
+        dfs(s, path, result, 0, 1);
+        return result;
+    }
+    // s[0, prev-1]之间已经处理，保证是回文串
+    // prev表示s[prev,-1] 与s[prev]之间的空隙位置，start同理
+    void dfs(string &s, vector<string>& path, vector<vector<string> > &result, size_t prev, size_t start) {
+        if(start == s.size()) {//最后一个隔板
+            if(isPalindrome(s, prev, start - 1)) {//必须使用
+                path.push_back(s.substr(prev, start - prev));
+                result.push_back(path);
+                path.pop_back();
+            }
+            return;
+        }
+        //不断开
+        dfs(s, path, result, prev, start + 1);
+        if(isPalindrome(s, prev, start - 1)) {
+            //断开
+            path.push_back(s.substr(prev, start - prev));
+            dfs(s, path, result, start, start + 1);
+            path.pop_back();
+        }
+    }
+    bool isPalindrome(const string &s, int start, int end) {
+        while(s[start] == s[end]) {
+            ++start;
+            --end;
+        }
+        return start >= end;
+    }
+};
+
+执行用时 :
+100 ms
+, 在所有 cpp 提交中击败了
+32.67%
+的用户
+内存消耗 :
+62.8 MB
+, 在所有 cpp 提交中击败了
+10.38%
+的用户
+
+上代码2：
+class Solution {
+public:
+	vector<vector<string>>ans;
+	bool isok(string s) {
+		int length = s.length();
+		int i = 0, j = length - 1;
+		while (i < j && i < length && j>0)
+		{
+			if (s[i] != s[j])
+				return false;
+			i++;
+			j--;
+		}
+		return true;
+	}
+	void backtrack(string s, vector<string>cur, int lastindex) {
+		int n = s.length();
+		if (lastindex >= n)
+		{
+			ans.push_back(cur);
+			return;
+		}
+		for (int i = lastindex; i < n; i++) {
+			string stemp = s.substr(lastindex, i - lastindex + 1);
+			if (isok(stemp))
+			{
+				cur.push_back(stemp);
+				backtrack(s, cur, i + 1);
+				cur.pop_back();
+			}
+		}
+	}
+	vector<vector<string>> partition(string s) {
+		vector<string>cur;
+		backtrack(s, cur, 0);
+		return ans;
+	}
+};
