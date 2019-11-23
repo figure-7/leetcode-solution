@@ -1,1 +1,3 @@
 reverse(aim.begin(), aim.end());
+指定下标范围反转
+reverse(vec.begin() + i, vec.begin() + j + 1);
