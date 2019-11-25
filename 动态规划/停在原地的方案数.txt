@@ -1,0 +1,107 @@
+题目难度：HARD
+
+有一个长度为?arrLen?的数组，开始有一个指针在索引?0 处。
+
+
+每一步操作中，你可以将指针向左或向右移动 1 步，或者停在原地（指针不能被移动到数组范围外）。
+
+
+给你两个整数?steps 和?arrLen ，请你计算并返回：在恰好执行?steps?次操作以后，指针仍然指向索引?0 处的方案数。
+
+
+由于答案可能会很大，请返回方案数 模?10^9 + 7 后的结果。
+
+?
+
+
+
+示例 1：
+
+输入：steps = 3, arrLen = 2
+
+输出：4
+
+解释：3 步后，总共有 4 种不同的方法可以停在索引 0 处。
+
+向右，向左，不动
+
+不动，向右，向左
+
+向右，不动，向左
+
+不动，不动，不动
+
+
+示例? 2：
+
+输入：steps = 2, arrLen = 4
+
+输出：2
+
+解释：2 步后，总共有 2 种不同的方法可以停在索引 0 处。
+
+向右，向左
+
+不动，不动
+
+
+示例 3：
+
+输入：steps = 4, arrLen = 2
+
+输出：8
+?
+
+
+提示：
+
+1 <= steps <= 500
+1 <= arrLen?<= 10^6
+
+
+
+思路：dp其实不难，但是我有dp恐惧症，考虑了半天数论。。。
+dp表达式：dp[i][j] = dp[i-1][j];dp[i][j] += dp[i-1][j-1];dp[i][j] += dp[i-1][j+1];
+i表示第i步，j表示当前位置，dp[i][j]表示当前位置方案数
+初始化都为1，可以得到在范围内下一步可以是以下几种情况
+1：不移动，dp[i+1][j] = dp[i][j]
+2：左移，dp[i+1][j-1] = dp[i][j]
+3：右移，dp[i+1][j+1] = dp[i][j]
+下面的代码就是由i-1转移到i的，原理同
+最后返回dp[steps][0]（初始位置）即可
+
+上代码：
+typedef pair<int,int> P;
+typedef long long ll;
+#define _for(i,a,b) for(register int i = (a);i < b;i ++)
+#define _rep(i,a,b) for(register int i = (a);i > b;i --)
+#define INF 0x3f3f3f3f
+#define MOD 1000000007
+#define maxn 1003
+#define pb push_back
+#define debug() printf("Miku Check OK!\n")
+
+class Solution
+{
+	public:
+		int dp[510][510];
+		int numWays(int steps, int arrLen)
+		{
+			dp[0][0] = 1;
+			_for(i,1,steps+1)
+			{
+				_for(j,0,min(503,arrLen))
+				{
+					dp[i][j] = dp[i-1][j];
+                    dp[i][j] %= MOD;
+					if(j)
+						dp[i][j] += dp[i-1][j-1];
+                    dp[i][j] %= MOD;
+					if(j!=arrLen)
+						dp[i][j] += dp[i-1][j+1];
+                    dp[i][j] %= MOD;
+				}
+			}
+			return dp[steps][0]%=MOD;
+		}
+};
