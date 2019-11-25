@@ -1,0 +1,24 @@
+相比利用二维数组的查找方式，时间复杂度为O(logN)
+struct BIT//树状数组
+{
+	int c[N];
+	int lowbit(int x) { return x & (-x); }//树状数组基本操作
+	void add(int x, int y)//在第 x 位上加上 y
+	{
+		while (x <= n) {
+			c[x] += y;
+			x += lowbit(x);
+		}
+	}
+	int query(int x)//查询前缀和
+	{
+		int sum = 0;
+		while (x) {
+			sum += c[x];
+			x -= lowbit(x);
+		}
+		return sum;
+	}
+}t;
+树状数组添加数值：t.add(1,4)下标1添加数值4
+树状数组查询数值：query(2)查找2的下标对应数值
