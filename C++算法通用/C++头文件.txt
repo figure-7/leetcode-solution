@@ -4,5 +4,24 @@
 #include<cstdio>
 #include<algorithm>
 #include <vector>
+#include <queue>
+#include <map>
+#include <math.h>
 typedef long long ll;
+typedef long double ld;
 using namespace std;
+inline int read()
+{
+	int x = 0; char s = getchar();
+	while (!isdigit(s))s = getchar();
+	while (isdigit(s))x = (x << 1) + (x << 3) + (s ^ 48), s = getchar();
+	return x;
+}//实现所有直接输入，可无视空格及回车
+inline void print(int x)
+{
+	if (x < 10)putchar(x + '0');
+	else {
+		print(x / 10);
+		putchar(x % 10 + '0');
+	}
+}//输出存在空格或回车需自行输出
