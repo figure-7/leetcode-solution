@@ -1,0 +1,121 @@
+题目难度：MEDIUM
+
+给你一个产品数组?products?和一个字符串?searchWord?，products? 数组中每个产品都是一个字符串。
+
+
+请你设计一个推荐系统，在依次输入单词?searchWord 的每一个字母后，推荐?products 数组中前缀与?searchWord 相同的最多三个产品。
+如果前缀相同的可推荐产品超过三个，请按字典序返回最小的三个。
+
+
+请你以二维列表的形式，返回在输入?searchWord?每个字母后相应的推荐产品的列表。
+
+?
+
+
+
+示例 1：
+
+输入：products = ["mobile","mouse","moneypot","monitor","mousepad"], searchWord = "mouse"
+
+输出：[
+["mobile","moneypot","monitor"],
+["mobile","moneypot","monitor"],
+["mouse","mousepad"],
+["mouse","mousepad"],
+["mouse","mousepad"]
+]
+
+解释：按字典序排序后的产品列表是 ["mobile","moneypot","monitor","mouse","mousepad"]
+
+输入 m 和 mo，由于所有产品的前缀都相同，所以系统返回字典序最小的三个产品 ["mobile","moneypot","monitor"]
+
+输入 mou， mous 和 mouse 后系统都返回 ["mouse","mousepad"]
+
+
+示例 2：
+
+输入：products = ["havana"], searchWord = "havana"
+
+输出：[["havana"],["havana"],["havana"],["havana"],["havana"],["havana"]]
+
+
+示例 3：
+
+输入：products = ["bags","baggage","banner","box","cloths"], searchWord = "bags"
+
+输出：[["baggage","bags","banner"],["baggage","bags","banner"],["baggage","bags"],["bags"]]
+
+
+示例 4：
+
+输入：products = ["havana"], searchWord = "tatiana"
+
+输出：[[],[],[],[],[],[],[]]
+?
+
+
+
+提示：
+
+1 <= products.length <= 1000	
+1 <= Σ products[i].length <= 2 * 10^4	
+products[i]?中所有的字符都是小写英文字母。
+
+1 <= searchWord.length <= 1000
+	searchWord?中所有字符都是小写英文字母。
+
+思路：考虑到让时间更短，这里我额外开了一个二维数组用来保存每一步的字符串集
+（因为是每次比较时相同字符个数加一，所以肯定是上一个结果集合的子集）
+第一次对原数组做运算
+然后需要考虑当数组元素为三个时，结果二维数组不能再放入字符串，而接下来的数组可能会作为后续判断的结果
+所以还需要另开一个二维数组保存所有符合条件的字符串（可能大于三个）
+之后进行运算时时用这个另开的二维数组的上一层运算
+最后遍历结束返回结果数组即可（周赛三题AC！！，不过真的水）
+
+上代码：
+class Solution {
+public:
+    int aim = 0;
+    bool flag = true;
+    vector<vector<string> > currmodtwo;
+    vector<vector<string> > currmodthree;
+    vector<vector<string>> suggestedProducts(vector<string>& products, string searchWord) {
+        sort(products.begin(), products.end());
+        for(int i = 0; i < searchWord.length(); i++) {
+            bool fast = false;
+            bool low = true;
+            vector<string> curr;
+            if(flag) {
+                for(int j = 0; j < products.size(); j++) {
+                    if(products[j][aim] == searchWord[i])
+                        curr.push_back(products[j]);
+                    if(curr.size() == 3 && low) {
+                        currmodtwo.push_back(curr);
+                        fast = true;
+                        low = false;
+                    }
+                }
+                if(!fast)
+                    currmodtwo.push_back(curr);
+                currmodthree.push_back(curr);
+                flag = false;
+            }
+            else {
+                for(int j = 0; j < currmodthree[aim - 1].size(); j++) {
+                    if(currmodthree[aim - 1][j][aim] == searchWord[i])
+                        curr.push_back(currmodthree[aim - 1][j]);
+                    if(curr.size() == 3 && low) {
+                        currmodtwo.push_back(curr);
+                        fast = true;
+                        low = false;
+                    }
+                }
+                if(!fast)
+                    currmodtwo.push_back(curr);
+                currmodthree.push_back(curr);
+            }
+            aim++;
+        }
+        return currmodtwo;
+    }
+};
