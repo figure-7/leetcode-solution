@@ -9,7 +9,11 @@
 #include <math.h>
 typedef long long ll;
 typedef long double ld;
+typedef pair<int,int> P;
 using namespace std;
+#define INF 0x3f3f3f3f
+#define MOD 100000000
+#define debug() printf("Tairitsu Check OK!\n")
 inline int read()
 {
 	int x = 0; char s = getchar();
