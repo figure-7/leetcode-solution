@@ -1,0 +1,4 @@
+主函数这么写：this->cols = vector<int>(n, 0)
+算法函数内部：
+private:
+	vector<int> cols;
