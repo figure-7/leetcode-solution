@@ -1,0 +1,92 @@
+题目难度：MEDIUM
+
+给定一个无重复元素的数组?candidates?和一个目标数?target?，找出?candidates?中所有可以使数字和为?target?的组合。
+
+
+candidates?中的数字可以无限制重复被选取。
+
+
+
+说明：
+
+所有数字（包括?target）都是正整数。
+解集不能包含重复的组合。?
+
+
+示例?1:
+
+输入: candidates = [2,3,6,7], target = 7,
+
+所求解集为:
+[
+  [7],
+  [2,2,3]
+]
+
+
+示例?2:
+
+输入: candidates = [2,3,5], target = 8,
+
+所求解集为:
+[
+? [2,2,2,2],
+? [2,3,3],
+? [3,5]
+]
+
+
+
+思路：首先几个月前我做过了组合总和II ( ° ▽、° )
+具体思路见LeetCode->回溯->组合总和II，不再详述
+改变的地方如下：
+1.因为无重复元素，所以取消回溯函数内部的while判断重复元素循环
+2.因为单个元素可以去多次，所以回溯递归时，下标值不变，结束根据target的值判断
+3.本题不需要提前排序？！！（题里没说啊，但是就过了，，，）(*′Д｀*)
+返回结果数组即可
+相比组合总和II，难度基本一致
+最后一句话：2分钟题。。。入水了(￣▽￣")
+
+执行用时 :
+124 ms
+, 在所有 cpp 提交中击败了
+12.40%
+的用户
+内存消耗 :
+44.1 MB
+, 在所有 cpp 提交中击败了
+11.90%
+的用户
+（emmm...）
+
+上代码：
+class Solution {
+public:
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        vector<vector<int>> ret;
+        if(candidates.size() == 0 || target < 0) {
+            return ret;
+        }
+        vector<int> curr;
+        sort(candidates.begin(), candidates.end());   //先排序，便于后面讲相同的项取消
+        int n = candidates.size();
+        BackTracking(ret, curr, candidates, n, target, 0);
+        return ret;
+    }
+    void BackTracking(vector<vector<int>>& ret, vector<int> curr, vector<int> candidates, int n, int target, int level) {
+        if(target==0) {
+            ret.push_back(curr);
+            return;
+        }
+        else if(target < 0) {
+            return;
+        }
+        for(int i = level; i < n; i++) {
+            curr.push_back(candidates[i]);
+            target -= candidates[i];
+            BackTracking(ret,curr,candidates,n,target,i);
+            curr.pop_back();
+            target += candidates[i];        //另一遍时需要把target重新赋初值
+        }
+    }
+};
