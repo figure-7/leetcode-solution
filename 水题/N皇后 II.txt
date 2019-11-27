@@ -1,0 +1,94 @@
+题目难度：HARD
+
+n?皇后问题研究的是如何将 n?个皇后放置在 n×n 的棋盘上，并且使皇后彼此之间不能相互攻击。
+
+
+
+
+上图为 8 皇后问题的一种解法。
+
+
+给定一个整数 n，返回 n 皇后不同的解决方案的数量。
+
+
+
+示例:
+
+输入: 4
+
+输出: 2
+
+解释: 4 皇后问题存在如下两个不同的解法。
+
+[
+?[".Q..",
+? "...Q",
+? "Q...",
+? "..Q."], ?// 解法 1
+
+
+ ?["..Q.",? "Q...",
+? "...Q",
+? ".Q.."]
+] ?// 解法 2
+
+
+思路：首先说明，我刚做完N皇后就来看这道了，而这道是N皇后的削弱版( ° ▽、° )
+所以我还是进行了一下优化，之后效率暴增！
+实现具体思路见 LeetCode->DFS->N皇后的思路
+改变地方：
+1：不再需要保存结果的二维数组，（空间优化）
+2：DFS内部不在需要进行遍历到最后一行时候的结果拼凑，而是直接设置一个全局变量，成了就加一即可
+最后说一句：2分钟题，入水了。。。(￣▽￣")
+
+执行用时 :
+4 ms
+, 在所有 cpp 提交中击败了
+92.11%
+的用户
+内存消耗 :
+8.2 MB
+, 在所有 cpp 提交中击败了
+68.77%
+的用户
+（嘿嘿）
+
+上代码：
+class Solution {
+public:
+    int res = 0;
+    int totalNQueens(int n) {
+        this->columns = vector<int>(n, 0);
+        this->main_diag = vector<int>(2 * n, 0);
+        this->anti_diag = vector<int>(2 * n, 0);
+        
+        vector<int> C(n, 0);  //C[i]代表第i行皇后所在的列编号
+        dfs(C, 0);
+        return res;
+    }
+private:
+    //这三个变量用于剪枝
+    vector<int> columns;   //表示已经放置皇后占据了哪些列
+    vector<int> main_diag; //占据了哪些主对角线
+    vector<int> anti_diag; //占据了哪些副对角线
+    
+    void dfs(vector<int> &C, int row) {
+        const int N = C.size();
+        if(row == N) {      //终止状态，也是收敛条件，意味着找到了一个可行解
+            res++;
+            return;
+        }
+        
+        for(int j = 0; j < N; ++j) {    //扩展状态。一列一列的试
+            const bool ok = columns[j] == 0 && main_diag[row + j] == 0 && anti_diag[row - j + N] == 0;
+            if(!ok) continue;           //剪枝，如果合法，继续递归
+            //执行扩展动作
+            C[row] = j;
+            columns[j] = main_diag[row + j] = anti_diag[row - j + N] = 1;
+            dfs(C, row+1);
+            //撤销动作
+            //C[row] = 0;
+            columns[j] = main_diag[row + j] = anti_diag[row - j + N] = 0;
+        }
+    } 
+};
