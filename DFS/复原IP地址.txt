@@ -1,0 +1,70 @@
+题目难度：MEDIUM
+
+给定一个只包含数字的字符串，复原它并返回所有可能的 IP 地址格式。
+
+
+
+示例:
+
+输入: "25525511135"
+
+输出: ["255.255.11.135", "255.255.111.35"]
+
+
+
+思路：我又不知到IP格式是什么怎么写（滑稽）Σ( ° △ °|||)
+经过代码观察，只要是每个字符'.'内区间的数值不大于255即可
+利用DFS深搜实现DFS内部一个一维数组保存最后结果，一个指针保存遍历到字符串的当前下标，一个指针用来保存'.'之间区间数
+遍历时针对每三个下标（因为如果到了第四个数值肯定是四位大于255）进行与255大小作比较
+大于就不管了，小于等于就放入字符串中去，然后加上'.'，同时当前下标值更改，步数加一进入DFS递归
+知道遍历字符串到最后并且步数到达4步就把结果字符串长度减一截取（注意这里最后多了个字符'.'，要resize一下）
+之后放入数组中作为一个可行解
+直至结束即可，注意当遇见0时，要break。
+剪枝方法如下：
+1.当遍历字符串的长度大于（4-步数）*3退出（已结束）
+2.当遍历字符串的长度小于（4-步数）退出（已结束）
+剩下的具体见注释
+难度不大。。。
+
+执行用时 :
+0 ms
+, 在所有 cpp 提交中击败了
+100.00%
+的用户
+内存消耗 :
+8.3 MB
+, 在所有 cpp 提交中击败了
+95.52%
+的用户
+（这效率好厉害~）
+
+上代码：
+class Solution {
+public:
+    vector<string> restoreIpAddresses(string s) {
+        vector<string> result;
+        string ip; //存放中间结果
+        dfs(s, 0, 0, ip, result);
+        return result;
+    }
+    void dfs(string s, size_t start, size_t step, string ip, vector<string> &result) {
+        if(start == s.size() && step == 4) {    // 找到一个合法解
+            ip.resize(ip.size() - 1);
+            result.push_back(ip);
+            return;
+        }
+        if(s.size() - start > (4 - step) * 3)
+            return; // 剪枝
+        if(s.size() - start < (4 - step))
+            return; // 剪枝
+        int num = 0;
+        for(size_t i = start; i < start + 3; i++) {
+            num = num * 10 + (s[i] - '0');
+            if(num <= 255) {    // 当前节点合法，则继续往下递归
+                ip += s[i];
+                dfs(s, i + 1, step + 1, ip + '.', result);
+            }
+            if(num == 0) break; // 不允许前缀0
+        }
+    }
+};
