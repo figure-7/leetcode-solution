@@ -1,0 +1,145 @@
+题目难度：HARD
+
+给定一个字符串?s1，我们可以把它递归地分割成两个非空子字符串，从而将其表示为二叉树。
+
+下图是字符串?s1?=?"great"?的一种可能的表示形式。
+
+    great
+   /    \
+  gr    eat
+ / \    /  \
+g   r  e   at
+           / \
+          a   t
+在扰乱这个字符串的过程中，我们可以挑选任何一个非叶节点，然后交换它的两个子节点。
+
+例如，如果我们挑选非叶节点?"gr"?，交换它的两个子节点，将会产生扰乱字符串?"rgeat"?。
+
+    rgeat
+   /    \
+  rg    eat
+ / \    /  \
+r   g  e   at
+           / \
+          a   t
+我们将?"rgeat”?称作?"great"?的一个扰乱字符串。
+
+同样地，如果我们继续交换节点?"eat"?和?"at"?的子节点，将会产生另一个新的扰乱字符串?"rgtae"?。
+
+    rgtae
+   /    \
+  rg    tae
+ / \    /  \
+r   g  ta  e
+       / \
+      t   a
+我们将?"rgtae”?称作?"great"?的一个扰乱字符串。
+
+给出两个长度相等的字符串 s1 和?s2，判断?s2?是否是?s1?的扰乱字符串。
+
+示例?1:
+
+输入: s1 = "great", s2 = "rgeat"
+输出: true
+示例?2:
+
+输入: s1 = "abcde", s2 = "caebd"
+输出: false
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/scramble-string
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+
+思路：第一种方法，递归，书上说超时，但实际过了效率还贼高
+递归中将字符串两两分割，分别把字符串1前段与字符串2后段取与运算或上字符串2前段与字符串1后段取与运算
+每次递归判断两个子串是不是字符相等，如果出现（思路的）上一行结尾所说得到的值为true就直接返回true即可
+结束都没有符合条件的就返回false
+剪枝方法如下：
+1：找到符合条件就直接结束返回true即可（谁都会的）
+2：加入字符计数器（外部两个26次循环，省去判断到最后长度为一的时间）
+
+执行用时 :
+8 ms
+, 在所有 cpp 提交中击败了
+90.31%
+的用户
+内存消耗 :
+9.4 MB
+, 在所有 cpp 提交中击败了
+91.23%
+的用户
+（这么厉害的吗~~~Σ( ° △ °|||)）
+
+上代码：
+class Solution {
+public:
+    bool isScramble(string s1, string s2) {
+        if (s1 == s2) 
+            return true;
+        int n = s1.size();
+        int memo[26] = {0};
+        for (int i = 0; i < n; ++i) {
+           ++memo[s1[i] - 'a'];
+           --memo[s2[i] - 'a'];
+        }
+        for (int i = 0; i < 26; ++i) {
+           if (memo[i] != 0) 
+               return false;
+        }
+        for (int i = 1; i < n; ++i) {
+           if ((isScramble(s1.substr(0, i), s2.substr(0, i)) && isScramble(s1.substr(i), s2.substr(i))) || (isScramble(s1.substr(0, i), s2.substr(n - i)) && isScramble(s1.substr(i), s2.substr(0, n - i)))) {
+               return true;
+           }
+        }
+        return false;
+    }
+};
+
+思路：接下来重点：dp实现
+dp表达式：
+f[n][i][j]中：n表示长度，起点为s1[i]和起点为s2[j]两个字符串是否互为Scramble
+初始化f[0][0][0]为 false（反正也不会使用的），f[1][i][j]为判断i和j下标对应两个字符串对应字符是否相等
+
+执行用时 :
+8 ms
+, 在所有 cpp 提交中击败了
+90.31%
+的用户
+内存消耗 :
+8.3 MB
+, 在所有 cpp 提交中击败了
+97.37%
+的用户
+（结果时间没变？？？，空间缩短了。。。）
+
+上代码：
+class Solution {
+public:
+    bool isScramble(string s1, string s2) {
+        const int N = s1.size();
+        if(N != s2.size()) return false;
+        
+        //f[n][i][j]中：n表示长度
+        //起点为s1[i]和起点为s2[j]两个字符串是否互为Scramble
+        bool f[N + 1][N][N];
+        fill_n(&f[0][0][0], (N + 1) * N * N, false);
+        
+        for (int i = 0; i < N; ++i)
+           for(int j = 0; j < N; ++j)
+               f[1][i][j] = s1[i] == s2[j];
+        
+        for (int n = 1; n <= N; ++n) {
+           for(int i = 0; i + n <= N; ++i) {
+               for(int j = 0; j + n <= N; ++j) {
+                   for(int k = 1; k < n; ++k) {
+                       if((f[k][i][j] && f[n - k][i + k][j + k]) || (f[k][i][j + n - k] && f[n - k][i + k][j])) {
+                           f[n][i][j] = true;
+                           break;
+                       }
+                   }
+               }
+           }
+        }
+        return f[N][0][0];
+    }
+};
