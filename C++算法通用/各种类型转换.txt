@@ -34,6 +34,10 @@ int main(){
 
 3：把字符串转换为数字
 int res = stoi(s);
+大数转换：
+for(int i = 0; i < num.length(); i++)
+            c[i] = num[i];
+long long sum = atoll(c);
 
 4：字符转数字类型：
 int index = digits[0]-'0';
