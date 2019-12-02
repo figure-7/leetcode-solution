@@ -1,0 +1,86 @@
+题目难度：HARD
+
+(此题是 交互式问题?)
+
+在用笛卡尔坐标系表示的二维海平面上，有一些船。
+每一艘船都在一个整数点上，且每一个整数点最多只有 1 艘船。
+
+
+有一个函数?Sea.hasShips(topRight, bottomLeft)?，输入参数为右上角和左下角两个点的坐标，当且仅当这两个点所表示的矩形区域（包含边界）内至少有一艘船时，这个函数才返回?true?，否则返回?false 。
+
+
+给你矩形的右上角?topRight 和左下角?bottomLeft 的坐标，请你返回此矩形内船只的数目。
+题目保证矩形内?至多只有 10 艘船。
+
+
+调用函数?hasShips?超过400次?的提交将被判为?错误答案（Wrong Answer）?。
+同时，任何尝试绕过评测系统的行为都将被取消比赛资格。
+
+?
+
+
+
+示例：
+
+
+
+输入：
+ships = [[1,1],[2,2],[3,3],[5,5]], topRight = [4,4], bottomLeft = [0,0]
+
+输出：3
+
+解释：在 [0,0] 到 [4,4] 的范围内总共有 3 艘船。
+?
+
+
+提示：
+
+ships?数组只用于评测系统内部初始化。
+你无法得知?ships?的信息，所以只能通过调用?hasShips?接口来求解。
+
+0 <=?bottomLeft[0]?<= topRight[0]?<= 1000
+	0 <=?bottomLeft[1]?<= topRight[1]?<= 1000
+
+
+
+思路：双周赛第四题，利用二（四）分+BFS+函数调用来解（由于题目中说调用函数?hasShips?超过400次?的提交将被判为?错误答案（Wrong Answer））
+对于区域矩阵内的区间进行四分，分为左上，左下，右上，右下四个部分，进行查找有没有船
+有船就进行递归，没船就直接结束该区间搜索，
+直到左上角和右上角是一个点，判断该点是否有船，有船就加一给结果
+注意保证遍历不相交即可
+
+上代码：
+/**
+ * // This is Sea's API interface.
+ * // You should not implement it, or speculate about its implementation
+ * class Sea {
+ *   public:
+ *     bool hasShips(vector<int> topRight, vector<int> bottomLeft);
+ * };
+ */
+
+class Solution {
+public:
+    int countShips(Sea sea, vector<int> topRight, vector<int> bottomLeft) {
+        int ans=0;
+        int lx=bottomLeft[0],ly=bottomLeft[1];
+        int rx=topRight[0],ry=topRight[1];
+        if(lx==rx&&ly==ry&&sea.hasShips({rx,ry},{lx,ly})){
+            return 1;
+        }
+        int midx=(lx+rx)/2,midy=(ly+ry)/2;
+        if(midx>=lx&&midy>=ly&&sea.hasShips({midx,midy},{lx,ly})){
+            ans+=countShips(sea,{midx,midy},{lx,ly});
+        }
+        if(rx>=midx+1&&ry>=midy&&sea.hasShips({rx,ry},{midx+1,midy})){
+            ans+=countShips(sea,{rx,ry},{midx+1,midy});
+        }
+        if(midx>=lx&&ry>=midy+1&&sea.hasShips({midx,ry},{lx,midy+1})){
+            ans+=countShips(sea,{midx,ry},{lx,midy+1});
+        }
+        if(rx>=midx+1&&midy-1>=ly&&sea.hasShips({rx,midy-1},{midx+1,ly})){
+            ans+=countShips(sea,{rx,midy-1},{midx+1,ly});
+        }
+        return ans;
+    }
+};
