@@ -1,0 +1,140 @@
+模板1：单词最少改变（增删改）次数使两个单词相等
+dp表达式：for(size_t i = 0; i <= n; i++)
+            	f[i][0] = i;
+          for(size_t j = 0; j <= m; j++)
+            	f[0][j] = j;if(word1[i - 1] == word2[j - 1])	
+		f[i][j] = f[i - 1][j - 1];
+          else	
+		int mn = min(f[i - 1][j], f[i][j - 1]);
+		f[i][j] = 1 + min(f[i - 1][j - 1], mn);
+
+模板2：将字符串s分割成一些都是回文串的子串的最少分割次数。
+dp表达式：for(int i = 0; i <= n; i++)
+            	f[i] = n - i - 1;   //最后一个 f[n]=-1
+          for(int i = n - 1; i >= 0; i--) {
+            	for(int j = i; j < n; j++) {
+                	if(s[i] == s[j] && (j - i < 2 || p[i + 1][j - 1])) {
+                    		p[i][j] = true;
+                    		f[i] = min(f[i], f[j + 1] + 1);
+                	}
+            	}
+         }
+
+模板3：在可以改变指定次数字符情况下，将字符串s分割成一些都是回文串的子串的最少分割次数。
+dp表达式：for(int i=0;i<s.size();i++){
+            for(int j=0;j<=k;j++){
+                dp[i][j]=999999999;
+            }
+        }
+        for(int i=0;i<s.size();i++){
+            dp[i][0]=cost(0,i);
+        }
+        for(int i=0;i<s.size();i++){
+            for(int j=0;j<i;j++){
+                for(int o=1;o<=k;o++){
+                    dp[i][o]=min(dp[i][o],dp[j][o-1]+cost(j+1,i));
+                }
+            }
+        }
+	int cost(int l,int r){
+        	string tmp = "";
+        	for(int i=l;i<=r;i++)tmp+=ss[i];
+        	int res = 0;
+        	for(int i=0;i<tmp.size();i++){
+            		if(tmp[i]!=tmp[tmp.size()-1-i]){
+                		res++;
+                		tmp[tmp.size()-1-i]=tmp[i];
+            		}
+        	}	
+        	return res;
+    	}
+
+模板4：验证字符串s3是否是由字符串s1和字符串s2交错组成的。
+dp表达式：for(size_t i = 1; i <= s1.length(); ++i)
+            f[i][0] = f[i - 1][0] && s1[i - 1] == s3[i - 1];
+        
+        for(size_t i = 1; i <= s2.length(); ++i)
+            f[0][i] = f[0][i - 1] && s2[i - 1] == s3[i - 1];
+        
+        for(size_t i = 1; i <= s1.length(); ++i)
+            for(size_t j = 1; j <= s2.length(); ++j)
+                f[i][j] = (s1[i - 1] == s3[i + j - 1] && f[i - 1][j]) || (s2[j - 1] == s3[i + j -1] && f[i][j - 1]);
+
+模板5：将字符串展开为二叉树，验证字符串s3是否是交换叶子节点字符得到的
+dp表达式：for (int i = 0; i < N; ++i)
+           	for(int j = 0; j < N; ++j)
+               		f[1][i][j] = s1[i] == s2[j];
+        
+        for (int n = 1; n <= N; ++n) {
+           for(int i = 0; i + n <= N; ++i) {
+               for(int j = 0; j + n <= N; ++j) {
+                   for(int k = 1; k < n; ++k) {
+                       if((f[k][i][j] && f[n - k][i + k][j + k]) || (f[k][i][j + n - k] && f[n - k][i + k][j])) {
+                           f[n][i][j] = true;
+                           break;
+                       }
+                   }
+               }
+           }
+        }
+
+模板6：无重复字符的最长子串的长度
+dp表达式：for(j = 0;j<size;j++){      //从头开始比较
+            	for(k = i;k<j;k++)      //从i下标开始比较
+                	if(s[k]==s[j]){     //出现不符合，更新i的值
+                    		i = k+1;
+                    		break;
+                	}
+            	if(j-i+1 > max)
+                	max = j-i+1;
+          }
+
+模板7：最长回文子串
+dp表达式：for(int i=0;i<len;i++)//初始化状态
+        {
+            dp[i][i]=1;
+            if(i<len-1&&s[i]==s[i+1])
+            {
+                dp[i][i+1]=1;
+                max=2;
+                start=i;
+            }
+        }
+        for(int l=3;l<=len;l++)//l表示检索的子串长度，等于3表示先检索长度为3的子串
+        {
+            for(int i=0;i+l-1<len;i++)
+            {
+                int j=l+i-1;//终止字符位置
+                if(s[i]==s[j]&&dp[i+1][j-1]==1)//状态转移
+                {
+                    dp[i][j]=1;
+                    start=i;
+                    max=l;
+                }
+            }
+        }
+
+模板8：最长字符串链
+dp表达式：for(i=0;i<n;i++)for(j=0;j<n;j++)if(words[i].size()+1==words[j].size())//后一项个数为前一项的个数加一，即可能产生词链
+        {
+            x=words[i].size();                  //记录前一个项的值个数
+            y=words[j].size();                  //记录后一个项的值个数
+            for(k=0;k<x;k++)if(words[i][k]!=words[j][k])break;        //k记录从前至后的相同字节数
+            for(l=0;l<x;l++)if(words[i][x-l-1]!=words[j][y-l-1])break;//l记录从后至前的相同字节数
+            if(k+l>=x)g[i][j]=1;                //如果相同字符总数等于前一个下标的字符数，对应二维数组值赋1，两个下标分别对应前一个词链下标和后一个词链的下标
+        }
+        for(i=0;i<n;i++)
+        {
+            if(!v[i])dfs(i);
+            ans=max(ans,f[i]);
+        }
+	void dfs(int x)
+    	{
+        	f[x]=1;
+        	v[x]=1;
+        	for(int i=0;i<n;i++)if(g[x][i])         //DFS深度优先遍历二维数组
+        	{
+            		if(!v[i])dfs(i);
+            		f[x]=max(f[x],f[i]+1);              //有连着的就加一，取最大。
+       		 }
+    	}
