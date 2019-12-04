@@ -1,0 +1,166 @@
+题目难度：MEDIUM
+
+给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
+
+
+百度百科中最近公共祖先的定义为：
+“对于有根树 T 的两个结点 p、q，最近公共祖先表示为一个结点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”
+
+
+例如，给定如下二叉树:? root =?[3,5,1,6,2,0,8,null,null,7,4]
+
+
+
+?
+
+
+
+示例 1:
+
+输入: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1
+
+输出: 3
+
+解释: 节点 5 和节点 1 的最近公共祖先是节点 3。
+
+
+示例?2:
+
+输入: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4
+
+输出: 5
+
+解释: 节点 5 和节点 4 的最近公共祖先是节点 5。因为根据定义最近公共祖先节点可以为节点本身。
+?
+
+
+说明:
+
+所有节点的值都是唯一的。
+p、q 为不同节点且均存在于给定的二叉树中。
+
+思路：好的思路见下面
+笨方法，DFS深搜，先进行路径的搜索，同时用两个数组保存两个节点的路径
+之后从后向前遍历数组，遇到第一个相等的值就是最近祖先
+直接break剪枝
+由于是需要返回节点类型的结果
+所以在DFS一次，找到对应祖先值的节点返回即可
+
+执行用时 :
+628 ms
+, 在所有 cpp 提交中击败了
+5.08%
+的用户
+内存消耗 :
+708.1 MB
+, 在所有 cpp 提交中击败了
+5.06%
+的用户
+（丢死人）
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> res;
+    vector<int> resex;
+    void dfs(TreeNode* head, TreeNode* a, TreeNode* b, vector<int> node) {
+        if(head->val == a->val) {
+            node.push_back(head->val);
+            res = node;
+        }
+        if(head->val == b->val) {
+            node.push_back(head->val);
+            resex = node;
+        }
+        node.push_back(head->val);
+        if(head->left != nullptr && head->right != nullptr) {
+            dfs(head->left, a, b, node);
+            dfs(head->right, a, b, node);
+        }
+        else if(head->left != nullptr)
+            dfs(head->left, a, b, node);
+        else if(head->right != nullptr)
+            dfs(head->right, a, b, node);
+        else {
+            return ;
+        }
+    }
+    
+    void dfsex(TreeNode* head, int sum, TreeNode*& ans) {
+        if(head->val == sum)
+            ans = head;
+        if(head->left != nullptr && head->right != nullptr) {
+            dfsex(head->left, sum, ans);
+            dfsex(head->right, sum, ans);
+        }
+        else if(head->left != nullptr)
+            dfsex(head->left, sum, ans);
+        else if(head->right != nullptr)
+            dfsex(head->right, sum, ans);
+        else {
+            return;
+        }
+    }
+    
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        bool flag = false;
+        TreeNode* ans = root;
+        vector<int> aimer;
+        dfs(root, p, q, aimer);
+        cout<<res.size()<<resex.size();
+        for(int i = resex.size() - 1; i >= 0; i--) {
+            for(int j = res.size() - 1; j >= 0; j--) {
+                if(resex[i] == res[j]) {
+                    cout<<res[j];
+                    dfsex(root, res[j], ans);
+                    flag = true;
+                    break;
+                }
+            }
+            if(flag)
+                break;
+        }
+        return ans;
+    }
+};
+
+思路：在左、右子树中分别查找是否包含p或q：
+
+如果以下两种情况（左子树包含p，右子树包含q/左子树包含q，右子树包含p），那么此时的根节点就是最近公共祖先
+
+如果左子树包含p和q，那么到root->left中继续查找，最近公共祖先在左子树里面
+
+如果右子树包含p和q，那么到root->right中继续查找，最近公共祖先在右子树里面
+
+
+
+执行用时 :
+16 ms
+, 在所有 cpp 提交中击败了
+97.11%
+的用户
+内存消耗 :
+16.7 MB
+, 在所有 cpp 提交中击败了
+37.72%
+的用户
+
+上代码：
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if(root == nullptr || root == p || root == q){return root; }
+        TreeNode* left = lowestCommonAncestor(root->left, p, q);
+        TreeNode* right = lowestCommonAncestor(root->right, p, q);
+        return left == nullptr? right : (right == nullptr? left : root); 
+    }
+};
