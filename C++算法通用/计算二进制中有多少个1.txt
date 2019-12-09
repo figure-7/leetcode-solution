@@ -1,0 +1,2 @@
+_builtin_popcount(a)
+计算a对应二进制数中多少个1
