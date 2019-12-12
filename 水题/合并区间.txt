@@ -1,0 +1,52 @@
+题目难度：MEDIUM
+
+给出一个区间的集合，请合并所有重叠的区间。
+
+示例 1:
+
+输入: [[1,3],[2,6],[8,10],[15,18]]
+输出: [[1,6],[8,10],[15,18]]
+解释: 区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6].
+示例 2:
+
+输入: [[1,4],[4,5]]
+输出: [[1,5]]
+解释: 区间 [1,4] 和 [4,5] 可被视为重叠区间。
+
+思路：先排序，然后一次遍历
+只要针对前一项的左右两个值，分别小于等于，大于等于下一项的左值
+就进行区间合并，然后把下一项删了
+要注意合并后下标要减一，因为可能下一项能跟当前项结果再合并
+此外，注意空区间直接返回即可
+
+执行用时 :
+1332 ms
+, 在所有 cpp 提交中击败了
+5.80%
+的用户
+内存消耗 :
+12.3 MB
+, 在所有 cpp 提交中击败了
+5.08%
+的用户
+（这效率我就不说啥了，就十几行代码，iterater函数效率就这么低吗。。。）
+
+上代码：
+class Solution {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        if(intervals.size() == 0)
+            return intervals;
+        sort(intervals.begin(), intervals.end());
+        for(int i = 0; i < intervals.size() - 1; i++) {
+            if(intervals[i][0] <= intervals[i + 1][0] && intervals[i][1] >= intervals[i + 1][0]) {
+                int curr = max(intervals[i][1], intervals[i + 1][1]);
+                intervals[i][1] = curr;
+                vector<vector<int> >::iterator it = intervals.begin() + i + 1;
+                intervals.erase(it);
+                i--;
+            } 
+        }
+        return intervals;
+    }
+};
