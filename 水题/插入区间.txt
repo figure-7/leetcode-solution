@@ -1,0 +1,123 @@
+题目难度：HARD
+
+给出一个无重叠的 ，按照区间起始端点排序的区间列表。
+
+在列表中插入一个新的区间，你需要确保列表中的区间仍然有序且不重叠（如果有必要的话，可以合并区间）。
+
+示例 1:
+
+输入: intervals = [[1,3],[6,9]], newInterval = [2,5]
+输出: [[1,5],[6,9]]
+示例 2:
+
+输入: intervals = [[1,2],[3,5],[6,7],[8,10],[12,16]], newInterval = [4,8]
+输出: [[1,2],[3,10],[12,16]]
+解释: 这是因为新的区间 [4,8] 与 [3,5],[6,7],[8,10] 重叠。
+
+思路：作为HARD，我这么写就是无比麻烦
+实际就是模拟，过程就是区间合并，情况太多我就不详述了，具体见代码
+反正是会的
+
+执行用时 :
+20 ms
+, 在所有 cpp 提交中击败了
+79.36%
+的用户
+内存消耗 :
+12.8 MB
+, 在所有 cpp 提交中击败了
+5.23%
+的用户
+（果不其然，时间还可以，空间炸了）
+
+上代码：
+class Solution {
+public:
+    bool flag = false;
+    vector<int> curr;
+    vector<int> empty;
+    int jie = 0;
+    bool ok = false;
+    vector<vector<int> > res;
+    vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
+        if(intervals.size() == 0) {
+            curr.push_back(newInterval[0]);
+            curr.push_back(newInterval[1]);
+            res.push_back(curr);
+            return res;
+        }
+        for(int i = 0; i < intervals.size(); i++) {
+            if(flag) {
+                if(intervals[i][0] <= newInterval[1]) {
+                    jie = max(newInterval[1], intervals[i][1]);
+                    if(i == intervals.size() - 1) {
+                        curr.push_back(jie);
+                        res.push_back(curr);
+                    }
+                }
+                else {
+                    flag = false;
+                    curr.push_back(jie);
+                    res.push_back(curr);
+                    curr = empty;
+                }
+            }
+            if(!flag && (i + 1) < intervals.size() && newInterval[0] > intervals[i][1] && newInterval[1] < intervals[i + 1][0]) {
+                ok = true;
+                curr.push_back(intervals[i][0]);
+                curr.push_back(intervals[i][1]);
+                res.push_back(curr);
+                curr = empty;
+                curr.push_back(newInterval[0]);
+                curr.push_back(newInterval[1]);
+                res.push_back(curr);
+                curr = empty;
+            }
+            else if(!flag && newInterval[0] >= intervals[i][0] && newInterval[1] <= intervals[i][1]) {
+                ok = true;
+                curr.push_back(intervals[i][0]);
+                curr.push_back(intervals[i][1]);
+                res.push_back(curr);
+                curr = empty;
+            }
+            else if(!flag && intervals[i][0] <= newInterval[0] && intervals[i][1] >= newInterval[0]) {
+                ok = true;
+                flag = true;
+                jie = max(intervals[i][1], newInterval[1]);
+                curr.push_back(intervals[i][0]);
+            }
+            else if(!flag && newInterval[0] <= intervals[i][0] && newInterval[1] >= intervals[i][0]) {
+                ok = true;
+                flag = true;
+                jie = max(intervals[i][1], newInterval[1]);
+                curr.push_back(newInterval[0]);
+            }
+            else {
+                if(!flag) {
+                    curr.push_back(intervals[i][0]);
+                    curr.push_back(intervals[i][1]);
+                    res.push_back(curr);
+                    curr = empty;
+                }
+            }
+        }
+        if(flag && curr.size() == 1) {
+            jie = max(newInterval[1], intervals[intervals.size() - 1][1]);
+            curr.push_back(jie);
+            res.push_back(curr);
+        }
+        if(!ok) {
+            if(res[0][0] > newInterval[0]) {
+                curr.push_back(newInterval[0]);
+                curr.push_back(newInterval[1]);
+                res.insert(res.begin(), curr);
+            }
+            else {
+                curr.push_back(newInterval[0]);
+                curr.push_back(newInterval[1]);
+                res.push_back(curr);
+            }
+        }
+        return res;
+    }
+};
