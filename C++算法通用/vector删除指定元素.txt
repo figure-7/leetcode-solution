@@ -1,5 +1,9 @@
-É¾³ıvectorÖ¸¶¨Î»ÖÃµÄÔªËØ£º
+åˆ é™¤vectoræŒ‡å®šä½ç½®çš„å…ƒç´ ï¼š
+ä¸€ç»´ï¼š
 	vector<int> vec;
-	......(¸³Öµ²Ù×÷);
-	vector<int>::iterator it = vec.begin()+10;£¨ÏÂ±ê10¶ÔÓ¦ÊıÖµÉ¾³ı£¬°üÀ¨¿Õ¼äÒ²¼õ1£©
+	......(èµ‹å€¼æ“ä½œ);
+	vector<int>::iterator it = vec.begin()+10;ï¼ˆä¸‹æ ‡10å¯¹åº”æ•°å€¼åˆ é™¤ï¼ŒåŒ…æ‹¬ç©ºé—´ä¹Ÿå‡1ï¼‰
     	vec.erase(it);
+äºŒç»´ï¼š
+	vector<vector<int> >::iterator it = intervals.begin() + i + 1;ï¼ˆä¸‹æ ‡i+1å¯¹åº”æ•°å€¼åˆ é™¤ï¼ŒåŒ…æ‹¬ç©ºé—´ä¹Ÿå‡1ï¼‰
+        intervals.erase(it);
