@@ -1,0 +1,97 @@
+题目难度：MEDIUM
+
+请你设计一个迭代器类，包括以下内容：
+
+一个构造函数，输入参数包括：一个 有序且字符唯一 的字符串 characters（该字符串只包含小写英文字母）和一个数字 combinationLength 。
+函数 next() ，按 字典序 返回长度为 combinationLength 的下一个字母组合。
+函数 hasNext() ，只有存在长度为 combinationLength 的下一个字母组合时，才返回 True；否则，返回 False。
+ 
+
+示例：
+
+CombinationIterator iterator = new CombinationIterator("abc", 2); // 创建迭代器 iterator
+
+iterator.next(); // 返回 "ab"
+iterator.hasNext(); // 返回 true
+iterator.next(); // 返回 "ac"
+iterator.hasNext(); // 返回 true
+iterator.next(); // 返回 "bc"
+iterator.hasNext(); // 返回 false
+ 
+
+提示：
+
+1 <= combinationLength <= characters.length <= 15
+每组测试数据最多包含 10^4 次函数调用。
+题目保证每次调用函数 next 时都存在下一个字母组合。
+
+思路：周赛第三题，初见吓一跳，解决问题函数调用+DFS+BackTracking实现
+首先先设立好全局变量，这里我直接局部变量累加奇偶调用函数实现的
+奇数就调用返回字符串的方法，偶数就调用返回布尔类型值的方法
+然后主类先调用DFS的回溯实现对字符串指定长度所有子串的预处理
+当取到字符个数等于所需长度时就把对应子串放到一个全局二维数组里
+然后主类针对结果二维数组进行排序，便于进行按字典序运算子串内容
+之后查询函数只要按顺序输出子串即可，每次运行结束返回当前子串，再调用一下iterater函数将该值删除
+这样的话在调用布尔判断函数时，只要看二维数组长度是否等于0
+不是0就返回true，否则返回false即可
+（码量还是很大的，也比较有难度，不少人也是做了1,2,4三题，（其实第四题我感觉时间给多一点也能搞出来，思路DFS+BackTracking+哈希表就行）
+可是莫得AK，本题做出来啦，还是很爽的！！！）
+
+上代码：
+class CombinationIterator {
+public:
+    vector<vector<char> > res;
+    int aimmodtwo = 0;
+    
+    void DFS(string ch, int n, vector<char> curr, int level, int aim, int sum) {
+        if(aim == sum)
+            res.push_back(curr);
+        sum++;
+        for(int i = level; i < n; i++) {
+            curr.push_back(ch[i]);
+            DFS(ch, n, curr, i + 1, aim, sum);
+            curr.pop_back();
+        }
+    }
+    
+    CombinationIterator(string characters, int combinationLength) {
+        int q = 0;
+        bool flag = false;
+        if(q == 1)
+            flag = true;
+        vector<char> cur;
+        DFS(characters, characters.size(), cur, 0, combinationLength, 0);
+        sort(res.begin(), res.end());
+        if(q % 2 == 0 && flag) {
+            next();
+        }
+        else {
+            if(flag)
+                hasNext();
+        }
+        q++;
+    }
+    
+    string next() {
+        string resmodtwo = "";
+        for(int i = 0; i < res[0].size(); i++)
+            resmodtwo += res[aimmodtwo][i];
+        aimmodtwo++;
+        cout<<aimmodtwo;
+        return resmodtwo;
+    }
+    
+    bool hasNext() {
+        if(res.size() == aimmodtwo)
+            return false;
+        else
+            return true;
+    }
+};
+
+/**
+ * Your CombinationIterator object will be instantiated and called as such:
+ * CombinationIterator* obj = new CombinationIterator(characters, combinationLength);
+ * string param_1 = obj->next();
+ * bool param_2 = obj->hasNext();
+ */
