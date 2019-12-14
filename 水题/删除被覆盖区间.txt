@@ -1,0 +1,56 @@
+题目难度：MEDIUM
+
+给你一个区间列表，请你删除列表中被其他区间所覆盖的区间。
+
+只有当 c <= a 且 b <= d 时，我们才认为区间 [a,b) 被区间 [c,d) 覆盖。
+
+在完成所有删除操作后，请你返回列表中剩余区间的数目。
+
+ 
+
+示例：
+
+输入：intervals = [[1,4],[3,6],[2,8]]
+输出：2
+解释：区间 [3,6] 被区间 [2,8] 覆盖，所以它被删除了。
+ 
+
+提示：​​​​​​
+
+1 <= intervals.length <= 1000
+0 <= intervals[i][0] < intervals[i][1] <= 10^5
+对于所有的 i != j：intervals[i] != intervals[j]
+
+思路：周赛第二题，先进行排序，然后一次遍历
+分两种情况：
+1：当相邻的左边界值相等，就利用iterater函数将右边的数组值带空间删除，直到相邻的两个区间左边界数值不等为止
+然后下标减一（注意不要内部减一，否则指针溢出）
+2：当相邻的左边界值不相等，就看相邻区间的右边界值比较
+如果左边区间的右边界值大于右边区间的右边界值，那么就利用iterater函数将右边的数组值带空间删除
+否则就不做调整
+因为要固定左侧判断依据区间，所以一定要用iterater函数，否则比较起来会很麻烦且容易出错
+
+上代码：
+class Solution {
+public:
+    int removeCoveredIntervals(vector<vector<int>>& intervals) {
+        sort(intervals.begin(), intervals.end());
+        for(int i = 0; i < intervals.size() - 1; i++) {
+            if(intervals[i][0] == intervals[i + 1][0]) {
+                while(i + 1 < intervals.size() && intervals[i][0] == intervals[i + 1][0]) {
+                    vector<vector<int> >::iterator it = intervals.begin() + i + 1;
+                    intervals.erase(it);
+                }
+                i--;
+            }
+            else {
+                if(i + 1 < intervals.size() && intervals[i][1] >= intervals[i + 1][1]) {
+                    vector<vector<int> >::iterator it = intervals.begin() + i + 1;
+                    intervals.erase(it);
+                    i--;
+                }
+            }
+        }
+        return intervals.size();
+    } 
+};
