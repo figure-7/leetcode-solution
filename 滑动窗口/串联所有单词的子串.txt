@@ -1,0 +1,83 @@
+题目难度：HARD
+
+给定一个字符串 s 和一些长度相同的单词 words。找出 s 中恰好可以由 words 中所有单词串联形成的子串的起始位置。
+
+注意子串要与 words 中的单词完全匹配，中间不能有其他字符，但不需要考虑 words 中单词串联的顺序。
+
+ 
+
+示例 1：
+
+输入：
+  s = "barfoothefoobarman",
+  words = ["foo","bar"]
+输出：[0,9]
+解释：
+从索引 0 和 9 开始的子串分别是 "barfoo" 和 "foobar" 。
+输出的顺序不重要, [9,0] 也是有效答案。
+示例 2：
+
+输入：
+  s = "wordgoodgoodgoodbestword",
+  words = ["word","good","best","word"]
+输出：[]
+
+思路：首先想到的是利用DFS+BackTracking+SildingWindow实现，然而不出意外超时
+结果这道题使用哈希表实现，没注意每个子串长度相同
+首先算出每个子串的长度和所有子串加一起的长度
+当所有子串加一起的长度大于给定字符串的长度时，直接返回空（无法实现）
+然后把所有子串放入哈希表中
+遍历给定子符串，并在内部设立一个新的哈希表继承原哈希表，以便修改删除
+然后针对原字符串每个长度为所有子串长度的子串遍历，记录此时下标，再从内不遍历一个子串长度的字符串，看是不是哈希表里的
+是的话就把哈希表找到的串删除，继续遍历看有没有剩下的哈希表中的子串
+如果哈希表空了，那么就把下标放入结果数组里，否则就退出，继续外部遍历
+返回结果数组即可
+（注意：空的情况要另做处理，且一定写在前面，因为要用front函数，没有值会报错，书上没这个处理所以WA了）
+
+执行用时 :
+700 ms
+, 在所有 cpp 提交中击败了
+31.93%
+的用户
+内存消耗 :
+286.4 MB
+, 在所有 cpp 提交中击败了
+14.21%
+的用户
+（效率属实是不咋地）
+
+上代码：
+class Solution {
+public:
+    vector<int> findSubstring(string s, vector<string>& words) {
+        vector<int> result;
+        
+        if(words.size() == 0) return result;
+        
+        size_t wordLength = words.front().length();
+        size_t catLength = wordLength * words.size();
+        
+        if(s.length() < catLength) return result;
+        
+        unordered_map<string, int>wordCount;
+        
+        for(auto const& word : words) ++wordCount[word];
+        
+        for(auto i = begin(s); i <= prev(end(s), catLength); ++i) {
+            unordered_map<string, int> unused(wordCount);
+            
+            for(auto j = i; j != next(i, catLength); j += wordLength) {
+                auto pos = unused.find(string(j, next(j, wordLength)));
+                
+                if(pos == unused.end() || pos->second == 0)
+                    break;
+                
+                if(--pos->second == 0) unused.erase(pos);
+            }
+            
+            if(unused.size() == 0) result.push_back(distance(begin(s), i));
+        }
+        
+        return result;
+    }
+};
