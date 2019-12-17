@@ -1,0 +1,50 @@
+题目难度：MEDIUM
+
+执行用时 :
+12 ms
+, 在所有 cpp 提交中击败了
+85.45%
+的用户
+内存消耗 :
+10.5 MB
+, 在所有 cpp 提交中击败了
+85.00%
+的用户
+（还是非常NICE的）
+
+思路：找规律解
+针对(numRows - 1) * 2的值遍历，也就是中间所隔字符最大数，也就是第一行所隔字符数
+同时用一个定量保存当前值，因为后序遍历要修改上面的值
+然后合理一个变量没运行一次就减二，也就是下一行中间所隔字符数
+注意到最后一行要把最大值重新赋给它进行遍历
+遍历外部针对行数作循环，内部针对串相差的差值的数做字符累加到结果字符串中
+注意当行数为中间的时候，所隔字符差值由当前差值和定量减去当前差值交替作为循环的下标加的值
+而且注意第一次不要交替，否则会把中间的字符差值对弄反
+遍历结束返回结果字符串即可
+注意另加考虑行数为1的情况判断，直接返回原字符串即可（这里WA了一发）
+
+上代码：
+class Solution {
+public:
+    string res = "";
+    
+    string convert(string s, int numRows) {
+        if(numRows == 1) return s;
+        int curr = (numRows - 1) * 2 ;
+        int currmodthree = curr;
+        for(int i = 0; i < numRows; i++) {
+            int currmodtwo = curr;
+            for(int j = i; j < s.length(); j += currmodtwo) {
+                res += s[j];
+                if(i != 0 && i != numRows - 1 && j != i) {
+                    currmodtwo = currmodthree - currmodtwo;
+                    cout<<currmodtwo;
+                }
+            }
+            curr -= 2;
+            if(i == numRows - 2)
+                curr = (numRows - 1) * 2;
+        }
+        return res;
+    }
+};
