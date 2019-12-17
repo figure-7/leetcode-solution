@@ -1,0 +1,57 @@
+题目难度：MEDIUM
+
+给定一个正整数 n，生成一个包含 1 到 n2 所有元素，且元素按顺时针顺序螺旋排列的正方形矩阵。
+
+示例:
+
+输入: 3
+输出:
+[
+ [ 1, 2, 3 ],
+ [ 8, 9, 4 ],
+ [ 7, 6, 5 ]
+]
+
+执行用时 :
+8 ms
+, 在所有 cpp 提交中击败了
+52.44%
+的用户
+内存消耗 :
+8.8 MB
+, 在所有 cpp 提交中击败了
+82.66%
+的用户
+（还不错，空间比较好）
+
+思路：还是用对应一题的思路，利用BFS四象封印来解，不太好想
+只要把对应两个标记位置作为结果数组的两个下标，循环下标值作为对应数组值
+返回结果数组即可
+
+上代码：
+class Solution {
+public:
+    int dr[4] = {0, 1, 0, -1};
+    int dc[4] = {1, 0, -1, 0};
+    
+    vector<vector<int>> generateMatrix(int n) {
+        vector<vector<bool> > seen(n, vector<bool>(n, 0));
+        vector<vector<int> > res(n, vector<int>(n, 0));
+        int r = 0, c = 0, di = 0;
+        for (int i = 1; i <= n * n; i++) {
+            res[r][c] = i;
+            seen[r][c] = true;
+            int cr = r + dr[di];
+            int cc = c + dc[di];
+            if (0 <= cr && cr < n && 0 <= cc && cc < n && !seen[cr][cc]){
+                r = cr;
+                c = cc;
+            } else {
+                di = (di + 1) % 4;
+                r += dr[di];
+                c += dc[di];
+            }
+        }
+        return res;
+    }
+};
