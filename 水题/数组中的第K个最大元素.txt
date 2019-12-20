@@ -1,0 +1,74 @@
+题目难度：MEDIUM
+
+在未排序的数组中找到第 k 个最大的元素。请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。
+
+示例 1:
+
+输入: [3,2,1,5,6,4] 和 k = 2
+输出: 5
+示例 2:
+
+输入: [3,2,3,1,2,4,5,5,6] 和 k = 4
+输出: 4
+说明:
+
+你可以假设 k 总是有效的，且 1 ≤ k ≤ 数组的长度。
+
+思路：提高效率的话，就用快排了，然后从后向前遍历找第K大的元素返回即可
+
+执行用时 :
+8 ms
+, 在所有 cpp 提交中击败了
+97.99%
+的用户
+内存消耗 :
+9.3 MB
+, 在所有 cpp 提交中击败了
+57.63%
+的用户
+（时间很好，空间一般，这里我套模板数组复制了，可以优化的）
+
+上代码：
+class Solution {
+public:
+    void swap(int arr[], int i, int j) {
+        int temp;
+
+        temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+    
+    void QuickSort(int arr[], int left, int right) {
+        int i, pivot;
+
+        if (left >= right)
+            return;
+        pivot = left;
+        swap(arr, left, (left + right) / 2);
+        for (i = left + 1; i <= right; i++) //单边搜索，可以该为双向搜索（据说快点( ° ▽、° )）
+            if (arr[i] < arr[left])
+                swap(arr, i, ++pivot);
+        swap(arr, left, pivot);
+        QuickSort(arr, left, pivot - 1);
+        QuickSort(arr, pivot + 1, right);
+    }
+    
+    int findKthLargest(vector<int>& nums, int k) {
+        if(nums.size() == 1)
+            return nums[0];
+        int n = nums.size();
+        int curr[n];
+        for(int i = 0; i < nums.size(); i++)
+            curr[i] = nums[i];
+        QuickSort(curr, 0, n - 1);
+        cout<<curr[0]<<curr[1];
+        for(int i = n - 1; i >= 0; i--) {
+            k--;
+            if(k == 0) {
+                return curr[i];
+            }
+        }
+        return curr[n - 1];
+    }
+};
