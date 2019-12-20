@@ -1,0 +1,51 @@
+题目难度：MEDIUM
+
+编写一个高效的算法来搜索 m x n 矩阵 matrix 中的一个目标值 target。该矩阵具有以下特性：
+
+每行的元素从左到右升序排列。
+每列的元素从上到下升序排列。
+示例:
+
+现有矩阵 matrix 如下：
+
+[
+  [1,   4,  7, 11, 15],
+  [2,   5,  8, 12, 19],
+  [3,   6,  9, 16, 22],
+  [10, 13, 14, 17, 24],
+  [18, 21, 23, 26, 30]
+]
+给定 target = 5，返回 true。
+
+给定 target = 20，返回 false。
+
+思路：直接二维爆搜，找到就返回true并break，否则遍历结束返回false
+或者高效的二分，再或者更高效的空间压缩，这里我懒得写了，具体见模板即可
+
+执行用时 :
+1316 ms
+, 在所有 cpp 提交中击败了
+6.39%
+的用户
+内存消耗 :
+12.4 MB
+, 在所有 cpp 提交中击败了
+96.20%
+的用户
+（果不其然，但是空间效率相当高）
+
+上代码：
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        for(int i = 0; i < matrix.size(); i++) {
+            for(int j = 0; j < matrix[0].size(); j++) {
+                if(matrix[i][j] == target) {
+                    return true;
+                    break;
+                }
+            }
+        }
+        return false;
+    }
+};
