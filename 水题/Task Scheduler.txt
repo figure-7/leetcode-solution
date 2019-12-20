@@ -1,0 +1,61 @@
+题目难度：MEDIUM
+
+给定一个用字符数组表示的 CPU 需要执行的任务列表。其中包含使用大写的 A - Z 字母表示的26 种不同种类的任务。任务可以以任意顺序执行，并且每个任务都可以在 1 个单位时间内执行完。CPU 在任何一个单位时间内都可以执行一个任务，或者在待命状态。
+
+然而，两个相同种类的任务之间必须有长度为 n 的冷却时间，因此至少有连续 n 个单位时间内 CPU 在执行不同的任务，或者在待命状态。
+
+你需要计算完成所有任务所需要的最短时间。
+
+示例 1：
+
+输入: tasks = ["A","A","A","B","B","B"], n = 2
+输出: 8
+执行顺序: A -> B -> (待命) -> A -> B -> (待命) -> A -> B.
+注：
+
+任务的总个数为 [1, 10000]。
+n 的取值范围为 [0, 100]。
+
+思路：先排序，然后找最大相同数，再找有几个最大相同数的值
+之后只要算出最大相同数减一乘以间隔值（也就是中间最隔多少个）加上最大相同数的值（也就是排到最后尾部加一）再加上最大相同数
+上述运算过程中已经可以包含中间不为空闲的情况（剩下的只要找空插就行，肯定能在间隔时间找到空位置）
+然后返回上述结果与数组长度的最大值即可
+
+执行用时 :
+68 ms
+, 在所有 cpp 提交中击败了
+46.44%
+的用户
+内存消耗 :
+9.5 MB
+, 在所有 cpp 提交中击败了
+94.00%
+的用户
+（时间一般，空间不错）
+
+上代码：
+class Solution {
+public:
+    int sum = 1;
+    int summodtwo = 0;
+    int aim = 0;
+    
+    int leastInterval(vector<char>& tasks, int n) {
+        if(tasks.size() == 1)
+            return 1;
+        sort(tasks.begin(), tasks.end());
+        for(int i = 0; i < tasks.size() - 1; i++) {
+            if(tasks[i] ==tasks[i + 1])
+                sum++;
+            else
+                sum = 1;
+            if(sum == summodtwo)
+                aim++;
+            if(sum > summodtwo) {
+                summodtwo = sum;
+                aim = 0;
+            }
+        }
+        return tasks.size() > summodtwo + aim + (summodtwo - 1) * n ? tasks.size() : summodtwo + aim + (summodtwo - 1) * n;
+    }
+};
