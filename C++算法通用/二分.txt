@@ -5,6 +5,20 @@ while(begin<=end) {
 		else if() begin=mid+1;
 	}
 
+二维数组比二分好的方法：O（M+N）
+int row = matrix.size(), col = matrix[0].size();
+        int i = 0, j = col - 1;
+        while (i < row && j >= 0) {
+            if (matrix[i][j] == target) {
+                return true;
+            } else if (matrix[i][j] < target) {
+                ++i;
+            } else if (matrix[i][j] > target) {
+                --j;
+            }
+        }
+
+
 二分查找的函数有 3 个： 参考：C++ lower_bound 和upper_bound
 
 lower_bound(起始地址，结束地址，要查找的数值) 返回的是数值 第一个 出现的位置。
