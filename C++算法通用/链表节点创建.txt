@@ -1,0 +1,4 @@
+ListNode* head=new ListNode(-1);//存放结果的链表
+ListNode* h=head;//移动指针
+h->next=new ListNode(sum%10);//存值
+h=h->next;//向下走
