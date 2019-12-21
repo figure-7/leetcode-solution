@@ -1,0 +1,7 @@
+ListNode* slow = head, *prev = nullptr;
+while (slow){//reverse
+            ListNode* ovn = slow->next;
+            slow->next = prev;
+            prev = slow;
+            slow = ovn;
+        }
