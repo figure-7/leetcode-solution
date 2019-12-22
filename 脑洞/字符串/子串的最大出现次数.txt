@@ -1,0 +1,64 @@
+题目难度：MEDIUM
+
+给你一个字符串 s ，请你返回满足以下条件且出现次数最大的 任意 子串的出现次数：
+
+子串中不同字母的数目必须小于等于 maxLetters 。
+子串的长度必须大于等于 minSize 且小于等于 maxSize 。
+ 
+
+示例 1：
+
+输入：s = "aababcaab", maxLetters = 2, minSize = 3, maxSize = 4
+输出：2
+解释：子串 "aab" 在原字符串中出现了 2 次。
+它满足所有的要求：2 个不同的字母，长度为 3 （在 minSize 和 maxSize 范围内）。
+示例 2：
+
+输入：s = "aaaa", maxLetters = 1, minSize = 3, maxSize = 3
+输出：2
+解释：子串 "aaa" 在原字符串中出现了 2 次，且它们有重叠部分。
+示例 3：
+
+输入：s = "aabcabcab", maxLetters = 2, minSize = 2, maxSize = 3
+输出：3
+示例 4：
+
+输入：s = "abcde", maxLetters = 2, minSize = 3, maxSize = 3
+输出：0
+
+思路：周赛第三题，哈希表处理
+（因为卡二题，所以这道没做）
+先单向遍历，利用SlidingWindow解决，双指针截取每个在长度范围内的子串
+然后放入哈希表在查找，找到就累加值，然后去最大即可
+（属实不难，但是没时间写）
+
+上代码：
+class Solution {
+public:
+    int maxFreq(string s, int maxLetters, int minSize, int maxSize) {
+        unordered_map<string, int> cnt;
+        int n = s.size();
+        for (int len = minSize; len <= maxSize; len++) {
+            map<char, int> dict;
+            string str = s.substr(0, len);
+            for (char c : str)
+                dict[c]++;
+            if (dict.size() <= maxLetters)
+                cnt[str]++;
+            for (int i = 1; i <= n - len; ++i) {
+                string str = s.substr(i, len);
+                char d = s[i - 1];
+                char e = s[i + len - 1];
+                dict[d]--;
+                if (dict[d] == 0) dict.erase(d);
+                dict[e]++;
+                if (dict.size() <= maxLetters)
+                    cnt[str]++;
+            }
+        }
+        int ans = 0;
+        for (const auto &it : cnt)
+            ans = max(ans, it.second);
+        return ans;
+    }
+};
