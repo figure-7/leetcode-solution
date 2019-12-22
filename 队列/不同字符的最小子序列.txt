@@ -1,0 +1,77 @@
+题目难度：MEDIUM
+
+返回字符串 text 中按字典序排列最小的子序列，该子序列包含 text 中所有不同字符一次。
+
+ 
+
+示例 1：
+
+输入："cdadabcc"
+输出："adbc"
+示例 2：
+
+输入："abcd"
+输出："abcd"
+示例 3：
+
+输入："ecbacba"
+输出："eacb"
+示例 4：
+
+输入："leetcode"
+输出："letcod"
+ 
+
+提示：
+
+1 <= text.length <= 1000
+text 由小写英文字母组成
+
+思路：先将每个字符放到表中存储对应出现次数
+再用队列，第一个字符先进队，然后对后面的每个字符做判断
+每次循环map对应字符值（字符剩余个数）减一
+如果比前一个字符字典小就看它前一个对应map是否还有值（后面还有该字符）
+有值就让他前一个字符出队，在向前边遍历，直至队空或字典比前一个字符大为止
+最后输出队列元素即可
+
+上代码：
+#define _for(i,a,b) for(int i = (a);i < b;i ++)
+class Solution
+{
+	public:
+		string smallestSubsequence(string text)
+		{
+			int vis[26];
+			deque<char> deque1;
+			map<char,int> map1;
+
+			deque1.clear();
+			map1.clear();
+			int len=text.size();
+			for(int i=0; i<len; i++)
+			{
+				vis[text[i]-'a']=0;
+				map1[text[i]]++;
+			}
+			for(int i=0; i<len; i++)
+			{
+				map1[text[i]]--;
+				if(vis[text[i]-'a'])
+					continue;
+				while(!deque1.empty()&&deque1.back()>text[i]&&map1[deque1.back()]>0)
+				{
+					vis[deque1.back()-'a']=0;
+					deque1.pop_back();
+				}
+				deque1.push_back(text[i]);
+				vis[text[i]-'a']=1;
+			}
+			string rnt;
+			while(!deque1.empty())
+			{
+				rnt += deque1.front();
+				deque1.pop_front();
+			}
+			return rnt;
+		}
+};
