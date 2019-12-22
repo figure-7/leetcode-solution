@@ -1,0 +1,70 @@
+题目难度：MEDIUM
+
+给你一个整数数组 nums 和一个正整数 k，请你判断是否可以把这个数组划分成一些由 k 个连续数字组成的集合。
+如果可以，请返回 True；否则，返回 False。
+
+ 
+
+示例 1：
+
+输入：nums = [1,2,3,3,4,4,5,6], k = 4
+输出：true
+解释：数组可以分成 [1,2,3,4] 和 [3,4,5,6]。
+示例 2：
+
+输入：nums = [3,2,1,2,3,4,3,4,5,9,10,11], k = 3
+输出：true
+解释：数组可以分成 [1,2,3] , [2,3,4] , [3,4,5] 和 [9,10,11]。
+示例 3：
+
+输入：nums = [3,3,2,2,1,1], k = 3
+输出：true
+示例 4：
+
+输入：nums = [1,2,3,4], k = 3
+输出：false
+解释：数组不能分成几个大小为 3 的子数组。
+ 
+
+提示：
+
+1 <= nums.length <= 10^5
+1 <= nums[i] <= 10^9
+1 <= k <= nums.length
+
+思路：周赛第二题，哈希表或者数组模拟
+（10^9在int型范围内，我。。。考虑了一个小时不开空间的作法）
+首先纯遍历查找超时，很正常
+利用数组先存值，然后根据k个次数循环，一次找加一的值然后个数减一
+之后再取看过程中是否有个数依旧不为0的最小的值，有就从当前最小值开始继续遍历
+没有就按照排好序的数组的下一个值作为下标开始
+最后如果遍历值的次数等于数组长度就返回true，否则返回false
+（以下是哈希表写法）
+
+上代码：
+class Solution {
+public:
+    bool isPossibleDivide(vector<int>& nums, int k) {
+        map<int, int> cnt;
+        for (const int num : nums)
+            cnt[num]++;
+        bool ok = true;
+        while (ok && !cnt.empty()) {
+            int start = cnt.begin()->first;
+            for (int i = start; i < start+k; ++i) {
+                if (cnt.find(i) == cnt.end()) {
+                    ok = false;
+                    break;
+                }
+                cnt[i]--;
+            }
+            if (!ok) break;
+            for (int i = start; i < start+k; ++i) {
+                if (cnt[i] == 0)
+                    cnt.erase(i);
+            }
+        }
+        
+        return cnt.empty();
+    }
+};
