@@ -1,0 +1,85 @@
+题目难度：HARD
+
+思路：利用函数调用+DFS来解，其中包含类型转换，二叉树节点构造，方法见模板
+首先DFS深搜构造该树的字符串序列，子节点为空用'='表示，数据直接转换为字符串模式累加并在尾部加上一个'+'
+serialize函数调用DFS前序遍历返回结果字符串即可
+deserialize函数利用DFS的方式运行，每次先看是不是'+'，是的话下标加一
+再看如果下标大于等于字符串长度或者对应字符值为'='，就返回NULL（遍历结束或者空的叶子结点）
+之后按位累加数值，如果第一个字符是'-'，那么最后数值要变反，利用一个flag数值调整
+分别下标加一左右DFS遍历直至结束即可
+
+执行用时 :
+300 ms
+, 在所有 cpp 提交中击败了
+5.96%
+的用户
+内存消耗 :
+701.9 MB
+, 在所有 cpp 提交中击败了
+5.60%
+的用户
+（双高爆。。。空间真的不理解）
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Codec {
+public:
+    int i = 0;
+    string res = "";
+    bool flag = false;
+
+    void DFS(TreeNode* node) {
+        if(node != nullptr) {
+            res += to_string(node->val);
+            res += '+';
+            DFS(node->left);
+            DFS(node->right);
+        } else
+            res += '=';
+    }
+    
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        DFS(root);
+        cout<<res;
+        return res;
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        if(i < data.length() && data[i] == '+') i++;
+        if(i >= data.length() || data[i] == '=') return NULL;
+        int curr = 0;
+        while(data[i] != '+' && data[i] != '=') {
+            if(data[i] == '-') {
+                flag = true;
+                i++;
+            }
+            curr *= 10;
+            curr += data[i] - '0';
+            i++;
+        }
+        if(flag) {
+            curr = -curr;
+            flag = false;
+        }
+        TreeNode* root = new TreeNode(curr);
+        i++;
+        root->left = deserialize(data);
+        i++;
+        root->right = deserialize(data);
+        return root;
+    }
+};
+
+// Your Codec object will be instantiated and called as such:
+// Codec codec;
+// codec.deserialize(codec.serialize(root));
