@@ -1,0 +1,95 @@
+题目难度：MEIDUM
+
+给定一个含有 M x N 个元素的矩阵（M 行，N 列），请以对角线遍历的顺序返回这个矩阵中的所有元素，对角线遍历如下图所示。
+
+ 
+
+示例:
+
+输入:
+[
+ [ 1, 2, 3 ],
+ [ 4, 5, 6 ],
+ [ 7, 8, 9 ]
+]
+
+输出:  [1,2,4,7,5,3,6,8,9]
+
+解释:
+
+ 
+
+说明:
+
+给定矩阵中的元素总数不会超过 100000 。
+
+思路：模拟
+这题感觉有点问题，第一次直接用的数组边界做判断结果他给当成变量了，不知道咋的，真的迷
+利用一个布尔标志表示是右上走还是左下走，每次针对数组区间内循环一遍
+然后判断越界，分四种情况：
+1：i小于0，j不越界：布尔状态反转，i给0
+2：j大于0，j不越界：布尔状态反转，i加二，j下标指向最后一个位置
+3：j小于0，i不越界：布尔状态反转，j给0
+4：i大于0，i不越界：布尔状态反转，j加二，i下标指向最后一个位置
+每次加一个数都累计进入一个变量，如果次数到达数组值的个数就结束
+注意当数组为空时直接返回空数组即可
+
+执行用时 :
+84 ms
+, 在所有 cpp 提交中击败了
+79.55%
+的用户
+内存消耗 :
+15.2 MB
+, 在所有 cpp 提交中击败了
+7.11%
+的用户
+（时间还可以，空间不是原地，所以很差）
+
+上代码：
+class Solution {
+public:
+    bool flag = true;
+    vector<int> res;
+    int sum = 0;
+    
+    vector<int> findDiagonalOrder(vector<vector<int>>& matrix) {
+        if(matrix.size() == 0) return res;
+        int m = matrix.size();
+        int n = matrix[0].size();
+        int i = 0, j = 0;
+        while(sum < m * n) {
+            while(i >= 0 && j >= 0 && i < matrix.size() && j < matrix[0].size()) {
+                res.push_back(matrix[i][j]);
+                sum++;
+                if(flag){
+                    i--;
+                    j++;
+                }
+                else {
+                    i++;
+                    j--;
+                }
+            }
+            if(i < 0 && j < matrix[0].size()) {
+                i = 0;
+                flag = false;
+            }
+            if(j > 0 && j >= matrix[0].size()) {
+                i += 2;
+                j = matrix[0].size() - 1;
+                flag = false;
+            }
+            if(j < 0 && i < matrix.size()) {
+                j = 0;
+                flag = true;
+            }
+            if(i > 0 && i >= matrix.size()) {
+                j += 2;
+                i = matrix.size() - 1;
+                flag = true;
+            }
+        }
+        return res;
+    }
+};
