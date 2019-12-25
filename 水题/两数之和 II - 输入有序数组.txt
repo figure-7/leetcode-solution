@@ -1,0 +1,47 @@
+题目难度：EASY
+
+给定一个已按照升序排列 的有序数组，找到两个数使得它们相加之和等于目标数。
+
+函数应该返回这两个下标值 index1 和 index2，其中 index1 必须小于 index2。
+
+说明:
+
+返回的下标值（index1 和 index2）不是从零开始的。
+你可以假设每个输入只对应唯一的答案，而且你不可以重复使用相同的元素。
+示例:
+
+输入: numbers = [2, 7, 11, 15], target = 9
+输出: [1,2]
+解释: 2 与 7 之和等于目标数 9 。因此 index1 = 1, index2 = 2 。
+
+思路：哈希表
+利用哈希表存原数组值，值为下标，然后再遍历一次，每次去哈希表里找目标减去当前值
+找到了就返回当前下标加一和哈希表找到的对应值加一组成的数组即可
+
+执行用时 :
+8 ms
+, 在所有 cpp 提交中击败了
+65.91%
+的用户
+内存消耗 :
+9.8 MB
+, 在所有 cpp 提交中击败了
+5.15%
+的用户
+（时间还不是很快...空间用来哈希表，也太低了，惨）
+
+上代码：
+class Solution {
+public:
+    unordered_map<int, int> map;
+    vector<int> twoSum(vector<int>& numbers, int target) {
+        for(int i = 0; i < numbers.size(); i++)
+            map[numbers[i]] = i;
+        for(int i = 0; i < numbers.size(); i++) {
+            int curr = target - numbers[i];
+            if(map.count(curr))
+                return {i + 1, map[curr] + 1};
+        }
+        return {0,0};
+    }
+};
