@@ -1,0 +1,56 @@
+题目难度：EASY
+
+给定一个二进制数组， 计算其中最大连续1的个数。
+
+示例 1:
+
+输入: [1,1,0,1,1,1]
+输出: 3
+解释: 开头的两位和最后的三位都是连续1，所以最大连续1的个数是 3.
+注意：
+
+输入的数组只包含 0 和1。
+输入数组的长度是正整数，且不超过 10,000。
+
+思路：模拟
+进行连续医德查找，注意好各个细节即可
+（WA了好几发，丢人）
+
+执行用时 :
+60 ms
+, 在所有 cpp 提交中击败了
+9.23%
+的用户
+内存消耗 :
+11.8 MB
+, 在所有 cpp 提交中击败了
+62.10%
+的用户
+（空间满足原地条件，时间慢的一匹...）
+
+上代码：
+class Solution {
+public:
+    int res = 0, sum = 1, aim = 0;;
+    
+    int findMaxConsecutiveOnes(vector<int>& nums) {
+        if(nums.size() == 1 && nums[0] == 1) return 1;
+        for(int i = 0; i < nums.size() - 1; i++) {
+            if(nums[i] == nums[i + 1] && nums[i] == 1) {
+                sum++;
+                aim = 1;
+            }
+            else if(nums[i] == 1)
+                aim = 1;
+            else {
+                res = max(sum, res);
+                sum = 1;
+            }
+        }
+        if(nums[nums.size() - 1] == 1)
+            aim = 1;
+        res = max(1, res);
+        res = max(sum, res);
+        return aim > 0 ? res : 0;
+    }
+};
