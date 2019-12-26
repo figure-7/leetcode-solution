@@ -1,0 +1,64 @@
+题目难度：
+
+给定一个含有 n 个正整数的数组和一个正整数 s ，找出该数组中满足其和 ≥ s 的长度最小的连续子数组。如果不存在符合条件的连续子数组，返回 0。
+
+示例: 
+
+输入: s = 7, nums = [2,3,1,2,4,3]
+输出: 2
+解释: 子数组 [4,3] 是该条件下的长度最小的连续子数组。
+进阶:
+
+如果你已经完成了O(n) 时间复杂度的解法, 请尝试 O(n log n) 时间复杂度的解法。
+
+思路：SlidingWindow
+双指针遍历每个长度刚好大于等于的区间，如果等于就取一下给定值
+大于就去循环左指针，并减去对应的值，直到小于等于给定值之后，取一下当前长度加一（因为要大于给定值）与当前结果值的最小值
+注意当整个数组的和等于给定值时，返回数组长度
+注意除上述情况外如果左指针没有移动，就返回0（表示没有大于等于的情况）
+（也是坑点较多，WA了两发...）
+
+执行用时 :
+16 ms
+, 在所有 cpp 提交中击败了
+35.88%
+的用户
+内存消耗 :
+9.8 MB
+, 在所有 cpp 提交中击败了
+94.22%
+的用户
+（时间有点迷，空间原地）
+
+上代码：
+class Solution {
+public:
+    int begin = 0, aim = 0, sum = 0, res = 999999;
+    bool flag = false;
+    
+    int minSubArrayLen(int s, vector<int>& nums) {
+        for(int i = 0; i < nums.size(); i++) {
+            sum += nums[i];
+            aim++;
+            while(sum > s) {
+                sum -= nums[begin];
+                begin++;
+                aim--;
+                flag = true;
+            }
+            if(sum == s)
+                res = min(res, aim);
+            if(flag) {
+                cout<<aim;
+                if(sum == s)
+                    res = min(res, aim);
+                else
+                    res = min(res, aim + 1);
+                flag = false;
+            }
+        }
+        if(begin == 0 && sum == s) return nums.size();
+        if(begin == 0) return 0;
+        return res;
+    }
+};
