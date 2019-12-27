@@ -1,0 +1,59 @@
+题目难度：EASY
+
+给定一个字符串，你需要反转字符串中每个单词的字符顺序，同时仍保留空格和单词的初始顺序。
+
+示例 1:
+
+输入: "Let's take LeetCode contest"
+输出: "s'teL ekat edoCteeL tsetnoc" 
+注意：在字符串中，每个单词由单个空格分隔，并且字符串中不会有任何额外的空格。
+
+思路；模拟，3分钟题
+有了上一题翻转字符串里的单词的代码，只需要做以下操作即可
+1：字符串每次放进数组前先翻转
+2：结果数组正向输出
+3：当i下标不为最后一项时加空格
+返回结果即可
+
+执行用时 :
+16 ms
+, 在所有 cpp 提交中击败了
+93.15%
+的用户
+内存消耗 :
+15.6 MB
+, 在所有 cpp 提交中击败了
+15.81%
+的用户
+（时间很好，空间不是原地，大了）
+
+上代码：
+class Solution {
+public:
+    string cur = "";
+    vector<string> res;
+    string ss = "";
+    
+    string reverseWords(string s) {
+        for(int i = 0; i < s.length(); i++) {
+            if(s[i] != ' ')
+                cur += s[i];
+            else {
+                if(cur.length() != 0) {
+                    reverse(cur.begin(), cur.end());
+                    res.push_back(cur);
+                }
+                cur = ss;
+            }
+        }
+        reverse(cur.begin(), cur.end());
+        if(cur.length() != 0)
+            res.push_back(cur);
+        for(int i = 0; i < res.size(); i++) {
+            ss += res[i];
+            if(i != res.size() - 1)
+                ss += ' ';
+        }
+        return ss;
+    }
+};
