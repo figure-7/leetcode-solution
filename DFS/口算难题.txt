@@ -1,0 +1,120 @@
+题目难度：HARD
+
+给你一个方程，左边用 words 表示，右边用 result 表示。
+
+你需要根据以下规则检查方程是否可解：
+
+每个字符都会被解码成一位数字（0 - 9）。
+每对不同的字符必须映射到不同的数字。
+每个 words[i] 和 result 都会被解码成一个没有前导零的数字。
+左侧数字之和（words）等于右侧数字（result）。 
+如果方程可解，返回 True，否则返回 False。
+
+ 
+
+示例 1：
+
+输入：words = ["SEND","MORE"], result = "MONEY"
+输出：true
+解释：映射 'S'-> 9, 'E'->5, 'N'->6, 'D'->7, 'M'->1, 'O'->0, 'R'->8, 'Y'->'2'
+所以 "SEND" + "MORE" = "MONEY" ,  9567 + 1085 = 10652
+示例 2：
+
+输入：words = ["SIX","SEVEN","SEVEN"], result = "TWENTY"
+输出：true
+解释：映射 'S'-> 6, 'I'->5, 'X'->0, 'E'->8, 'V'->7, 'N'->2, 'T'->1, 'W'->'3', 'Y'->4
+所以 "SIX" + "SEVEN" + "SEVEN" = "TWENTY" ,  650 + 68782 + 68782 = 138214
+示例 3：
+
+输入：words = ["THIS","IS","TOO"], result = "FUNNY"
+输出：true
+示例 4：
+
+输入：words = ["LEET","CODE"], result = "POINT"
+输出：false
+ 
+
+提示：
+
+2 <= words.length <= 5
+1 <= words[i].length, results.length <= 7
+words[i], result 只含有大写英文字母
+表达式中使用的不同字符数最大为 10
+
+思路：周赛第四题，DFS+预处理
+先进行字符转换为数字，然后预处理计算权值，效果如下面专类解释
+然后DFS的时候就对10以内进行遍历，如果当前值之前用过了就不能赋值，并且第一个数字不能是0
+否则就可以赋值，之后全排列的思路解决所有情况计算
+如果DFS成功了就返回true，否则返回false
+接下来介绍权值计算：
+例如案例1：SEND+MORE MONEY
+S ：         1000     0
+E ：         101      10
+N ：         10       100
+D ：         1        0
+M ：         1000     10000
+O ：         100      1000
+R ：         10       0
+Y ：         0        1
+然后当DFS得到的对应字符序列为：85671082时，结果为：
+左边：8000+505+60+7+1000+0+80 = 10652
+右边：50+600+10000+0 = 10652
+从而得出两边权重一致即可返回true
+（挺绕的一道题，时间基本充裕，可惜额将近一个小时还是有问题，除了预处理剩下思路基本一致）
+（还有这题有部分人爆WA打表过，呃呃....）
+
+上代码：
+class Solution {
+public:
+    bool canZero[26];
+    int left[15], right[15], numc;
+    map<char, int> toIndex;
+    bool vis[15];
+    
+    void calcWeight(const string &s, int arr[]){
+        int n = s.length(), w = 1;
+        for (int i = n - 1; i >= 0; i--){
+            arr[toIndex[s[i]]] += w;
+            w *= 10;
+        }
+    }
+    
+    bool dfs(int cur, int n, int l, int r){
+        if (cur > n){
+            // if (l == r) printf("%d\n", l);
+            return l == r;
+        }
+        
+        for (int i = 0; i <= 9; i++){
+            if (canZero[cur] == false && i == 0) continue;
+            if (vis[i]) continue;
+            vis[i] = true;
+            bool flag = dfs(cur + 1, n, l + i * left[cur], r + i * right[cur]);
+            if (flag) return true;
+            vis[i] = false;
+        }
+        return false;
+    }
+    
+    bool isSolvable(vector<string>& words, string result) {
+        numc = 0; toIndex.clear();
+        for (auto w: words) for (auto c: w){
+            if (toIndex[c] == 0) toIndex[c] = ++numc;
+        }
+        for (auto c: result){
+            if (toIndex[c] == 0) toIndex[c] = ++numc;
+        }
+        
+        for (int i = 0; i < 26; i++) canZero[i] = true;
+        canZero[toIndex[result[0]]] = false;
+        for (auto w: words) canZero[toIndex[w[0]]] = false;
+        
+        memset(left, 0, sizeof(left));
+        memset(right, 0, sizeof(right));
+        calcWeight(result, right);
+        for (auto w: words) calcWeight(w, left);
+        
+        memset(vis, false, sizeof(vis));
+        return dfs(1, numc, 0, 0);
+    }
+};
