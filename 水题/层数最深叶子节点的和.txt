@@ -1,0 +1,57 @@
+题目难度：MEDIUM
+
+给你一棵二叉树，请你返回层数最深的叶子节点的和。
+
+ 
+
+示例：
+
+
+
+输入：root = [1,2,3,4,5,null,6,7,null,null,null,null,8]
+输出：15
+ 
+
+提示：
+
+树中节点数目在 1 到 10^4 之间。
+每个节点的值在 1 到 100 之间。
+
+思路：双周赛第三题，DFS深搜
+这题没啥说的，水题，只要DFS带层数值递归，开一个数组
+将对应层数作为下标，节点值累加即可
+注意返回结果数组的下标值（样例好坑，最后一层和跟倒数第二层和一样，WA了一发...）
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> res;
+    int num = 0;
+    
+    void DFS(TreeNode *node, int level) {
+        res[level] += node->val;
+        if(node->left)
+            DFS(node->left,level+1); 
+        if(node->right)
+            DFS(node->right,level+1);
+        if(!node->left && !node->right) {
+            num = max(num,level);
+            return ;                    //减少程序耗时
+        }
+    }
+    
+    int deepestLeavesSum(TreeNode* root) {
+        res.resize(1000, 0);
+        DFS(root, 0);
+        return res[num];
+    }
+};
