@@ -1,0 +1,69 @@
+题目难度：MEDIUM
+
+给你一个整数数组 arr 和一个目标值 target ，请你返回一个整数 value ，使得将数组中所有大于 value 的值变成 value 后，数组的和最接近  target （最接近表示两者之差的绝对值最小）。
+
+如果有多种使得和最接近 target 的方案，请你返回这些整数中的最小值。
+
+请注意，答案不一定是 arr 中的数字。
+
+ 
+
+示例 1：
+
+输入：arr = [4,9,3], target = 10
+输出：3
+解释：当选择 value 为 3 时，数组会变成 [3, 3, 3]，和为 9 ，这是最接近 target 的方案。
+示例 2：
+
+输入：arr = [2,3,5], target = 10
+输出：5
+示例 3：
+
+输入：arr = [60864,25176,27249,21296,20204], target = 56803
+输出：11361
+ 
+
+提示：
+
+1 <= arr.length <= 10^4
+1 <= arr[i], target <= 10^5
+
+思路：双周赛第二题，模拟
+先排序，然后从左向右遍历，范围从0到给定最大范围
+然后如果遍历当前值大于数组对应下标的值（初值为0），就将数组下标加一
+每一步都取当前遍历的值乘以（数组长度减去当前数组下标）（即将大于当前值的数都变为当前值再累加起来的和）
+再加上数组下标前面数组值的和（用到一个变量保存，代码里的cur）（即小于当前值的数不变，直接求和即可）
+然后把当前的结果与目标值求差的绝对值，当遇到差值的绝对值小于之前的值就更新结果为当前遍历的值，同时更新差值
+否则就直接退出循环即可
+（好在不超时，汗）
+
+上代码：
+class Solution {
+public:
+    int cur = 0;
+    int chamodtwo = 9999999;
+    
+    int findBestValue(vector<int>& arr, int target) {
+        sort(arr.begin(), arr.end());
+        int res = 0;
+        int sum = 0;
+        int j = 0;
+        for(int i = 0; i <= 100000; i++) {
+            while(j < arr.size() && i > arr[j]) {
+                cur += arr[j];
+                j++;
+            }
+            int aim = i * (arr.size() - j) + cur;
+            int cha = abs(aim - target);
+
+            cout<<cha;
+            if(cha < chamodtwo) {
+                res = i;
+                chamodtwo = cha;
+            }
+            else
+                break;
+        }
+        return res;
+    }
+};
