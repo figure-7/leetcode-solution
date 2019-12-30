@@ -1,0 +1,135 @@
+题目难度：MEDIUM
+
+设计你的循环队列实现。 循环队列是一种线性数据结构，其操作表现基于 FIFO（先进先出）原则并且队尾被连接在队首之后以形成一个循环。它也被称为“环形缓冲器”。
+
+循环队列的一个好处是我们可以利用这个队列之前用过的空间。在一个普通队列里，一旦一个队列满了，我们就不能插入下一个元素，即使在队列前面仍有空间。但是使用循环队列，我们能使用这些空间去存储新的值。
+
+你的实现应该支持如下操作：
+
+MyCircularQueue(k): 构造器，设置队列长度为 k 。
+Front: 从队首获取元素。如果队列为空，返回 -1 。
+Rear: 获取队尾元素。如果队列为空，返回 -1 。
+enQueue(value): 向循环队列插入一个元素。如果成功插入则返回真。
+deQueue(): 从循环队列中删除一个元素。如果成功删除则返回真。
+isEmpty(): 检查循环队列是否为空。
+isFull(): 检查循环队列是否已满。
+ 
+
+示例：
+
+MyCircularQueue circularQueue = new MycircularQueue(3); // 设置长度为 3
+
+circularQueue.enQueue(1);  // 返回 true
+
+circularQueue.enQueue(2);  // 返回 true
+
+circularQueue.enQueue(3);  // 返回 true
+
+circularQueue.enQueue(4);  // 返回 false，队列已满
+
+circularQueue.Rear();  // 返回 3
+
+circularQueue.isFull();  // 返回 true
+
+circularQueue.deQueue();  // 返回 true
+
+circularQueue.enQueue(4);  // 返回 true
+
+circularQueue.Rear();  // 返回 4
+ 
+ 
+
+提示：
+
+所有的值都在 0 至 1000 的范围内；
+操作数将在 1 至 1000 的范围内；
+请不要使用内置的队列库。
+
+思路：模拟
+由于题中不让使用内置的队列库，所有就用了全局变量和vector数组
+MyCircularQueue：把总量值传给两个全局变量，分别进行最大值检测和剩余空间数判断
+enQueue：当剩余空间不为0时，将数据写入数组，空间数减一，返回true，否则返回false
+deQueue：当剩余空间不等于最大空间数时，数组第一个元素删除，返回true，否则返回false
+Front：一行，数组中有元素就输出第一个元素即可，否则输出-1
+Rear：一行，数组中有元素就输出最后一个元素即可，否则输出-1
+isEmpty：一行，数组中有元素就返回true，否则返回false
+isFull：一行，当剩余空间为0时就返回true，否则返回false
+
+执行用时 :
+40 ms
+, 在所有 cpp 提交中击败了
+58.59%
+的用户
+内存消耗 :
+16.2 MB
+, 在所有 cpp 提交中击败了
+97.52%
+的用户
+（时间一般，空间很好）
+
+上代码：
+class MyCircularQueue {
+public:
+    int cnt = 0;
+    int sum = 0;
+    vector<int> cur;
+    
+    /** Initialize your data structure here. Set the size of the queue to be k. */
+    MyCircularQueue(int k) {
+        cnt = k;
+        sum = k;
+    }
+    
+    /** Insert an element into the circular queue. Return true if the operation is successful. */
+    bool enQueue(int value) {
+        if(cnt > 0) {
+            cnt--;
+            cur.push_back(value);
+            return true;
+        }
+        return false;
+    }
+    
+    /** Delete an element from the circular queue. Return true if the operation is successful. */
+    bool deQueue() {
+        if(cnt != sum) {
+            cnt++;
+            vector<int>::iterator it = cur.begin();
+    	    cur.erase(it);
+            cout<<cur.size();
+            return true;
+        }
+        return false;
+    }
+    
+    /** Get the front item from the queue. */
+    int Front() {
+        return cur.size() == 0 ? -1 : cur[0];
+    }
+    
+    /** Get the last item from the queue. */
+    int Rear() {
+        return cur.size() == 0 ? -1 : cur[cur.size() - 1];
+    }
+    
+    /** Checks whether the circular queue is empty or not. */
+    bool isEmpty() {
+        return cur.size() == 0 ? true : false;
+    }
+    
+    /** Checks whether the circular queue is full or not. */
+    bool isFull() {
+        return cnt == 0 ? 1 : 0;
+    }
+};
+
+/**
+ * Your MyCircularQueue object will be instantiated and called as such:
+ * MyCircularQueue* obj = new MyCircularQueue(k);
+ * bool param_1 = obj->enQueue(value);
+ * bool param_2 = obj->deQueue();
+ * int param_3 = obj->Front();
+ * int param_4 = obj->Rear();
+ * bool param_5 = obj->isEmpty();
+ * bool param_6 = obj->isFull();
+ */
