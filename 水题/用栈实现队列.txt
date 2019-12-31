@@ -1,0 +1,105 @@
+题目难度：EASY
+
+使用栈实现队列的下列操作：
+
+push(x) -- 将一个元素放入队列的尾部。
+pop() -- 从队列首部移除元素。
+peek() -- 返回队列首部的元素。
+empty() -- 返回队列是否为空。
+示例:
+
+MyQueue queue = new MyQueue();
+
+queue.push(1);
+queue.push(2);  
+queue.peek();  // 返回 1
+queue.pop();   // 返回 1
+queue.empty(); // 返回 false
+说明:
+
+你只能使用标准的栈操作 -- 也就是只有 push to top, peek/pop from top, size, 和 is empty 操作是合法的。
+你所使用的语言也许不支持栈。你可以使用 list 或者 deque（双端队列）来模拟一个栈，只要是标准的栈操作即可。
+假设所有操作都是有效的 （例如，一个空的队列不会调用 pop 或者 peek 操作）。
+
+思路：解决问题+栈
+用到两个栈，然后对应函数操作如下：
+push(int x)：一行，直接将元素进栈即可
+pop()：先将原来栈的所有元素除去栈顶元素依次出栈存进另一个栈里，然后将栈顶元素删除，并记录删除的值
+再把另一个栈的所有元素依次出栈存进原栈中，返回删除的值即可
+peek()：先将原来栈的所有元素除去栈顶元素依次出栈存进另一个栈里，然后记录栈顶的值
+再把另一个栈的所有元素依次出栈存进原栈中，返回记录栈顶的值即可
+empty()：一行，三元运算符看栈空不空，空就返回true，否则返回false即可
+（但是感觉这题属实挺没意思，，，）
+
+执行用时 :
+0 ms
+, 在所有 cpp 提交中击败了
+100.00%
+的用户
+内存消耗 :
+8.9 MB
+, 在所有 cpp 提交中击败了
+39.94%
+的用户
+（时间无敌了，，，还是暴力，空间不咋地，用来两个栈）
+
+上代码：
+class MyQueue {
+public:
+    stack<int> s;
+    stack<int> smodtwo;
+    
+    /** Initialize your data structure here. */
+    MyQueue() {
+
+    }
+    
+    /** Push element x to the back of queue. */
+    void push(int x) {
+        s.push(x);
+    }
+    
+    /** Removes the element from in front of queue and returns that element. */
+    int pop() {
+        while(s.size() > 1) {
+            smodtwo.push(s.top());
+            s.pop();
+        }
+        int res = s.top();
+        s.pop();
+        while(!smodtwo.empty()) {
+            s,push(smodtwo.top());
+            smodtwo.pop();
+        }
+        return res;
+        
+    }
+    
+    /** Get the front element. */
+    int peek() {
+        while(s.size() > 1) {
+            smodtwo.push(s.top());
+            s.pop();
+        }
+        int res = s.top();
+        while(!smodtwo.empty()) {
+            s,push(smodtwo.top());
+            smodtwo.pop();
+        }
+        return res;
+    }
+    
+    /** Returns whether the queue is empty. */
+    bool empty() {
+        return s.empty() ? true : false;
+    }
+};
+
+/**
+ * Your MyQueue object will be instantiated and called as such:
+ * MyQueue* obj = new MyQueue();
+ * obj->push(x);
+ * int param_2 = obj->pop();
+ * int param_3 = obj->peek();
+ * bool param_4 = obj->empty();
+ */
