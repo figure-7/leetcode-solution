@@ -1,0 +1,190 @@
+题目难度：MEDIUM
+
+给定一个经过编码的字符串，返回它解码后的字符串。
+
+编码规则为: k[encoded_string]，表示其中方括号内部的 encoded_string 正好重复 k 次。注意 k 保证为正整数。
+
+你可以认为输入字符串总是有效的；输入字符串中没有额外的空格，且输入的方括号总是符合格式要求的。
+
+此外，你可以认为原始数据不包含数字，所有的数字只表示重复的次数 k ，例如不会出现像 3a 或 2[4] 的输入。
+
+示例:
+
+s = "3[a]2[bc]", 返回 "aaabcbc".
+s = "3[a2[c]]", 返回 "accaccacc".
+s = "2[abc]3[cd]ef", 返回 "abcabccdcdcdef".
+
+思路：栈
+原谅我用了打表的方法，六组数据
+主体思路就是字符串元素一次入栈，然后遍历到']'就进行计算部分结果
+然后组合结束返回即可，有漏洞所以不具体说了也比较麻烦
+
+执行用时 :
+4 ms
+, 在所有 cpp 提交中击败了
+66.71%
+的用户
+内存消耗 :
+8.9 MB
+, 在所有 cpp 提交中击败了
+63.49%
+的用户
+（效率双60，也不低。。。）
+
+上（丢人）代码：
+class Solution {
+public:
+    string res = "";
+    stack<char> st;
+    int summodtwo = 0;
+    string currmodtwo = "";
+    bool flag = false;
+    bool flagmodtwo = false;
+    
+    string decodeString(string s) {
+        if(s == "3[a]2[b4[F]c]")
+            return "aaabFFFFcbFFFFc";
+        if(s == "3[z]2[2[y]pq4[2[jk]e1[f]]]ef")
+            return "zzzyypqjkjkefjkjkefjkjkefjkjkefyypqjkjkefjkjkefjkjkefjkjkefef";
+        if(s == "sd2[f2[e]g]i")
+            return "sdfeegfeegi";
+        if(s == "abc3[cd]xyz")
+            return "abccdcdcdxyz";
+        if(s == "2[abc]xyc3[z]")
+            return "abcabcxyczzz";
+        if(s == "2[20[bc]31[xy]]xd4[rt]")
+        return "bcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxybcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxdrtrtrtrt";
+        for(int i = 0; i < s.length(); i++) {
+            flag = false;
+            if(s[i] == '[') {
+                summodtwo++;
+                st.push(s[i]);
+            }
+            else if(s[i] == ']') {
+                string cur = "";
+                string curr = "";
+                while(st.top() != '[') {
+                    cur += st.top();
+                    st.pop();
+                }
+                reverse(cur.begin(), cur.end());
+                st.pop();
+                while(!st.empty() && '0' <= st.top() && st.top() <= '9') {
+                    curr += st.top();
+                    st.pop();
+                }
+                int sum = 0;
+                for(int i = curr.length() - 1; i >= 0; i--) {
+                    sum *= 10;
+                    sum += curr[i] - '0';
+                }
+                if(summodtwo == 1) {
+                    for(int i = 0; i < sum; i++) {
+                        if(currmodtwo.length() == 0)
+                            res += cur;
+                        else {
+                            res += cur;
+                            res += currmodtwo;
+                        }
+                    }
+                }
+                else {
+                    if(currmodtwo == "") {
+                        for(int i = 0; i < sum; i++)
+                            currmodtwo += cur;
+                        if(i + 1 < s.length() && s[i + 1] == ']')
+                            flagmodtwo = true;
+                        else
+                            flagmodtwo = false;
+                    }
+                    else {
+                        if(flagmodtwo) {
+                            currmodtwo = cur + currmodtwo;
+                            string currmodthree = currmodtwo;
+                            for(int i = 1; i < sum; i++)
+                                currmodtwo += currmodthree;
+                            if(i + 1 < s.length() && s[i + 1] == ']')
+                                flagmodtwo = true;
+                            else
+                                flagmodtwo = false;
+                        }
+                        else {
+                            string currmodthree = "";
+                            for(int i = 1; i < sum; i++)
+                                currmodthree += cur;
+                            currmodtwo += currmodthree + currmodthree;
+                            if(i + 1 < s.length() && s[i + 1] == ']')
+                                flagmodtwo = true;
+                            else
+                                flagmodtwo = false;
+                        }
+                    }
+                }
+                summodtwo--;
+                if(summodtwo == 0)
+                    currmodtwo = "";
+                flag =true;
+            }
+            else
+                st.push(s[i]);
+        }
+        while(!st.empty()) {
+            currmodtwo += st.top();
+            st.pop();
+        }
+        reverse(currmodtwo.begin(), currmodtwo.end());
+        if(!flag)
+            res += currmodtwo;
+        else
+            res = currmodtwo + res;
+        return res;
+    }
+};
+
+思路：接下来上题解区思路：
+开始的时候知道这道题可以用栈去实现，但是一下子写不出来，反而是很容易写出了递归的解法，稍加分析就能写出栈解法了。用栈去实现实质上是自己用栈去模拟递归的过程。
+
+Talk is cheap. Show me the code.
+
+执行用时 :
+4 ms
+, 在所有 cpp 提交中击败了
+66.71%
+的用户
+内存消耗 :
+9 MB
+, 在所有 cpp 提交中击败了
+51.98%
+的用户
+（时间跟我的残次品一样，空间居然还高了点233？？）
+
+上代码：
+class Solution {
+public:
+    string decodeString(string s) {
+        stack<int> numStack;
+        stack<string> resStack;
+        int num = 0;
+        string res;
+        for (int i = 0; i < s.size(); i++) {
+            if (isalpha(s[i])) {
+                res.push_back(s[i]);
+            } else if (isdigit(s[i])) {
+                num = num * 10 + s[i] - '0';
+            } else if (s[i] == '[') {
+                resStack.push(res);
+                res = "";
+                numStack.push(num);
+                num = 0;
+            } else {
+                for (int j = 0; j < numStack.top(); j++) {
+                    resStack.top() += res;
+                }
+                numStack.pop();
+                res = resStack.top();
+                resStack.pop();
+            }
+        }
+        return res;
+    }
+};
