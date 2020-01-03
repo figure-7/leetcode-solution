@@ -1,0 +1,51 @@
+题目难度：EASY
+
+删除链表中等于给定值 val 的所有节点。
+
+示例:
+
+输入: 1->2->6->3->4->5->6, val = 6
+输出: 1->2->3->4->5
+
+思路：链表
+不会。。。思路具体见题解区题解
+方法一 不加dummyhead
+
+class Solution {
+public:
+    ListNode* removeElements(ListNode* head, int val) {
+        ListNode* lt;
+        while(head!=NULL&&head->val==val) head=head->next;
+        lt=head;
+        while(head!=NULL)
+            if(head->next!=NULL&&head->next->val==val) head->next=head->next->next;
+            else head=head->next;
+        return lt;
+    }
+};
+方法二 加dummyhead
+
+class Solution {
+public:
+    ListNode* removeElements(ListNode* head, int val) {
+        ListNode* dhead=new ListNode(-1);
+        dhead->next=head;
+        ListNode* res=dhead;
+        while(dhead!=NULL) 
+            if(dhead->next!=NULL&&dhead->next->val==val) dhead->next=dhead->next->next;
+            else dhead=dhead->next;
+        return res->next;
+    }
+};
+方法三 递归
+
+class Solution {
+public:
+    ListNode* removeElements(ListNode* head, int val) {
+        if(head==NULL) return NULL;
+        head->next=removeElements(head->next,val);
+        if(head->val==val) return head->next;
+        else return head;   
+    }
+}
+
