@@ -1,0 +1,82 @@
+题目难度：MEDIUM
+
+给定一个链表，旋转链表，将链表每个节点向右移动 k 个位置，其中 k 是非负数。
+
+示例 1:
+
+输入: 1->2->3->4->5->NULL, k = 2
+输出: 4->5->1->2->3->NULL
+解释:
+向右旋转 1 步: 5->1->2->3->4->NULL
+向右旋转 2 步: 4->5->1->2->3->NULL
+示例 2:
+
+输入: 0->1->2->NULL, k = 4
+输出: 2->0->1->NULL
+解释:
+向右旋转 1 步: 2->0->1->NULL
+向右旋转 2 步: 1->2->0->NULL
+向右旋转 3 步: 0->1->2->NULL
+向右旋转 4 步: 2->0->1->NULL
+
+思路：链表
+比较笨，先用一个数组存链表所有节点的值
+然后再逆序遍历，根据链表长度-1-k模链表长度的差值将前面的值付给后面的值，直至前面的值下标下雨0，然后每次遍历将值存放进另外一个数组中
+之后前面就剩下k各元素值没有改了，逆序遍历k次将数组值改为从0下标开始的另一个数组的值即可
+结束后得到链表的结果序列，然后数组依次给链表节点赋值即可
+（注意空链表，移动次数为0，链表长度为1直接返回链表即可）
+
+执行用时 :
+12 ms
+, 在所有 C++ 提交中击败了
+63.81%
+的用户
+内存消耗 :
+9.3 MB
+, 在所有 C++ 提交中击败了
+74.17%
+的用户
+（时间一般，空间居然还不错（用两个数组），，，）
+
+上代码：
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> curr;
+    vector<int> currmodtwo;
+    int len = 0;
+    
+    ListNode* rotateRight(ListNode* head, int k) {
+        if(head == nullptr || k == 0 || head->next == nullptr) return head;
+        ListNode* dummy = head;
+        ListNode* dummymodtwo = head;
+        while(dummy != nullptr) {
+            curr.push_back(dummy->val);
+            dummy = dummy->next;
+        }
+        k = k % curr.size();
+        for(int i = curr.size() - 1; i >= 0; i--) {
+            currmodtwo.push_back(curr[i]);
+            if(i - k >= 0)
+                curr[i] = curr[i - k];
+        }
+        for(int i = k - 1; i >= 0; i--) {
+            curr[i] = currmodtwo[len];
+            len++;
+        }
+        len = 0;
+        while(head != nullptr) {
+            head->val = curr[len];
+            len++;
+            head = head->next;
+        }
+        return dummymodtwo;
+    }
+};
