@@ -1,0 +1,177 @@
+题目难度：MEDIUM
+
+给定一个链表，每个节点包含一个额外增加的随机指针，该指针可以指向链表中的任何节点或空节点。
+
+要求返回这个链表的深拷贝。 
+
+ 
+
+示例：
+
+
+
+输入：
+{"$id":"1","next":{"$id":"2","next":null,"random":{"$ref":"2"},"val":2},"random":{"$ref":"2"},"val":1}
+
+解释：
+节点 1 的值是 1，它的下一个指针和随机指针都指向节点 2 。
+节点 2 的值是 2，它的下一个指针指向 null，随机指针指向它自己。
+ 
+
+提示：
+
+你必须返回给定头的拷贝作为对克隆列表的引用。
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/copy-list-with-random-pointer
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+
+思路：链表
+接下来上题解区思路：
+思路一：哈希
+借助哈希保存节点信息。
+
+代码
+时间复杂度：O(nlogn)，其中map查找时间复杂度O(logn)
+空间复杂度：O(n)
+
+class Solution {
+public:
+    Node* copyRandomList(Node* head) {
+        if (head == nullptr) {
+            return head;
+        }
+        Node *cur = head;
+        map<Node*, Node*> map;
+        //1. 遍历链表，将原节点作为key，拷贝节点作为value保存在map中
+        while (cur != nullptr) {
+            Node *copy = new Node(cur->val);
+            map[cur] = copy;
+            cur = cur->next;
+        }
+        //2. 复制链表next和random指针
+        cur = head;
+        while (cur != nullptr) {
+            map[cur]->next = map[cur->next];
+            map[cur]->random = map[cur->random];
+            cur = cur->next;
+        }
+        return map[head];
+    }
+};
+思路二：原地复制
+复制节点，同时将复制节点链接到原节点后面，如A->B->C 变为 A->A'->B->B'->C->C'。
+设置节点random值。
+将复制链表从原链表分离。
+代码
+时间复杂度：O(n)
+空间复杂度：O(1)
+
+class Solution {
+public:
+    Node* copyRandomList(Node* head) {
+        if (head == nullptr) {
+            return head;
+        }
+        Node *node = head;
+        //1. 将复制节点添加到原节点后面
+        while (node != nullptr) {
+            Node *copy = new Node(node->val, nullptr, nullptr);
+            copy->next = node->next;
+            node->next = copy;
+            node = copy->next;
+        }
+        
+        //2. 复制random节点
+        node = head;
+        while (node != nullptr) {
+            if (node->random != nullptr) {
+                node->next->random = node->random->next;
+            }            
+            node = node->next->next;
+        }
+        
+        //3. 分离链表
+        node = head;
+        Node *newHead = head->next;
+        Node *newNode = newHead;
+        while (node != nullptr) {
+            node->next = node->next->next;     
+            if (newNode->next != nullptr) {
+                newNode->next = newNode->next->next;            
+            }            
+            node = node->next;
+            newNode = newNode->next;
+        }
+        return newHead;
+    }
+};
+
+利用代码2：
+执行用时 :
+12 ms
+, 在所有 C++ 提交中击败了
+96.25%
+的用户
+内存消耗 :
+13.2 MB
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+（双杀效率极高！）
+
+上代码：
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    Node* next;
+    Node* random;
+    
+    Node(int _val) {
+        val = _val;
+        next = NULL;
+        random = NULL;
+    }
+};
+*/
+class Solution {
+public:
+    Node* copyRandomList(Node* head) {
+        if (head == nullptr) {
+            return head;
+        }
+        Node *node = head;
+        //1. 将复制节点添加到原节点后面
+        while (node != nullptr) {
+            Node *copy = new Node(node->val, nullptr, nullptr);
+            copy->next = node->next;
+            node->next = copy;
+            node = copy->next;
+        }
+        
+        //2. 复制random节点
+        node = head;
+        while (node != nullptr) {
+            if (node->random != nullptr) {
+                node->next->random = node->random->next;
+            }            
+            node = node->next->next;
+        }
+        
+        //3. 分离链表
+        node = head;
+        Node *newHead = head->next;
+        Node *newNode = newHead;
+        while (node != nullptr) {
+            node->next = node->next->next;     
+            if (newNode->next != nullptr) {
+                newNode->next = newNode->next->next;            
+            }            
+            node = node->next;
+            newNode = newNode->next;
+        }
+        return newHead;
+    }
+};
