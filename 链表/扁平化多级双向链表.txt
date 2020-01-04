@@ -1,0 +1,102 @@
+题目难度：MEDIUM
+
+您将获得一个双向链表，除了下一个和前一个指针之外，它还有一个子指针，可能指向单独的双向链表。
+这些子列表可能有一个或多个自己的子项，依此类推，生成多级数据结构，如下面的示例所示。
+
+扁平化列表，使所有结点出现在单级双链表中。
+您将获得列表第一级的头部。
+
+ 
+
+示例:
+
+输入:
+ 1---2---3---4---5---6--NULL
+         |
+         7---8---9---10--NULL
+             |
+             11--12--NULL
+
+输出:
+1-2-3-7-8-11-12-9-10-4-5-6-NULL
+ 
+
+以上示例的说明:
+
+给出以下多级双向链表:
+
+
+ 
+
+我们应该返回如下所示的扁平双向链表:
+
+思路：链表
+（弄了将近一个小时，好不容易序列对了，告诉我双向链表不合法，，，（应该是没有指向prev和child的说明，而这两个指针必须有）看来还是递归好用）
+下面介绍题解区思路：
+第一眼看到输入格式就想到了递归来解决，在每一级链表进行遍历，找到当前结点“child”域不为NULL的结点，进行递归，在递归之前分别先记录该结点(p)，该结点的下一个结点(n)，以及该结点的child结点(child)：
+
+边界条件为：该级链表没有子结点，即每个结点的“child”域为NULL，就停止递归；
+递归式：head = 当前级链表的child结点前半部分（1） + child结点之后的子链表部分（2） + 当前级链表的n结点后半部分（3）。
+在重新连接三个部分的时候，要考虑n结点是否为NULL，若为NULL，则不需要连接（2）和（3）。
+过程如下所示：
+
+执行用时 :
+8 ms
+, 在所有 C++ 提交中击败了
+90.42%
+的用户
+内存消耗 :
+9.7 MB
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+（双杀了厉害）
+
+上代码：
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    Node* prev;
+    Node* next;
+    Node* child;
+};
+*/
+class Solution {
+public:
+    Node* flatten(Node* head) {
+        // 边界条件
+        Node *p = head, *n = NULL; // p指向该级表头，n指向该级存在子结点的结点的下一个结点
+        Node* child = NULL; // child用来存子结点
+        
+        // 遍历当前子链表，若所有结点的域都为NULL，则返回其头结点
+        while(p) {
+            if(p -> child == NULL)
+                p = p -> next;
+            else {
+                // 找到了孩子
+                child = p -> child; // 记录子结点
+                n = p -> next; // 记录当前结点的下一个结点
+                break;
+            }
+        }
+        if(child == NULL) return head; // 若子链表无孩子结点，则返回该表的头结点
+        
+        // head = 前面部分 + childhead + 后面部分
+        Node* childHead = flatten(child);
+        while(childHead -> next) {
+            childHead = childHead -> next;
+        }
+        // 注意这个条件
+        if(n != NULL) {
+            childHead -> next = n;
+            n -> prev = childHead;
+        }
+        p -> next = child;
+        child -> prev = p;
+        p -> child = NULL;
+        
+        return head;
+    }
+};
