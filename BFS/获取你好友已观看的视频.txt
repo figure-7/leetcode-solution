@@ -1,0 +1,104 @@
+题目难度：MEDIUM
+
+有 n 个人，每个人都有一个  0 到 n-1 的唯一 id 。
+
+给你数组 watchedVideos  和 friends ，其中 watchedVideos[i]  和 friends[i] 分别表示 id = i 的人观看过的视频列表和他的好友列表。
+
+Level 1 的视频包含所有你好友观看过的视频，level 2 的视频包含所有你好友的好友观看过的视频，以此类推。一般的，Level 为 k 的视频包含所有从你出发，最短距离为 k 的好友观看过的视频。
+
+给定你的 id  和一个 level 值，请你找出所有指定 level 的视频，并将它们按观看频率升序返回。如果有频率相同的视频，请将它们按名字字典序从小到大排列。
+
+ 
+
+示例 1：
+
+
+
+输入：watchedVideos = [["A","B"],["C"],["B","C"],["D"]], friends = [[1,2],[0,3],[0,3],[1,2]], id = 0, level = 1
+输出：["B","C"] 
+解释：
+你的 id 为 0 ，你的朋友包括：
+id 为 1 -> watchedVideos = ["C"] 
+id 为 2 -> watchedVideos = ["B","C"] 
+你朋友观看过视频的频率为：
+B -> 1 
+C -> 2
+示例 2：
+
+
+
+输入：watchedVideos = [["A","B"],["C"],["B","C"],["D"]], friends = [[1,2],[0,3],[0,3],[1,2]], id = 0, level = 2
+输出：["D"]
+解释：
+你的 id 为 0 ，你朋友的朋友只有一个人，他的 id 为 3 。
+ 
+
+提示：
+
+n == watchedVideos.length == friends.length
+2 <= n <= 100
+1 <= watchedVideos[i].length <= 100
+1 <= watchedVideos[i][j].length <= 8
+0 <= friends[i].length < n
+0 <= friends[i][j] < n
+0 <= id < n
+1 <= level < n
+如果 friends[i] 包含 j ，那么 friends[j] 包含 i
+
+思路：周赛第三题，BFS+预处理+哈希表
+我的事了是BFS随机封印预处理在level层数内的所有好友（除了自己），保存进数组
+然后遍历所有好友的视频字符串，并用哈希表记录当前串的次数
+并将所有串保存进数组（不要重复的，例用哈希表）
+然后遇到了问题，怎么实现按观看频率升序返回。如果有频率相同的视频，请将它们按名字字典序从小到大排列。（就不会了。。。）
+看了别人的答案是重写sort方法，，然后别的思路一样
+重写sort方法方式详见C++算法通用里的vector排序，获取两个字符串，比较哈希表对应下标的值
+如果不等，返回从小到大顺序，否则按字典从小到大顺序即可
+返回排序后结果数组即可
+
+上代码;
+class Solution {
+public:
+    int G[101][101];
+    int d[101];
+    unordered_map<string,int>cnt;
+    vector<string> watchedVideosByFriends(vector<vector<string>>& watchedVideos, vector<vector<int>>& friends, int id, int level) {
+        memset(G,0,sizeof(G));
+        memset(d,0,sizeof(d));
+        int n=watchedVideos.size();
+        for(int i=0;i<n;i++){
+            for(auto j:friends[i])
+                G[i][j]=G[j][i]=1;
+        }
+        
+        queue<int>q;
+        q.push(id);
+        unordered_map<int,bool>vis;
+        vis[id]=true;
+        while(!q.empty()){
+            int now=q.front();
+            q.pop();
+            if(d[now]==level+1)break;
+            for(int i=0;i<n;i++){
+                if(G[i][now]==1 && !vis[i]){
+                    q.push(i);
+                    vis[i]=true;
+                    d[i]=d[now]+1;
+                }
+            }
+        }
+        vector<string>ans;
+        for(int i=0;i<n;i++){
+            // printf("%d ",d[i]);
+            if(d[i]!=level)continue;
+            for (auto s:watchedVideos[i]){
+                if(cnt[s]==0)ans.push_back(s);
+                cnt[s]++;
+            }
+        }
+        sort(ans.begin(),ans.end(),[&](string a,string b){
+            if(cnt[a]!=cnt[b])return cnt[a]<cnt[b];
+            else return a<b;
+        });
+        return ans;
+    }
+};
