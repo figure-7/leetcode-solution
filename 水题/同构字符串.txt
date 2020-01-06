@@ -1,0 +1,63 @@
+题目难度：EASY
+
+给定两个字符串 s 和 t，判断它们是否是同构的。
+
+如果 s 中的字符可以被替换得到 t ，那么这两个字符串是同构的。
+
+所有出现的字符都必须用另一个字符替换，同时保留字符的顺序。两个字符不能映射到同一个字符上，但字符可以映射自己本身。
+
+示例 1:
+
+输入: s = "egg", t = "add"
+输出: true
+示例 2:
+
+输入: s = "foo", t = "bar"
+输出: false
+示例 3:
+
+输入: s = "paper", t = "title"
+输出: true
+说明:
+你可以假设 s 和 t 具有相同的长度。
+
+思路：哈希表
+建立两个哈希表分别保存两个字符串，下标为字符，值为字符出现位置
+遍历一次字符串，当两个哈希表都找到存在过字符，就看值是不是相等，不相等（出现位置不同）就返回false，否则继续
+当两个哈希表都找不到存在过字符时，就将两个哈希表下标值为字符，值为字符出现位置
+其余情况直接返回false
+遍历结束返回true即可
+
+执行用时 :
+16 ms
+, 在所有 C++ 提交中击败了
+39.64%
+的用户
+内存消耗 :
+9.1 MB
+, 在所有 C++ 提交中击败了
+41.59%
+的用户
+（这效率都不太好啊~）
+
+上代码：
+class Solution {
+public:
+    unordered_map<int, int> map;
+    unordered_map<int, int> curr;
+    
+    bool isIsomorphic(string s, string t) {
+        for(int i = 0; i < s.length(); i++) {
+            if(map.find(s[i]) != map.end() && curr.find(t[i]) != curr.end()) {
+                if(map[s[i]] != curr[t[i]])
+                    return false;
+            }
+            else if(map.find(s[i]) == map.end() && curr.find(t[i]) == curr.end()) {
+                map[s[i]] = i;
+                curr[t[i]] = i;
+            }
+            else return false;
+        }
+        return true;
+    }
+};
