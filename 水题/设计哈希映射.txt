@@ -1,0 +1,91 @@
+题目难度：EASY
+
+不使用任何内建的哈希表库设计一个哈希映射
+
+具体地说，你的设计应该包含以下的功能
+
+put(key, value)：向哈希映射中插入(键,值)的数值对。如果键对应的值已经存在，更新这个值。
+get(key)：返回给定的键所对应的值，如果映射中不包含这个键，返回-1。
+remove(key)：如果映射中存在这个键，删除这个数值对。
+
+示例：
+
+MyHashMap hashMap = new MyHashMap();
+hashMap.put(1, 1);          
+hashMap.put(2, 2);         
+hashMap.get(1);            // 返回 1
+hashMap.get(3);            // 返回 -1 (未找到)
+hashMap.put(2, 1);         // 更新已有的值
+hashMap.get(2);            // 返回 1 
+hashMap.remove(2);         // 删除键为2的数据
+hashMap.get(2);            // 返回 -1 (未找到) 
+
+注意：
+
+所有的值都在 [1, 1000000]的范围内。
+操作的总数目在[1, 10000]范围内。
+不要使用内建的哈希库。
+
+思路：解决问题
+建立两个数组，各个函数功能如下：
+put()：把键值对分别保存进两个数组中即可
+get()：逆向搜索（因为有可能后面插入的值key跟之前一样，而值改为后面的值），有就返回对应下标保存value数组的值，否则返回-1即可
+remove()：遍历一次，删除所有等于key的下标对应两数组值，并将下标减一即可
+
+执行用时 :
+212 ms
+, 在所有 C++ 提交中击败了
+41.77%
+的用户
+内存消耗 :
+41.1 MB
+, 在所有 C++ 提交中击败了
+99.50%
+的用户
+（时间一般般，空间很好（两个数组，，,））
+
+上代码：
+class MyHashMap {
+public:
+    vector<int> curr;
+    vector<int> currmodtwo;
+    
+    /** Initialize your data structure here. */
+    MyHashMap() {
+        
+    }
+    
+    /** value will always be non-negative. */
+    void put(int key, int value) {
+        curr.push_back(key);
+        currmodtwo.push_back(value);
+    }
+    
+    /** Returns the value to which the specified key is mapped, or -1 if this map contains no mapping for the key */
+    int get(int key) {
+        for(int i = curr.size() - 1; i >= 0; i--)
+            if(curr[i] == key) return currmodtwo[i];
+        return -1;
+    }
+    
+    /** Removes the mapping of the specified value key if this map contains a mapping for the key */
+    void remove(int key) {
+        for(int i = 0; i < curr.size(); i++) {
+            if(curr[i] == key) {
+                vector<int>::iterator it = curr.begin() + i;
+    	        curr.erase(it);
+                vector<int>::iterator ite = currmodtwo.begin() + i;
+    	        currmodtwo.erase(ite);
+                i--;
+            }
+        }
+    }
+};
+
+/**
+ * Your MyHashMap object will be instantiated and called as such:
+ * MyHashMap* obj = new MyHashMap();
+ * obj->put(key,value);
+ * int param_2 = obj->get(key);
+ * obj->remove(key);
+ */
