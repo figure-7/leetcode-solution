@@ -1,0 +1,94 @@
+题目难度：MEDIUM
+
+给定一棵二叉树，返回所有重复的子树。对于同一类的重复子树，你只需要返回其中任意一棵的根结点即可。
+
+两棵树重复是指它们具有相同的结构以及相同的结点值。
+
+示例 1：
+
+        1
+       / \
+      2   3
+     /   / \
+    4   2   4
+       /
+      4
+下面是两个重复的子树：
+
+      2
+     /
+    4
+和
+
+    4
+因此，你需要以列表的形式返回上述重复子树的根结点。
+
+思路：树+DFS+哈希表
+（可惜我太菜，卡在一个误区并且用双重DFS将近两个小时才AC）
+丢人思路：先调用一层DFS深搜，内部再调用一层DFS深搜，针对外部DFS的每个节点
+内部DFS得出遍历路径上的所有值组成的字符串
+注意遍历节点左右子节点之间要添加一个字符做标记，否则可能会出现不是重复的子树但是得出的字符串一致的情况（比如值都是0，WA点1）
+然后针对每次内部DFS的结果字符串进行判断哈希表有无出现过，出现过一次就对对应节点保存到结果数组里
+没有的话就将字符串存进哈希表
+如果出现不止一次就不放入对应节点（比如有三个重复子树，就只返回1个节点，而不是两个，WA点2）
+（这里哈希表导乱了，所以用了外部递归两层DFS，出现三次时我把哈希表对应值赋了一，卡了半年，，，）
+最后主函数返回结果数组即可
+
+执行用时 :
+128 ms
+, 在所有 C++ 提交中击败了
+6.62%
+的用户
+内存消耗 :
+60.4 MB
+, 在所有 C++ 提交中击败了
+10.45%
+的用户
+（真踏娘的惨，全爆了。。。）
+
+上（丢人）代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    unordered_map<string, int> map;
+    vector<TreeNode*> res;
+    string s = "";
+    
+    void DFS(TreeNode* node) {
+        if(node != nullptr) {
+            char ch = node->val + '0';
+            s += ch;
+            DFS(node->left);
+            s += 'a';
+            DFS(node->right);
+        }
+    }
+    
+    void DFSMODTWO(TreeNode* nodemodtwo) {
+        if(nodemodtwo != nullptr) {
+            s = "";
+            DFS(nodemodtwo);
+            if(map.find(s) != map.end() && map[s] == 1) {
+                map[s] = 2;
+                res.push_back(nodemodtwo);
+            } else
+                if(map.find(s) == map.end())
+                    map[s] = 1;
+            DFSMODTWO(nodemodtwo->left);
+            DFSMODTWO(nodemodtwo->right);
+        }
+    }
+    
+    vector<TreeNode*> findDuplicateSubtrees(TreeNode* root) {
+        DFSMODTWO(root);
+        return res;
+    }
+};
