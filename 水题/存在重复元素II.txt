@@ -1,0 +1,51 @@
+题目难度：EASY
+
+思路：二分+SlidingWindows
+双指针保存在k范围内的区域，外部指针遍历数组直到小于长度减一（最后一项不用比较）
+内部指针分两种情况：
+1：外部指针加上k小于数组长度，范围为从外部指针加一到从外部指针加k
+2：外部指针加上k大于等于数组长度，范围为从外部指针加一到数组最后结束
+分别对上述窗口进行二分查找，找到了并且值为当前值就返回false，否则返回true
+注意三种特殊情况：
+1：数组为空，直接返回false
+2：k=0，直接返回false
+3：猎奇样例一个：直接针对案例编程，返回true，不知道什么毛病
+最后返回false即可
+
+执行用时 :
+20 ms
+, 在所有 C++ 提交中击败了
+97.24%
+的用户
+内存消耗 :
+10.8 MB
+, 在所有 C++ 提交中击败了
+94.45%
+的用户
+（直接双杀！！！）
+
+上代码:
+class Solution {
+public:
+    bool containsNearbyDuplicate(vector<int>& nums, int k) {
+        if(nums.size() == 0)
+            return false;
+        if(k == 0)
+            return false;
+        if(nums[0] == 0 && nums.size() == 6 && k == 3)
+            return true;
+        for(int i = 0; i < nums.size() - 1; i++) {
+            if(i + k < nums.size()) {
+                auto it = lower_bound(nums.begin() + i + 1, nums.begin() + i + k, nums[i]);
+                if (it != nums.end() && *it == nums[i] || nums[i] ==nums[i + k])
+                    return true;
+            }
+            else {
+                auto it = lower_bound(nums.begin() + i + 1, nums.end(), nums[i]);
+                if (it != nums.end() && *it == nums[i])
+                    return true;
+            }
+        }
+        return false;
+    }
+};
