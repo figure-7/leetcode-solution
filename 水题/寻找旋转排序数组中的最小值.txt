@@ -1,0 +1,61 @@
+题目难度：MEIDUM
+
+假设按照升序排序的数组在预先未知的某个点上进行了旋转。
+
+( 例如，数组 [0,1,2,4,5,6,7] 可能变为 [4,5,6,7,0,1,2] )。
+
+请找出其中最小的元素。
+
+你可以假设数组中不存在重复元素。
+
+示例 1:
+
+输入: [3,4,5,1,2]
+输出: 1
+示例 2:
+
+输入: [4,5,6,7,0,1,2]
+输出: 0
+
+思路：二分
+由于数组进行了翻转，所以不能用板子，而是改造
+起点0，中间值为首位和除二，终点最后一个数值下标
+二分外部是死循环，内部分以下三种情况：
+1.中间值大于两侧的值，就把中间值+1给起点
+2.中间值 大于左侧值小于右侧值，就把中间值-1给终点
+3.此外就把中间值给终点（注意不能减一，否则如果中间值为最小值就越过去了，这里WA了一发，，，）
+最后随便返回个int型整数即可（反正结果不会在这里）
+
+执行用时 :
+8 ms
+, 在所有 C++ 提交中击败了
+41.84%
+的用户
+内存消耗 :
+8.9 MB
+, 在所有 C++ 提交中击败了
+5.57%
+的用户
+（时间一般，空间就离谱，，，原地啊♂）
+
+上代码：
+class Solution {
+public:
+    int findMin(vector<int>& nums) {
+        int first = 0, last = nums.size() - 1;
+        while(1) {
+            if(first == last)
+                return nums[first];
+            if(first == last - 1)
+                return min(nums[first], nums[last]);
+            int mid = (first + last) / 2;
+            if(nums[mid] > nums[first] && nums[mid] > nums[last])
+                first = mid + 1;
+            else if(nums[mid] > nums[first] && nums[mid] < nums[last])
+                last = mid - 1;
+            else
+                last = mid;
+        }
+        return -1;
+    }
+};
