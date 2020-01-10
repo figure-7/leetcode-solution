@@ -1,0 +1,106 @@
+题目难度：MEDIUM
+
+给定一个排序好的数组，两个整数 k 和 x，从数组中找到最靠近 x（两数之差最小）的 k 个数。
+返回的结果必须要是按升序排好的。
+如果有两个数与 x 的差值一样，优先选择数值较小的那个数。
+
+示例 1:
+
+输入: [1,2,3,4,5], k=4, x=3
+输出: [1,2,3,4]
+ 
+
+示例 2:
+
+输入: [1,2,3,4,5], k=4, x=-1
+输出: [1,2,3,4]
+ 
+
+说明:
+
+k 的值为正数，且总是小于给定排序数组的长度。
+数组不为空，且长度不超过 104
+数组里的每个元素与 x 的绝对值不超过 104
+ 
+
+更新(2017/9/19):
+这个参数 arr 已经被改变为一个整数数组（而不是整数列表）。
+请重新加载代码定义以获取最新更改。
+
+思路：二分
+先将给定的x值插入数组并排序
+然后二分查找该值所在的下标并记录进一个全局变量
+然后左右遍历该下标相邻下标，分别取与当前下标值的差值，小的入数组
+如果小的在右边，那么数组值数量加一并且右侧指针加一
+如果小的在左边，那么数组值数量加一并且左侧指针减一
+当差值相同时，优先取左面的，然后数组值数量加一并且左侧指针减一（题目要求取小的）
+当两侧下标其中之一越界时，就向另外单向扩展放入结果数组中，直到数组值的数目等于k值返回结果数组即可
+
+执行用时 :
+96 ms
+, 在所有 C++ 提交中击败了
+98.72%
+的用户
+内存消耗 :
+16.8 MB
+, 在所有 C++ 提交中击败了
+5.60%
+的用户
+（时间很好！空间炸了，O(K)结果数组还能炸。。。就离谱）
+
+上代码：
+class Solution {
+public:
+    vector<int> res;
+    int cur = 0;
+    int sum = 0;
+    
+    vector<int> findClosestElements(vector<int>& arr, int k, int x) {
+        arr.push_back(x);
+        sort(arr.begin(), arr.end());
+        int begin = 0, end = arr.size() - 1;
+        while(begin <= end) {
+            int mid = (begin + end) / 2;
+            if(arr[mid] == x) { 
+                cur = mid;
+                break;
+            } else if(arr[mid] > x)
+                end = mid-1;
+            else
+                begin = mid + 1;
+        }
+        int left = cur - 1;
+        int right = cur + 1;
+        while(left >= 0 && right < arr.size() && sum < k) {
+            int a = abs(arr[left] - arr[cur]);
+            int b = abs(arr[right] - arr[cur]);
+            if(a <= b) {
+                res.push_back(arr[left]);
+                left--;
+            }
+            else {
+                res.push_back(arr[right]);
+                right++;
+            }
+            sum++;
+        }
+        if(sum < k) {
+            if(left == -1) {
+                while(sum < k) {
+                    res.push_back(arr[right]);
+                    right++;
+                    sum++;
+                }
+            }
+            else {
+                while(sum < k) {
+                    res.push_back(arr[left]);
+                    left--;
+                    sum++;
+                }
+            }
+        }
+        sort(res.begin(), res.end());
+        return res;
+    }
+};
