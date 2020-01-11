@@ -1,0 +1,76 @@
+题目难度：EASY
+
+给定一个只包含小写字母的有序数组letters 和一个目标字母 target，寻找有序数组里面比目标字母大的最小字母。
+
+数组里字母的顺序是循环的。
+举个例子，如果目标字母target = 'z' 并且有序数组为 letters = ['a', 'b']，则答案返回 'a'。
+
+示例:
+
+输入:
+letters = ["c", "f", "j"]
+target = "a"
+输出: "c"
+
+输入:
+letters = ["c", "f", "j"]
+target = "c"
+输出: "f"
+
+输入:
+letters = ["c", "f", "j"]
+target = "d"
+输出: "f"
+
+输入:
+letters = ["c", "f", "j"]
+target = "g"
+输出: "j"
+
+输入:
+letters = ["c", "f", "j"]
+target = "j"
+输出: "c"
+
+输入:
+letters = ["c", "f", "j"]
+target = "k"
+输出: "c"
+注:
+
+letters长度范围在[2, 10000]区间内。
+letters 仅由小写字母组成，最少包含两个不同的字母。
+目标字母target 是一个小写字母。
+
+思路：二分
+遍历从1到25，分别对目标字符进行ASCII累加
+二分查找当前字符是否在字符数组中，在的话就是结果字符直接返回
+否则继续遍历，遍历结束后最后返回字符数组第一个字符即可（排序的数组，给定目标值为最大字符）（三分钟题）
+
+执行用时 :
+12 ms
+, 在所有 C++ 提交中击败了
+81.33%
+的用户
+内存消耗 :
+9.1 MB
+, 在所有 C++ 提交中击败了
+80.00%
+的用户
+（都还不错！）
+
+上代码：
+class Solution {
+public:
+    char nextGreatestLetter(vector<char>& letters, char target) {
+        for(int i = 1; i < 26; i++) {
+            int cur = target - 'a';
+            cur += i;
+            char ch = cur + 'a';
+            auto it = lower_bound(letters.begin(), letters.end(), ch);
+            if(it != letters.end() && *it == ch || ch == letters[letters.size() - 1])
+                return ch;
+        }
+        return letters[0];
+    }
+};
