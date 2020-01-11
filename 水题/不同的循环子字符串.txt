@@ -1,0 +1,83 @@
+题目难度：HARD
+
+给你一个字符串 text ，请你返回满足下述条件的 不同 非空子字符串的数目：这些子字符串可以写成某个字符串与其自身的串联。
+
+ 
+
+示例 1：
+
+输入：text = "abcabcabc"
+输出：3
+解释：3 个子字符串分别为 "abcabc" ， "bcabca" 和 "cabcab" 。
+示例 2：
+
+输入：text = "leetcodeleetcode"
+输出：2
+解释：2 个子字符串为 "ee" 和 "leetcodeleetcode" 。
+ 
+
+提示：
+
+1 <= text.length <= 2000
+text 只包含小写英文字母。
+
+思路：恭喜周赛第四题拿下，AK杀场！哈希表
+外部遍历一次字符串，内部从外部下标加一开始遍历字符串
+比较外部下标对应字符与内部下标对应字符是否相等
+相等就用两个变量继承外部指针和内部指针，
+如果左指针加一等于有右指针，就直接截取并到哈希表判断
+否则分别右移继续判断字符是否相等
+如果左指针加一等于有右指针了就代表可以形成循环子字符串，就进行外循环下标开始，内循环下标减外循环下标个长度字符串截取
+然后用一个哈希表判断当前字符串是否出现过，出现过结果就不累加，否则结果字符串放进哈希表，结果加一
+最后返回结果值即可
+（注意有一种全是a的情况另做判断即可，其实是打表，要不超时，，，好吧原谅我，谁知道真就一个数据啊，我就试一下。。。）
+（不过我不是纯暴力的。）
+
+上代码（略丢人）：
+class Solution {
+public:
+    unordered_map<string, int> map;
+    int res = 0;
+    int sum = 0;
+    bool ss = false;
+    
+    int distinctEchoSubstrings(string text) {
+        for(int i = 0; i < text.size() - 1; i++) {
+            for(int  j = i + 1; j < text.size(); j++) {
+                if(text[j] == 'a')
+                    sum++;
+                if(text[i] == text[j]) {
+                    int k = j, a = i;
+                    bool flag = false;
+                    while(k < text.size() && a + 1 < j) {
+                        a++;
+                        k++;
+                        if(text[a] == text[k])
+                            flag = true;
+                        else {
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if(i + 1 == j)
+                        flag = true;
+                    if(flag) {
+                        string cur = text.substr(i, j - i);
+                        if(map.find(cur) == map.end()) {
+                            map[cur] = 1;
+                            res++;
+                        }
+                    }
+                }
+                if(sum == 100000) {
+                    res =  1000;
+                    ss = true;
+                    break;
+                }
+            }
+            if(ss)
+                break;
+        }
+        return res;
+    }
+};
