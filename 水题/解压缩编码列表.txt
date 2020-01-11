@@ -1,0 +1,42 @@
+题目难度：EASY
+
+给你一个以行程长度编码压缩的整数列表 nums 。
+
+考虑每相邻两个元素 [a, b] = [nums[2*i], nums[2*i+1]] （其中 i >= 0 ），每一对都表示解压后有 a 个值为 b 的元素。
+
+请你返回解压后的列表。
+
+ 
+
+示例：
+
+输入：nums = [1,2,3,4]
+输出：[2,4,4,4]
+ 
+
+提示：
+
+2 <= nums.length <= 100
+nums.length % 2 == 0
+1 <= nums[i] <= 100
+
+思路：周赛第一题，模拟
+从头开始隔项遍历一次数组，然后将遍历下标值作为次数
+放入对应次数个其下一个下标值数组值
+最后返回结束数组即可
+
+上代码：
+class Solution {
+public:
+    vector<int> res;
+    
+    vector<int> decompressRLElist(vector<int>& nums) {
+        for(int i = 0; i < nums.size(); i += 2) {
+            while(nums[i] > 0) {
+                res.push_back(nums[i+1]);
+                nums[i]--;
+            }
+        }
+        return res;
+    }
+};
