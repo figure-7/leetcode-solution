@@ -1,0 +1,47 @@
+题目难度：EASY
+
+给定一个正整数 num，编写一个函数，如果 num 是一个完全平方数，则返回 True，否则返回 False。
+
+说明：不要使用任何内置的库函数，如  sqrt。
+
+示例 1：
+
+输入：16
+输出：True
+示例 2：
+
+输入：14
+输出：False
+
+思路：二分
+规定二分范围为0到100000，即可包含所有的可能结果
+二分套板子，当中间值平方等于给定值的时候返回true
+否则循环结束返回false即可（三分钟题）
+
+执行用时 :
+4 ms
+, 在所有 C++ 提交中击败了
+63.98%
+的用户
+内存消耗 :
+7.9 MB
+, 在所有 C++ 提交中击败了
+73.53%
+的用户
+（都一般）
+
+上代码：
+class Solution {
+public:
+    bool isPerfectSquare(int num) {
+        if(num == 0) return false;
+        int begin = 0, end =  100000;
+        while(begin <= end) {
+            long long mid = (begin + end) / 2;
+            if(mid * mid == num) return true;
+            else if(mid * mid > num) end = mid - 1;
+            else begin = mid + 1;
+        }
+        return false;
+    }
+};
