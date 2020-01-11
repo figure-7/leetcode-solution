@@ -1,0 +1,57 @@
+题目难度：MEDIUM
+
+给你一个 m * n 的矩阵 mat 和一个整数 K ，请你返回一个矩阵 answer ，其中每个 answer[i][j] 是所有满足下述条件的元素 mat[r][c] 的和： 
+
+i - K <= r <= i + K, j - K <= c <= j + K 
+(r, c) 在矩阵内。
+ 
+
+示例 1：
+
+输入：mat = [[1,2,3],[4,5,6],[7,8,9]], K = 1
+输出：[[12,21,16],[27,45,33],[24,39,28]]
+示例 2：
+
+输入：mat = [[1,2,3],[4,5,6],[7,8,9]], K = 2
+输出：[[45,45,45],[45,45,45],[45,45,45]]
+ 
+
+提示：
+
+m == mat.length
+n == mat[i].length
+1 <= m, n, K <= 100
+1 <= mat[i][j] <= 100
+
+思路：周赛第二题，模拟
+二维遍历数组，然后对于给定范围内且在数组范围内下标所有值取和
+分别 放入一维数组中，然后遍历完一层就将一维数组放入二维数组中，并将一维数组清空
+最后返回二维结果数组即可
+
+上代码：
+class Solution {
+public:
+    vector<vector<int> > res;
+    vector<int> curr;
+    vector<int> empty;
+    
+    vector<vector<int>> matrixBlockSum(vector<vector<int>>& mat, int K) {
+        for(int i = 0; i < mat.size(); i++) {
+            for(int j = 0; j < mat[0].size(); j++) {
+                int curmodtwo = i - K, currmodthree = i + K, curmodfour = j - K, currmodfive = j + K, m = mat.size() - 1, n = mat[0].size() - 1;
+                int lefta = max(0, curmodtwo);
+                int righta = min(m, currmodthree);
+                int leftb = max(0, curmodfour);
+                int rightb = min(n, currmodfive);
+                int cur = 0;
+                for(int a = lefta; a <= righta; a++)
+                    for(int b = leftb; b <= rightb; b++)
+                        cur += mat[a][b];
+                curr.push_back(cur);
+            }
+            res.push_back(curr);
+            curr = empty;
+        }
+        return res;
+    }
+};
