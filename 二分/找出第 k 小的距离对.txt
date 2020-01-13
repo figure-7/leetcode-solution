@@ -1,0 +1,73 @@
+题目难度：HARD
+
+给定一个整数数组，返回所有数对之间的第 k 个最小距离。一对 (A, B) 的距离被定义为 A 和 B 之间的绝对差值。
+
+示例 1:
+
+输入：
+nums = [1,3,1]
+k = 1
+输出：0 
+解释：
+所有数对如下：
+(1,3) -> 2
+(1,1) -> 0
+(3,1) -> 2
+因此第 1 个最小距离的数对是 (1,1)，它们之间的距离为 0。
+提示:
+
+2 <= len(nums) <= 10000.
+0 <= nums[i] < 1000000.
+1 <= k <= len(nums) * (len(nums) - 1) / 2.
+
+思路：二分
+接下来上题解区题解：
+设数组元素有n个，那么共有n*(n-1)/2个所谓的距离。这些距离的大小是有范围的，即最小的距离必大于等于0，最大的距离为数组的最大元素减去数组的最小元素。题目中所求的第k个最小距离就在其中。
+我们可以用二分查找来找到这个目标距离，初始化l=0，r=最大距离。mid=(l+r)/2，计算出距离小于等于mid的数对的个数count。
+
+若count<k，则第k个最小距离不会在[l,mid]之间，故修改l=mid+1；
+否则，r=mid；(因为第k个最小距离在[l,mid]之间)；
+
+执行用时 :
+12 ms
+, 在所有 C++ 提交中击败了
+97.44%
+的用户
+内存消耗 :
+9.6 MB
+, 在所有 C++ 提交中击败了
+20.34%
+的用户
+（时间很好，空间不咋地，，，）
+
+上代码：
+class Solution {
+public:
+    int smallestDistancePair(vector<int>& nums, int k) {
+        sort(nums.begin(), nums.end());//nums数组一定要排序
+        int l = 0, r = nums.back() - nums.front(), mid;
+        while (l<r)
+        {
+            mid = (l + r) / 2;
+            int count = findDistance(nums, mid);
+            if(count<k)
+                l = mid + 1;
+            else
+                r = mid;
+        }
+        return l;
+    }
+    int findDistance(vector<int>& nums,int distance)//计算距离不会大于distance的数对个数
+    {
+        int res = 0, rightIndex = nums.size() - 1;   //rightIndex初始化为最大元素的对应下标
+        for (int i = nums.size() - 2; i >= 0;--i)//从右向左找  (从左向右找也可以)
+        {
+            while (rightIndex>i&&nums[rightIndex]-nums[i]>distance)
+            {
+                --rightIndex;
+            }
+            res += (rightIndex - i);
+        }
+        return res;
+    }
+};
