@@ -1,0 +1,2 @@
+TreeNode* node = new TreeNode(val);//创建节点
+root->left = node;//继承
