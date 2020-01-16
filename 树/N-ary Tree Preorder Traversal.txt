@@ -1,0 +1,70 @@
+题目难度：EASY
+
+给定一个 N 叉树，返回其节点值的前序遍历。
+
+例如，给定一个 3叉树 :
+
+ 
+
+
+
+ 
+
+返回其前序遍历: [1,3,5,6,2,4]。
+
+ 
+
+说明: 递归法很简单，你可以使用迭代法完成此题吗?
+
+思路：N叉树
+（第一次做N叉树，让用迭代写，然而我第一次做连遍历节点都不知道咋写。。。）接下来上题解区思路：
+此处撰写解题思路
+（？？？((）
+
+执行用时 :
+96 ms
+, 在所有 C++ 提交中击败了
+73.49%
+的用户
+内存消耗 :
+57 MB
+, 在所有 C++ 提交中击败了
+11.18%
+的用户
+（时间还行，空间炸了。。。）
+
+上代码：
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    vector<Node*> children;
+
+    Node() {}
+
+    Node(int _val) {
+        val = _val;
+    }
+
+    Node(int _val, vector<Node*> _children) {
+        val = _val;
+        children = _children;
+    }
+};
+*/
+class Solution {
+public:
+    vector<int> preorder(Node* root) {
+        vector<int> res;
+        vector<Node*> nodes; nodes.push_back(root);
+        Node* tmp;
+        while(!nodes.empty()){
+            tmp = nodes.front(); nodes.erase(nodes.begin());
+            if(tmp == NULL) continue;
+            res.push_back(tmp->val);
+            nodes.insert(nodes.begin(), tmp->children.begin(), tmp->children.end());
+        }
+        return res;
+    }
+};
