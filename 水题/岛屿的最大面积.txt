@@ -1,0 +1,92 @@
+题目难度：MEDIUM
+
+给定一个包含了一些 0 和 1的非空二维数组 grid , 一个 岛屿 是由四个方向 (水平或垂直) 的 1 (代表土地) 构成的组合。
+
+你可以假设二维矩阵的四个边缘都被水包围着。
+
+找到给定的二维数组中最大的岛屿面积。(如果没有岛屿，则返回面积为0。)
+
+示例 1:
+
+[[0,0,1,0,0,0,0,1,0,0,0,0,0],
+ [0,0,0,0,0,0,0,1,1,1,0,0,0],
+ [0,1,1,0,1,0,0,0,0,0,0,0,0],
+ [0,1,0,0,1,1,0,0,1,0,1,0,0],
+ [0,1,0,0,1,1,0,0,1,1,1,0,0],
+ [0,0,0,0,0,0,0,0,0,0,1,0,0],
+ [0,0,0,0,0,0,0,1,1,1,0,0,0],
+ [0,0,0,0,0,0,0,1,1,0,0,0,0]]
+对于上面这个给定矩阵应返回 6。注意答案不应该是11，因为岛屿只能包含水平或垂直的四个方向的‘1’。
+
+示例 2:
+
+[[0,0,0,0,0,0,0,0]]
+对于上面这个给定的矩阵, 返回 0。
+
+注意: 给定的矩阵grid 的长度和宽度都不超过 50。
+
+思路：BFS
+直接套带判重数组的BFS模板，四象封印
+队列内部及二重循环内部把判重数组值修改了，然后遍历队列前结果取跟一比的最大值（因为如果数组为一行一列值为1会出错，WA点）
+先设置内部变量值为1，然后遍历队列内部板子基础上分四种情况：
+1：当前下标对越数组的界，直接continue
+2：当前数组值为0，直接continue
+3：当前下标对遍历过，直接continue
+4：否则把对应判重数组值修改了，内部变量加一，再与结果值取最大给结果，最后当前节点对入队列
+最后返回结果即可
+
+执行用时 :
+36 ms
+, 在所有 C++ 提交中击败了
+18.14%
+的用户
+内存消耗 :
+25.9 MB
+, 在所有 C++ 提交中击败了
+6.90%
+的用户
+（都炸了。。。天）
+
+上代码：
+class Solution {
+public:
+    queue<pair<int, int> > que;
+    int dx[4][2] = {{1,0}, {0,1}, {0,-1}, {-1,0}};
+    int res = 0;
+    
+    int maxAreaOfIsland(vector<vector<int>>& grid) {
+        vector<vector<int> > dist(50, vector<int>(50, -1));
+        int n = grid.size(), m = grid[0].size();
+        for(int i = 0; i < grid.size(); i++) {
+            for(int j = 0; j < grid[0].size(); j++) {
+                if(grid[i][j] == 1 && dist[i][j] == -1) {
+                    int sum = 1;
+                    res = max(res, sum);
+                    que.push(make_pair(i,j));
+                    dist[i][j] = 0;
+                    while(!que.empty()){
+                        int x = que.front().first, y = que.front().second;
+                        que.pop();
+                        for (int kk = 0; kk < 4; kk++) {
+                            int tx = x + dx[kk][0], ty = y + dx[kk][1];
+                            if (tx < 0 || tx >= n || ty < 0 || ty >= m)
+                                continue;
+                            else if(grid[tx][ty] == 0)
+                                dist[tx][ty] = 0;
+                            else if(dist[tx][ty] == 0)
+                                continue;
+                            else {
+                                cout<<tx<<ty<<endl;
+                                dist[tx][ty] = 0;
+                                sum++;
+                                res = max(sum, res);
+                                que.push(make_pair(tx, ty));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return res;
+    }
+};
