@@ -1,0 +1,2 @@
+SELECT DISTINCT Salary AS SecondHighestSalary
+AS左面是数据库参数，右边是改的名字
