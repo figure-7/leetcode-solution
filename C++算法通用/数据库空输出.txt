@@ -1,2 +1,8 @@
-SELECT DISTINCT Salary from
-DISTINCT当没有找到值时返回NULL而不是空
+SELECT
+    (SELECT DISTINCT
+            Salary
+        FROM
+            Employee
+        ORDER BY Salary DESC
+        LIMIT 1 OFFSET 1) AS SecondHighestSalary
+如上，内部SELECT加上DISTINCT加上OFFSET实现当没有找到值时返回NULL而不是空
