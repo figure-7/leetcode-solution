@@ -1,0 +1,2 @@
+SELECT DISTINCT Salary from
+DISTINCT当没有找到值时返回NULL而不是空
