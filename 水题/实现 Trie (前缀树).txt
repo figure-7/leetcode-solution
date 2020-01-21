@@ -1,0 +1,86 @@
+题目难度：MEDIUM
+
+实现一个 Trie (前缀树)，包含 insert, search, 和 startsWith 这三个操作。
+
+示例:
+
+Trie trie = new Trie();
+
+trie.insert("apple");
+trie.search("apple");   // 返回 true
+trie.search("app");     // 返回 false
+trie.startsWith("app"); // 返回 true
+trie.insert("app");   
+trie.search("app");     // 返回 true
+说明:
+
+你可以假设所有的输入都是由小写字母 a-z 构成的。
+保证所有输入均为非空字符串。
+
+思路：哈希表
+初始化全局变量初值0，哈希表，数组，各个函数功能如下：
+insert：将字符串存进哈希表及数组即可
+search：哈希表找到返回true，否则返回false即可
+startsWith：遍历数组找到父串返回true，否则返回false即可（其实可以用二分upper_bound的，直接暴力了）
+（全局变量搞错WA了两次，不知道在想什么）
+
+执行用时 :
+124 ms
+, 在所有 C++ 提交中击败了
+22.17%
+的用户
+内存消耗 :
+25.7 MB
+, 在所有 C++ 提交中击败了
+96.56%
+的用户
+（时间爆了，空间很好）
+
+上代码：
+class Trie {
+public:
+    unordered_map<string, int> map;
+    vector<string> curr;
+    int a = 0;
+    
+    /** Initialize your data structure here. */
+    Trie() {
+        
+    }
+    
+    /** Inserts a word into the trie. */
+    void insert(string word) {
+        map[word] = 1;
+        curr.push_back(word);
+    }
+    
+    /** Returns if the word is in the trie. */
+    bool search(string word) {
+        if(map.find(word) != map.end())
+            return true;
+        else
+            return false;
+    }
+    
+    /** Returns if there is any word in the trie that starts with the given prefix. */
+    bool startsWith(string prefix) {
+        for(int i = 0; i < curr.size(); i++) {
+            while(a < curr[i].length() && a < prefix.length() && prefix[a] == curr[i][a])
+                a++;
+            if(a >= prefix.length()) {
+                a = 0;
+                return true;
+            }
+            a = 0;
+        }
+        return false;
+    }
+};
+
+/**
+ * Your Trie object will be instantiated and called as such:
+ * Trie* obj = new Trie();
+ * obj->insert(word);
+ * bool param_2 = obj->search(word);
+ * bool param_3 = obj->startsWith(prefix);
+ */
