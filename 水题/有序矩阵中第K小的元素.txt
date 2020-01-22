@@ -1,0 +1,48 @@
+题目难度：MEDIUM
+
+给定一个 n x n 矩阵，其中每行和每列元素均按升序排序，找到矩阵中第k小的元素。
+请注意，它是排序后的第k小元素，而不是第k个元素。
+
+示例:
+
+matrix = [
+   [ 1,  5,  9],
+   [10, 11, 13],
+   [12, 13, 15]
+],
+k = 8,
+
+返回 13。
+说明: 
+你可以假设 k 的值永远是有效的, 1 ≤ k ≤ n2 。
+
+思路：优先队列
+先将数组值存进优先队列，然后队列执行出队直到队列元素个数等于给定值
+返回队顶元素即可
+
+执行用时 :
+92 ms
+, 在所有 C++ 提交中击败了
+12.12%
+的用户
+内存消耗 :
+13.6 MB
+, 在所有 C++ 提交中击败了
+12.72%
+的用户
+（都炸了。。。）
+
+上代码：
+class Solution {
+public:
+    priority_queue<int> q;
+    
+    int kthSmallest(vector<vector<int>>& matrix, int k) {
+        for(int i = 0 ; i < matrix.size(); i++)
+            for(int j = 0; j < matrix[0].size(); j++)
+                q.push(matrix[i][j]);
+        while(q.size() > k)
+            q.pop();
+        return q.top();
+    }
+};
