@@ -1,0 +1,6 @@
+multiset<pair<int, int>> all;建立
+multiset<int> heights({0});建立并放入初值
+all.insert(make_pair(e[0], -e[2]))插入
+heights.insert(-p.second)插入
+heights.erase(heights.find(p.second))查找并删除
+auto maxHeight = *heights.rbegin();获取元素首个值
