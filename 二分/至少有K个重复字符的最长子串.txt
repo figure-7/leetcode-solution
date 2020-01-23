@@ -1,0 +1,88 @@
+题目难度:MEDIUM
+
+找到给定字符串（由小写字符组成）中的最长子串 T ， 要求 T 中的每一字符出现次数都不少于 k 。
+
+输出 T 的长度。
+
+示例 1:
+
+输入:
+s = "aaabb", k = 3
+
+输出:
+3
+
+最长子串为 "aaa" ，其中 'a' 重复了 3 次。
+示例 2:
+
+输入:
+s = "ababbc", k = 2
+
+输出:
+5
+
+最长子串为 "ababb" ，其中 'a' 重复了 2 次， 'b' 重复了 3 次。
+
+思路：二分+哈希表
+接下来上题解区思路：
+先用map存每个字符出现的数量
+
+当一个字符出现的次数小于k时，该字符肯定不会出现在某个满足条件的子串中，即该字符可以把字符串分割
+使用两个指针，第一个指针指向当前出现次数大于等于k的位置，第二个指针往后移动到后面第一个出现次数小于k的位置，那么中间这部分子串可能是一个结果，递归该子串求结果
+找到一个可能子串之后，第一个指针指向第二个指针的后一个位置，继续找下一个子串，知道找到字符串s的结尾
+不断递归找到所有可能结果中满足条件的最大值返回即可
+
+执行用时 :
+0 ms
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+内存消耗 :
+9.2 MB
+, 在所有 C++ 提交中击败了
+36.30%
+的用户
+（时间完杀！！！空间不咋地）
+
+上代码：
+class Solution {
+public:
+    int longestSubstring(string s, int k) {
+        unordered_map<char, int> map;
+        for (auto it : s) map[it]++;
+        // 整个字符串中所有字符均大于等于k，直接返回字符串长度
+        bool flag = true;
+        bool flag2 = true;
+        for (auto it : map) {
+            if (it.second < k) flag = false;
+            if (it.second >= k) flag2 = false;
+        }
+        if (flag) return s.size();
+        if (flag2) return 0;
+
+        int res = 0;
+
+        // 使用vs存储当前s的所有可能子串
+        vector<string> vs;
+        int i = 0;
+        while (i < s.size()) {
+            while (i < s.size() && map[s[i]] < k) i++;
+            int j;
+            for (j = i + 1; j < s.size(); j++) {
+                if (map[s[j]] < k) {
+                    vs.push_back(s.substr(i, j - i));
+                    break;
+                }
+            }
+            if (j == s.size()) vs.push_back(s.substr(i));
+            i = j + 1;
+        }
+
+        for (auto it : vs) {
+            // cout << it << endl;
+            res = max(res, longestSubstring(it, k));
+        }
+
+        return res;
+    }
+};
