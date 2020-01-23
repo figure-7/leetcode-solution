@@ -1,0 +1,64 @@
+题目难度：HARD
+
+给定一个整数数组 nums，按要求返回一个新数组 counts。
+
+数组 counts 有该性质： counts[i] 的值是  nums[i] 右侧小于 nums[i] 的元素的数量。
+
+示例:
+
+输入: [5,2,6,1]
+输出: [2,1,1,0] 
+解释:
+5 的右侧有 2 个更小的元素 (2 和 1).
+2 的右侧仅有 1 个更小的元素 (1).
+6 的右侧有 1 个更小的元素 (1).
+1 的右侧有 0 个更小的元素.
+
+思路：二叉搜索树
+接下来上题解区题解：
+借助二叉查找树： 倒序插入，每次插入第i个元素的过程中，计算树中比该值小的个数
+
+执行用时 :
+24 ms
+, 在所有 C++ 提交中击败了
+97.12%
+的用户
+内存消耗 :
+23.1 MB
+, 在所有 C++ 提交中击败了
+19.28%
+的用户
+（时间很好，空间炸了）
+
+上代码：
+class Solution {
+public:
+    // binary search tree
+    struct Node {
+        int val, smaller;
+        Node *left, *right;
+        Node(int v, int s) : val(v), smaller(s), left(NULL), right(NULL) {}
+    };
+    
+    int insert(Node *&root, int v) {
+        if (!root) {
+            root = new Node(v, 0);
+            return 0;
+        }
+        if (root->val > v) {
+            root->smaller++;
+            return insert(root->left, v);
+        } else {
+            return insert(root->right, v) + root->smaller + (root->val < v ? 1 : 0);
+        }
+    }
+    
+    vector<int> countSmaller(vector<int>& nums) {
+        vector<int> res(nums.size());
+        Node *root = NULL;
+        for (int i = nums.size() - 1; i >= 0; --i) {
+            res[i] = insert(root, nums[i]);
+        }
+        return res;
+    }
+};
