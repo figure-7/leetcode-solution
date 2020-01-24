@@ -1,0 +1,60 @@
+题目难度：MEDIUM
+
+思路：图论+DFS
+（刚开始用tarjan结果发现不是这个方法的题。。。）接下来上题解区题解：
+拓扑排序
+入度：设有向图中有一结点v，其入度即为当前所有从其他结点出发，终点为v的的边的数目。
+出度：设有向图中有一结点v，其出度即为当前所有起点为v，指向其他结点的边的数目。
+每次从入度为0的结点开始，加入队列。
+入度为0，表示没有前置结点。
+处理入度为0的结点，把这个结点指向的结点的入度-1。
+再把新的入度为0的结点加入队列。
+如果队列都处理完毕，但是和总结点数不符，说明有些结点形成环。
+
+执行用时 :
+28 ms
+, 在所有 C++ 提交中击败了
+69.35%
+的用户
+内存消耗 :
+14 MB
+, 在所有 C++ 提交中击败了
+40.99%
+的用户
+（都一般）
+
+上代码：
+class Solution {
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) 
+    {
+        vector<int> inDegree(numCourses, 0);
+        vector<vector<int>> lst(numCourses, vector<int>());
+        for (auto v : prerequisites)
+        {
+            inDegree[v[0]]++;	// 初始化入度列表
+            lst[v[1]].push_back(v[0]);	// 初始化邻接表
+        }
+
+        queue<int> que;
+        for (auto i = 0; i < inDegree.size(); i++)
+        {
+            if (inDegree[i] == 0) que.push(i);	// 将入度为0的结点放入队列
+        }
+
+        vector<int> ans;
+        while (!que.empty())
+        {
+            auto q = que.front();
+            que.pop();
+            ans.push_back(q);
+
+            for (auto l : lst[q])
+            {
+                if (--inDegree[l] == 0) que.push(l);
+            }
+        }
+
+        return ans.size() == numCourses;
+    }
+};
