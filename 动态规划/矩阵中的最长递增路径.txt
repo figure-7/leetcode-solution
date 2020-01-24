@@ -1,0 +1,97 @@
+题目难度：HARD
+
+给定一个整数矩阵，找出最长递增路径的长度。
+
+对于每个单元格，你可以往上，下，左，右四个方向移动。 
+
+你不能在对角线方向上移动或移动到边界外（即不允许环绕）。
+
+示例 1:
+
+输入: nums = 
+[
+  [9,9,4],
+  [6,6,8],
+  [2,1,1]
+] 
+输出: 4 
+解释: 最长递增路径为 [1, 2, 6, 9]。
+示例 2:
+
+输入: nums = 
+[
+  [3,4,5],
+  [3,2,6],
+  [2,2,1]
+] 
+输出: 4 
+解释: 最长递增路径是 [3, 4, 5, 6]。注意不允许在对角线方向上移动。
+
+思路：DP
+接下来上题解区题解：
+将所有的坐标按照对应位置的值升序排序
+依次处理上一步中得到的坐标列表,从附近比当前点矮的点DP值取最大加1得到当前点的DP值、
+第一步的时间复杂度是 O(log(mn))
+第二步的时间复杂度是 O(mn)
+
+执行用时 :
+80 ms
+, 在所有 C++ 提交中击败了
+34.34%
+的用户
+内存消耗 :
+15 MB
+, 在所有 C++ 提交中击败了
+31.84%
+的用户
+（都不咋地。。。）
+
+上代码：
+class Point {
+public:
+    int x, y, v;
+    Point(int ix, int iy, int iv) {
+        x = ix;
+        y = iy;
+        v = iv;
+    }
+};
+
+class Solution {
+public:
+    int longestIncreasingPath(vector<vector<int>>& matrix) {
+        if (matrix.size() == 0)
+            return 0;
+        const int rows = matrix.size();
+        const int cols = matrix[0].size();
+        vector<vector<int>> dp(rows, vector<int>(cols, 1));
+        vector<Point> vp;
+        vp.reserve(rows * cols);
+        for (int i = 0; i < rows; i++)
+            for (int j = 0; j < cols; j++) {
+                vp.push_back(Point(i, j, matrix[i][j]));
+            }
+        // 对坐标排序
+        sort(vp.begin(), vp.end(), [](const Point &lhs, const Point &rhs){
+            return lhs.v < rhs.v;
+        });
+        int ret = 1;
+        for (const auto &p : vp) {
+            auto x = p.x;
+            auto y = p.y;
+            auto v = p.v;
+            // 寻找附近比当前矮的点的最高DP值
+            if (x > 0 && matrix[x - 1][y] < v && dp[x - 1][y] + 1 > dp[x][y])
+                dp[x][y] = dp[x - 1][y] + 1;
+            if (x < rows - 1 && matrix[x + 1][y] < v && dp[x + 1][y] + 1 > dp[x][y])
+                dp[x][y] = dp[x + 1][y] + 1;
+            if (y > 0 && matrix[x][y - 1] < v && dp[x][y - 1] + 1 > dp[x][y])
+                dp[x][y] = dp[x][y - 1] + 1;
+            if (y < cols - 1 && matrix[x][y + 1] < v && dp[x][y + 1] + 1 > dp[x][y])
+                dp[x][y] = dp[x][y + 1] + 1;
+            if (dp[x][y] > ret)
+                ret = dp[x][y];
+        }
+        return ret;
+    }
+};
