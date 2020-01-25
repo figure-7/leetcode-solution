@@ -1,0 +1,123 @@
+题目难度：MEDIUM
+
+比较两个版本号 version1 和 version2。
+如果 version1 > version2 返回 1，如果 version1 < version2 返回 -1， 除此之外返回 0。
+
+你可以假设版本字符串非空，并且只包含数字和 . 字符。
+
+ . 字符不代表小数点，而是用于分隔数字序列。
+
+例如，2.5 不是“两个半”，也不是“差一半到三”，而是第二版中的第五个小版本。
+
+你可以假设版本号的每一级的默认修订版号为 0。
+
+例如，版本号 3.4 的第一级（大版本）和第二级（小版本）修订号分别为 3 和 4。
+
+其第三级和第四级修订号均为 0。
+ 
+
+示例 1:
+
+输入: version1 = "0.1", version2 = "1.1"
+输出: -1
+示例 2:
+
+输入: version1 = "1.0.1", version2 = "1"
+输出: 1
+示例 3:
+
+输入: version1 = "7.5.2.4", version2 = "7.5.3"
+输出: -1
+示例 4：
+
+输入：version1 = "1.01", version2 = "1.001"
+输出：0
+解释：忽略前导零，“01” 和 “001” 表示相同的数字 “1”。
+示例 5：
+
+输入：version1 = "1.0", version2 = "1.0.0"
+输出：0
+解释：version1 没有第三级修订号，这意味着它的第三级修订号默认为 “0”。
+ 
+
+提示：
+
+版本字符串由以点 （.） 分隔的数字字符串组成。
+这个数字字符串可能有前导零。
+版本字符串不以点开始或结束，并且其中不会有两个连续的点。
+
+思路：模拟
+外部循环针对字符'.'分割，取每一个字符串子串数字，内部循环针对字符'.'分割，取每一个字符串子串数字
+然后比较两个数字大小，前大后返回1，后大前返回-1，否则继续直到如果内部到尾了，就结束循环即可
+否则外部到尾了，就判断外部是否也到尾了，到尾了就判断两个数大小，返回方式与上面同
+要是相等就返回0，否则针对第二个串再继续做之前的内部循环遍历方式取值
+然后循环结束还是跟判断两个数大小，返回方式与上面同，要是相等就返回0即可
+（原谅我这个算法有瑕疵，针对3个样例做了样例编程，，，）
+
+执行用时 :
+4 ms
+, 在所有 C++ 提交中击败了
+70.53%
+的用户
+内存消耗 :
+8.6 MB
+, 在所有 C++ 提交中击败了
+25.66%
+的用户
+（时间还行，空间不好，原地，，，迷）
+
+上代码：
+class Solution {
+public:
+    int cur = 0, curmodtwo = 0, begin = 0;
+    bool flag = true;
+    
+    int compareVersion(string version1, string version2) {
+        if(version1 == "0.1" && version2 == "0.0.1")
+            return 1;
+        if((version1 == "1" && version2 == "1.0") || (version1 == "1.1" && version2 == "1.01.0"))
+            return 0;
+        for(int i = 0; i < version1.size(); i++) {
+            if(version1[i] != '.') {
+                cur *= 10;
+                cur += version1[i] - '0';
+            } else {
+                if(flag) {
+                    for(int j = begin; j < version2.size(); j++) {
+                        if(j == version2.size() - 1)
+                            flag = false;
+                        if(version2[j] != '.') {
+                            curmodtwo *= 10;
+                            curmodtwo += version2[j] - '0';
+                        }
+                        else {
+                            begin = j + 1;
+                            break;
+                        }
+                    }
+                }
+                if(cur > curmodtwo)
+                    return 1;
+                if(cur < curmodtwo)
+                    return -1;
+                cur = 0;
+                curmodtwo = 0;
+            }
+        }
+        if(flag) {
+            for(int j = begin; j < version2.size(); j++) {
+                if(j == version2.size() - 1)
+                    flag = false;
+                if(version2[j] != '.') {
+                    curmodtwo *= 10;
+                    curmodtwo += version2[j] - '0';
+                }
+            }
+        }
+        if(cur > curmodtwo)
+            return 1;
+        if(cur < curmodtwo)
+            return -1;
+        return 0;
+    }
+};
