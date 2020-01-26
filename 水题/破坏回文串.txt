@@ -1,0 +1,48 @@
+题目难度：MEDIUM
+
+给你一个回文字符串 palindrome ，请你将其中 一个 字符用任意小写英文字母替换，使得结果字符串的字典序最小，且 不是 回文串。
+
+请你返回结果字符串。如果无法做到，则返回一个空串。
+
+ 
+
+示例 1：
+
+输入：palindrome = "abccba"
+输出："aaccba"
+示例 2：
+
+输入：palindrome = "a"
+输出：""
+ 
+
+提示：
+
+1 <= palindrome.length <= 1000
+palindrome 只包含小写英文字母。
+
+思路：周赛第二题，模拟
+遍历前半部分的字符（向下取整），当不是字符'a'就改为字符'a'返回结果即可
+否则就把字符串最后一个字符赋'b'（WA点2）
+注意当个字符返回空（WA点1）
+
+上代码：
+class Solution {
+public:
+    bool flag = false;
+    
+    string breakPalindrome(string palindrome) {
+        if(palindrome.length() == 1)
+            return "";
+        for(int i = 0; i < palindrome.length() / 2; i++) {
+            if(palindrome[i] - 'a' > 0) {
+                palindrome[i] = 'a';
+                flag = true;
+                break;
+            }
+        }
+        if(!flag)
+            palindrome[palindrome.length() - 1] = 'b';
+        return palindrome;
+    }
+};
