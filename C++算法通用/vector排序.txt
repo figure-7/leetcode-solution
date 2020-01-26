@@ -4,6 +4,10 @@ sort(ans.begin(),ans.end(),[&](string a,string b){
             if(cnt[a]!=cnt[b])return cnt[a]<cnt[b];
             else return a<b;
         });
+inline bool cmp(const vector<int> &a, const vector<int> &b){
+    if (a[1] != b[1]) return a[1] > b[1];
+    return a[0] > b[0];
+}
 按照次数进行排序，cnt是string类型哈希表，重写sort方法实现数组按主出现次数频率有小到大次按字典序排列
 
 按指定范围排序（一下是实现从10到80个数的排序）
