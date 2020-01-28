@@ -1,0 +1,39 @@
+所有区间最小值和
+int N = A.size();
+stack<int> st;
+vector<long> sums(N, 0);
+for (int i = 0; i < N; ++i) {
+	while (!st.empty() && A[st.top()] >= A[i]) {
+		st.pop();
+        }
+        if (st.empty()) {
+                sums[i] = A[i] * (i + 1);
+        } else {
+                sums[i] = sums[st.top()] + A[i] * (i - st.top());
+        }
+        sums[i] %= M;
+        st.push(i);
+}
+long res = 0;
+for (auto x : sums) {
+        res += x;
+        res %= M;
+}
+return res;
+
+求每头牛能看到的牛数量之和
+int n;
+while(~scanf("%d",&n))
+{
+	stack<int>a;
+	int num;
+	Ull ans=0;
+	for(int i=0;i<n;i++)
+	{
+		scanf("%d",&num);
+		while(!a.empty()&&a.top()<=num) a.pop();
+		ans+=a.size();
+		a.push(num);
+	}
+printf("%lu\n",ans);
+}
