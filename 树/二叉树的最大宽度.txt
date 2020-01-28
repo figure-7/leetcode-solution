@@ -1,0 +1,150 @@
+题目难度：MEDIUM
+
+给定一个二叉树，编写一个函数来获取这个树的最大宽度。
+
+树的宽度是所有层中的最大宽度。
+
+这个二叉树与满二叉树（full binary tree）结构相同，但一些节点为空。
+
+每一层的宽度被定义为两个端点（该层最左和最右的非空节点，两端点间的null节点也计入长度）之间的长度。
+
+示例 1:
+
+输入: 
+
+           1
+         /   \
+        3     2
+       / \     \  
+      5   3     9 
+
+输出: 4
+解释: 最大值出现在树的第 3 层，宽度为 4 (5,3,null,9)。
+示例 2:
+
+输入: 
+
+          1
+         /  
+        3    
+       / \       
+      5   3     
+
+输出: 2
+解释: 最大值出现在树的第 3 层，宽度为 2 (5,3)。
+示例 3:
+
+输入: 
+
+          1
+         / \
+        3   2 
+       /        
+      5      
+
+输出: 2
+解释: 最大值出现在树的第 2 层，宽度为 2 (3,2)。
+示例 4:
+
+输入: 
+
+          1
+         / \
+        3   2
+       /     \  
+      5       9 
+     /         \
+    6           7
+输出: 8
+解释: 最大值出现在树的第 4 层，宽度为 8 (6,null,null,null,null,null,null,7)。
+注意: 答案在32位有符号整数的表示范围内。
+
+思路：树
+（因为空节点不存在子节点，所以搞了半天没搞出来）接下来上题解区思路：
+路：在层次遍历的基础上，记录每层第一个非空节点A，最后一个非空节点B，以及两者之间的节点，包括空节点。
+算出节点个数。
+
+例如：
+
+           1
+         /   \
+        3     2
+       / \     \  
+      5   3     9 
+最下层,[5,3,null,9]。
+第一个非空节点5，最后一个非空节点9，这个null节点，在5和9非空节点之间，也算入计数。
+
+要对层次遍历做修改。
+第一个非空节点，之后的null节点，也要向下一层扩展。
+
+例如：
+
+           1
+         /   \
+        3     2
+       /       \  
+      5         9 
+     / \         \
+    6   7         10
+在[5,null,null,9]这一层。
+5之后的null节点，也要向下一层扩展。
+
+有[6,7,null,null,null,null,null,10]。
+如果没有上面的扩展，结果就是错误的。
+
+执行用时 :
+780 ms
+, 在所有 C++ 提交中击败了
+5.10%
+的用户
+内存消耗 :
+263.9 MB
+, 在所有 C++ 提交中击败了
+5.20%
+的用户
+（都炸了。。。）
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    int widthOfBinaryTree(TreeNode* root) {
+        if(!root) return 0;
+        queue<TreeNode*> Q;
+        Q.push(root);
+        int ans = 0;
+        while(Q.size()){
+            int cnt = Q.size();
+            int f = -1;
+            int r = -1;
+            for(int i = 0;i < cnt;++i){
+                TreeNode* cur = Q.front();Q.pop();
+                if(cur && f < 0) r = f=i;
+                if(cur) r=i;
+                if(!cur) {
+                    if(f > -1){
+                        Q.push(NULL);
+                        Q.push(NULL);
+                    }
+                    continue;
+                }
+                
+                Q.push(cur->left);
+                Q.push(cur->right);
+            }
+            if(f > -1){
+                ans = max(ans,r-f+1);
+            }else break;
+            
+        }
+        return ans;
+    }
+};
