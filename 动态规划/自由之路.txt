@@ -1,0 +1,86 @@
+题目难度：HARD
+
+视频游戏“辐射4”中，任务“通向自由”要求玩家到达名为“Freedom Trail Ring”的金属表盘，并使用表盘拼写特定关键词才能开门。
+
+给定一个字符串 ring，表示刻在外环上的编码；
+
+给定另一个字符串 key，表示需要拼写的关键词。
+
+您需要算出能够拼写关键词中所有字符的最少步数。
+
+最初，ring 的第一个字符与12:00方向对齐。
+
+您需要顺时针或逆时针旋转 ring 以使 key 的一个字符在 12:00 方向对齐，然后按下中心按钮，以此逐个拼写完 key 中的所有字符。
+
+旋转 ring 拼出 key 字符 key[i] 的阶段中：
+
+您可以将 ring 顺时针或逆时针旋转一个位置，计为1步。
+旋转的最终目的是将字符串 ring 的一个字符与 12:00 方向对齐，并且这个字符必须等于字符 key[i] 。
+如果字符 key[i] 已经对齐到12:00方向，您需要按下中心按钮进行拼写，这也将算作 1 步。
+按完之后，您可以开始拼写 key 的下一个字符（下一阶段）, 直至完成所有拼写。
+示例：
+
+ 
+
+
+ 
+输入: ring = "godding", key = "gd"
+输出: 4
+解释:
+ 对于 key 的第一个字符 'g'，已经在正确的位置, 我们只需要1步来拼写这个字符。 
+ 对于 key 的第二个字符 'd'，我们需要逆时针旋转 ring "godding" 2步使它变成 "ddinggo"。
+ 当然, 我们还需要1步进行拼写。
+ 因此最终的输出是 4。
+提示：
+
+ring 和 key 的字符串长度取值范围均为 1 至 100；
+两个字符串中都只有小写字符，并且均可能存在重复字符；
+字符串 key 一定可以由字符串 ring 旋转拼出。
+
+思路：DP
+接下来上题解区题解：
+动态规划
+1，dp[i]代表该步将表盘旋转到下标为i处的最小操作数，N代表表盘的长度
+2，状态转移方程为：
+令dp_prev[j]代表上一步旋转到下标为j处的最小操作数，则有
+dp[i] = min{dp_prev[j] + 1 + min(abs(i - j), N - abs(i - j))}
+
+执行用时 :
+20 ms
+, 在所有 C++ 提交中击败了
+75.63%
+的用户
+内存消耗 :
+15.6 MB
+, 在所有 C++ 提交中击败了
+19.57%
+的用户
+（时间还行，空间不咋地（可改为滚动））
+
+上代码：
+class Solution {
+public:
+    const int INF = 1e8;
+    int findRotateSteps(string ring, string key) {
+        unordered_map<int, vector<int> > m;
+        int N = ring.size();
+        for (int i = 0; i < N; ++i) {
+            m[ring[i] - 'a'].push_back(i);
+        }
+        vector<int> dp(N, INF);
+        vector<int> start{0};
+        dp[0] = 0; 
+        for (int i = 0; i < key.size(); ++i) {
+            vector<int>& prev = (i > 0) ? m[key[i - 1] - 'a'] : start;
+            vector<int> dp1(N, INF);
+            for (int i : m[key[i] - 'a']) {
+                for (int j : prev) {
+                    int t = abs(i - j);
+                    dp1[i] = min(dp1[i], 1 + dp[j] + min(t, N - t));
+                }
+            }
+            swap(dp, dp1);
+        }
+        return *min_element(dp.begin(), dp.end());
+    }
+};
