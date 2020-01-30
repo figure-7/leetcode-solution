@@ -1,0 +1,94 @@
+题目难度：HARD
+
+给定一个字符串 S，计算 S 的不同非空子序列的个数。
+
+因为结果可能很大，所以返回答案模 10^9 + 7.
+
+ 
+
+示例 1：
+
+输入："abc"
+输出：7
+解释：7 个不同的子序列分别是 "a", "b", "c", "ab", "ac", "bc", 以及 "abc"。
+示例 2：
+
+输入："aba"
+输出：6
+解释：6 个不同的子序列分别是 "a", "b", "ab", "ba", "aa" 以及 "aba"。
+示例 3：
+
+输入："aaa"
+输出：3
+解释：3 个不同的子序列分别是 "a", "aa" 以及 "aaa"。
+ 
+
+ 
+
+提示：
+
+S 只包含小写字母。
+1 <= S.length <= 2000
+
+思路：DP
+接下来上题解区思路：
+记忆化DP
+1，dp[i][j]代表从字符串S的第i位开始到结束有多少个子字符串以'a' + j结尾
+2，状态转移方程为
+如果S[i] == 'a' + j，则dp[i][j] = dp[i + 1][j]
+否则，dp[i][j] = 1 + sum{dp[i + i][k] | 0 <= k <= 25}
+
+这里为了简化逻辑，利用了记忆化dp进行处理
+
+执行用时 :
+48 ms
+, 在所有 C++ 提交中击败了
+24.00%
+的用户
+内存消耗 :
+10.1 MB
+, 在所有 C++ 提交中击败了
+6.12%
+的用户
+（时间不咋地，空间炸了）
+
+上代码：
+class Solution {
+public:
+    using ll = long long;
+    const ll M = 1e9 + 7;
+    string S;
+    int N;
+    
+    ll MEMO[2000][26];
+    
+    ll dp(int i, int j) {
+        if (MEMO[i][j] != -1) return MEMO[i][j];
+        if (i == N - 1) return j == S[i] - 'a';
+        ll res = 0;
+        if (S[i] - 'a' == j) {
+            res = 1;
+            for (int k = 0; k < 26; ++k) {
+                res += dp(i + 1, k);
+            }
+        } else {
+            res = dp(i + 1, j);
+        }
+        res %= M;
+        MEMO[i][j] = res;
+        return res;
+    }
+    
+    int distinctSubseqII(string S) {
+        this->S = S;
+        this->N = S.size();
+        memset(MEMO, -1, sizeof(MEMO));
+        
+        ll res = 0;
+        for (int i = 0; i < 26; ++i) {
+            res += dp(0, i);
+        }
+        res %= M;
+        return res;
+    }
+};
