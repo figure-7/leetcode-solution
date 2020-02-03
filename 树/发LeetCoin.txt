@@ -1,0 +1,182 @@
+题目难度：HARD
+
+力扣决定给一个刷题团队发LeetCoin作为奖励。同时，为了监控给大家发了多少LeetCoin，力扣有时候也会进行查询。
+
+ 
+
+该刷题团队的管理模式可以用一棵树表示：
+
+团队只有一个负责人，编号为1。除了该负责人外，每个人有且仅有一个领导（负责人没有领导）；
+不存在循环管理的情况，如A管理B，B管理C，C管理A。
+ 
+
+力扣想进行的操作有以下三种：
+
+给团队的一个成员（也可以是负责人）发一定数量的LeetCoin；
+给团队的一个成员（也可以是负责人），以及他/她管理的所有人（即他/她的下属、他/她下属的下属，……），发一定数量的LeetCoin；
+查询某一个成员（也可以是负责人），以及他/她管理的所有人被发到的LeetCoin之和。
+ 
+
+输入：
+
+N表示团队成员的个数（编号为1～N，负责人为1）；
+leadership是大小为(N - 1) * 2的二维数组，其中每个元素[a, b]代表b是a的下属；
+operations是一个长度为Q的二维数组，代表以时间排序的操作，格式如下：
+operations[i][0] = 1: 代表第一种操作，operations[i][1]代表成员的编号，operations[i][2]代表LeetCoin的数量；
+operations[i][0] = 2: 代表第二种操作，operations[i][1]代表成员的编号，operations[i][2]代表LeetCoin的数量；
+operations[i][0] = 3: 代表第三种操作，operations[i][1]代表成员的编号；
+输出：
+
+返回一个数组，数组里是每次查询的返回值（发LeetCoin的操作不需要任何返回值）。
+
+由于发的LeetCoin很多，请把每次查询的结果模1e9+7 (1000000007)。
+
+ 
+
+示例 1：
+
+输入：N = 6, leadership = [[1, 2], [1, 6], [2, 3], [2, 5], [1, 4]], operations = [[1, 1, 500], [2, 2, 50], [3, 1], [2, 6, 15], [3, 1]]
+输出：[650, 665]
+解释：团队的管理关系见下图。
+第一次查询时，每个成员得到的LeetCoin的数量分别为（按编号顺序）：500, 50, 50, 0, 50, 0;
+第二次查询时，每个成员得到的LeetCoin的数量分别为（按编号顺序）：500, 50, 50, 0, 50, 15.
+
+
+ 
+
+限制：
+
+1 <= N <= 50000
+1 <= Q <= 50000
+operations[i][0] != 3 时，1 <= operations[i][2] <= 5000
+
+思路：线段树优化
+接下来上题解区题解：
+此题目非常巧妙，按照正常思路优化往往在遍历树上做手脚，但比较恶心的用例是 如果树的深度非常大，这样时间复杂度会降低到O(N^2) ,50000量级肯定是不达标的。如果先序遍历整棵树，那么每个子树的节点其实都是连续的，因此可以使用线段树的来实现区间求和，这样时间复杂度度将降到O(Nlog(N))满足要求。如图：
+
+先序遍历后 1、2、3、5、6、4 假如求1节点的子树就是1~4所在位置节点求和，2节点为2~5节点求和。
+通过先序遍历将会求出某个节点子树的区间范围。
+现在需要注意两种操作，一种是仅仅增加当前节点，一种为此节点及其子孙均增加相应值。
+第一种情况处理比较简单，只要此节点的祖先节点均增加此值即可。
+第二种情况比较复杂，为了优化性能，不对子区间进行增加，否则如果对根节点操作的复杂度将是O(N),这肯定完全不可接受，因此此值放在查询实计算。因此第二种操作此节点及其祖先节点均增加此子树节点数操作值，并且用另外变量标记在此节点第二种操作的总和，这样在查询的时候在把此操作传下来就可以避免遍历所有子孙。
+
+执行用时 :
+668 ms
+, 在所有 C++ 提交中击败了
+46.27%
+的用户
+内存消耗 :
+184.7 MB
+, 在所有 C++ 提交中击败了
+5.75%
+的用户
+（时间一般，空间炸了）
+
+上代码：
+typedef long long LL;
+LL BASE=pow(10,9)+7;
+
+class Node {
+public:
+    Node* l;
+    Node* r;
+    int s;
+    int e;
+    int m;
+    LL sum;   ///节点修改
+    LL val;   ///区间修改，对子孙节点求和才需要，本节点不需要
+    bool tag;   ///是否为叶子节点，true为叶子节点
+    Node(int s, int e) : l(nullptr), r(nullptr), s(s), e(e), m((s+e)/2),sum(0), val(0), tag(true) {}
+    Node* Left() {
+        if (s == e) return nullptr;
+        l = l ? l : new Node(s, m);
+        return l;
+    }
+    Node* Right() {
+        if (s == e) return nullptr;
+        r = r ? r : new Node(m+1, e);
+        return r;
+    }
+    void update(int start, int end, int newVal) {
+        //cout<<start<<" "<<end<<endl;
+
+        sum+=(LL)newVal*(end-start+1); 
+        sum%=BASE;
+        if (s == start && e == end){
+            val += newVal;
+            return;
+        }
+        if (tag) {
+            Left()->update(s, m, 0);
+            Right()->update(m+1, e, 0);
+            tag = false;
+        }
+        if (end <= m) Left()->update(start, end, newVal);
+        else if (start >= m+1) Right()->update(start, end, newVal);
+        else {
+            Left()->update(start, m, newVal);
+            Right()->update(m+1, end, newVal);
+        }
+    }
+    int query(int start, int end,LL add) {
+        LL res=0;
+        if (s == start && e == end){
+            res=sum+add*(end-start+1);
+            res%=BASE;
+            return res;
+        } 
+        add+=val;
+        
+        if (tag) {
+            res=add*(end-start+1);
+            res%=BASE;
+            return res;
+        }
+        
+        if (end <= m) return Left()->query(start, end,add);
+        if (start >= m+1) return Right()->query(start, end,add);
+        return (Left()->query(start, m,add)+Right()->query(m+1, end,add))%BASE;
+    }
+};
+
+class Solution {
+public:
+    vector<int> vIN;
+    vector<int> vOUT;
+    void dfs(vector<vector<int>>& vSun,int node,int &dfn){
+        vIN[node]=++dfn;
+        for(auto x:vSun[node]){
+            dfs(vSun,x,dfn);
+        }
+        vOUT[node]=dfn;
+    }
+    vector<int> bonus(int n, vector<vector<int>>& leadership, vector<vector<int>>& operations) {
+   
+        vector<vector<int>> vSun(n+1);
+        vIN=vector<int>(n+1);
+        vOUT=vector<int>(n+1);
+        for(auto ls:leadership){
+            vSun[ls[0]].push_back(ls[1]);
+        }
+        int dfn=-1;
+        dfs(vSun,1,dfn);
+        Node lTree(0,n-1);
+
+        vector<int> vAns;
+        for(auto op:operations){
+            int now=op[1];
+            if(op[0]==1){
+                lTree.update(vIN[op[1]],vIN[op[1]],op[2]);
+            }else if(op[0]==2){
+                lTree.update(vIN[op[1]],vOUT[op[1]],op[2]);
+
+            }else{
+
+                vAns.push_back(lTree.query(vIN[op[1]],vOUT[op[1]],0));
+            }
+        }
+        
+        
+        return vAns;
+    }
+};
