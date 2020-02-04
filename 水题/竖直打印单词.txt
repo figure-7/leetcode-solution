@@ -1,0 +1,91 @@
+题目难度：MEDIUM
+
+给你一个字符串 s。
+请你按照单词在 s 中的出现顺序将它们全部竖直返回。
+单词应该以字符串列表的形式返回，必要时用空格补位，但输出尾部的空格需要删除（不允许尾随空格）。
+每个单词只能放在一列上，每一列中也只能有一个单词。
+
+ 
+
+示例 1：
+
+输入：s = "HOW ARE YOU"
+输出：["HAY","ORO","WEU"]
+解释：每个单词都应该竖直打印。 
+ "HAY"
+ "ORO"
+ "WEU"
+示例 2：
+
+输入：s = "TO BE OR NOT TO BE"
+输出：["TBONTB","OEROOE","   T"]
+解释：题目允许使用空格补位，但不允许输出末尾出现空格。
+"TBONTB"
+"OEROOE"
+"   T"
+示例 3：
+
+输入：s = "CONTEST IS COMING"
+输出：["CIC","OSO","N M","T I","E N","S G","T"]
+ 
+
+提示：
+
+1 <= s.length <= 200
+s 仅含大写英文字母。
+题目数据保证两个单词之间只有一个空格。
+
+思路：模拟
+先遍历一次字符串看有多少除空格外的字符（即总字符数），并将所有按空格分割的字符串保存进数组
+然后外部当计算过的字符总数小于总字符数时，内部遍历字符串数组，下标初值为0，空格变量初值0
+当下标对应值小于当前字符串的长度时，先将空格数个空格累加进内部字符串（WA点，否则会出现尾空格）
+再将下标对应返回内字符直接累加进内部字符串，否则判断是否计算过的字符总数等于总字符数
+等于就退出外部循环，否则就将空格值累加，内部循环结束一次后将内部字符串入结果数组，下标值加一，空格数清零，内部字符串清空
+最后返回结果数组即可
+
+上代码：
+class Solution {
+public:
+    int sum = 0, curmodthree = 0, summodtwo = 0, space = 0;
+    string cur = "", curmodtwo = "";
+    vector<string> curr;
+    vector<string> res;
+    
+    vector<string> printVertically(string s) {
+        for(int i = 0; i < s.size(); i++) {
+            if(s[i] == ' ') {
+                curr.push_back(cur);
+                cur = "";
+            } else {
+                cur += s[i];
+                summodtwo++;
+            }
+        }
+        if(cur != "")
+            curr.push_back(cur);
+        while(sum < summodtwo) {
+            curmodtwo = "";
+            for(int i = 0; i < curr.size(); i++) {
+                if(curmodthree < curr[i].size()) {
+                    if(space != 0) {
+                        while(space > 0) {
+                            space--;
+                            curmodtwo += " ";
+                        }
+                    }
+                    sum++;
+                    curmodtwo += curr[i][curmodthree];
+                } else {
+                    if(sum < summodtwo)
+                        space++;
+                    else
+                        break;
+                }
+            }
+            space = 0;
+            curmodthree++;
+            res.push_back(curmodtwo);
+        }
+        return res;
+    }
+};
