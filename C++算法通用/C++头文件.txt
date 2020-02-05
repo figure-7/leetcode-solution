@@ -1,32 +1,39 @@
 #include<iostream>
 #pragma warning(disable:4996)
 #include<cstring>
+#include<string>
 #include<cstdio>
 #include<algorithm>
 #include <vector>
 #include <queue>
 #include <map>
 #include <math.h>
+#include<fstream>
+#include<cmath>
 typedef long long ll;
+typedef unsigned long long ull;
 typedef long double ld;
-typedef pair<int,int> P;
 using namespace std;
+#define Set(a) memset(a,0,sizeof(a))
+#define F(i,a,b) for(register int i=a,i##end=b;i<=i##end;++i)
+#define UF(i,a,b) for(register int i=a,i##end=b;i>=i##end;--i)
+#define openf(a) freopen(#a".in","r",stdin);freopen(#a".out","w",stdout)
+#define re register
+#define ri re int
+#define il inline
 #define INF 0x3f3f3f3f
 #define MOD 100000000
-#define debug() printf("Tairitsu Check OK!\n")
+#define debug() printf("Tairitsu Go PM!\n")
 const int mod = 1e9 + 7;
-inline int read()
+template<typename T> inline T rd(T& x)
 {
-	int x = 0; char s = getchar();
-	while (!isdigit(s))s = getchar();
-	while (isdigit(s))x = (x << 1) + (x << 3) + (s ^ 48), s = getchar();
+	T f = 1; x = 0; char c = getchar();
+	for (; !isdigit(c); c = getchar()) if (c == '-') f = -1;
+	for (; isdigit(c); c = getchar()) x = (x << 3) + (x << 1) + (T)(c - '0');
+	x *= f;
 	return x;
-}//实现所有直接输入，可无视空格及回车
-inline void print(int x)
-{
-	if (x < 10)putchar(x + '0');
-	else {
-		print(x / 10);
-		putchar(x % 10 + '0');
-	}
-}//输出存在空格或回车需自行输出
+}
+ll rd() { ll x; rd(x); return x; }
+inline int max(int a, int b) { return a > b ? a : b; }
+inline int min(int a, int b) { return a < b ? a : b; }
+const int inf = 1 << 30;
