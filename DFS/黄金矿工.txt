@@ -1,0 +1,140 @@
+题目难度：MEDIUM
+
+你要开发一座金矿，地质勘测学家已经探明了这座金矿中的资源分布，并用大小为 m * n 的网格 grid 进行了标注。
+
+每个单元格中的整数就表示这一单元格中的黄金数量；
+
+如果该单元格是空的，那么就是 0。
+
+为了使收益最大化，矿工需要按以下规则来开采黄金：
+
+每当矿工进入一个单元，就会收集该单元格中的所有黄金。
+矿工每次可以从当前位置向上下左右四个方向走。
+每个单元格只能被开采（进入）一次。
+不得开采（进入）黄金数目为 0 的单元格。
+矿工可以从网格中 任意一个 有黄金的单元格出发或者是停止。
+ 
+
+示例 1：
+
+输入：grid = [[0,6,0],[5,8,7],[0,9,0]]
+输出：24
+解释：
+[[0,6,0],
+ [5,8,7],
+ [0,9,0]]
+一种收集最多黄金的路线是：9 -> 8 -> 7。
+示例 2：
+
+输入：grid = [[1,0,7],[2,0,6],[3,4,5],[0,3,0],[9,0,20]]
+输出：28
+解释：
+[[1,0,7],
+ [2,0,6],
+ [3,4,5],
+ [0,3,0],
+ [9,0,20]]
+一种收集最多黄金的路线是：1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7。
+ 
+
+提示：
+
+1 <= grid.length, grid[i].length <= 15
+0 <= grid[i][j] <= 100
+最多 25 个单元格中有黄金。
+
+思路：DFS+backingtracking
+（BFS暴力超时。。。）接下来上题解区题解：
+先选择突出结点（联通数量为 1 的结点，上下左右只有 1 边有金矿）作为入口，并永久 visited 这个结点。
+如果有突出结点，且这个结点是最优解，那么在探索突出结点时，就已经得到答案了。
+如果再从拐角结点探索，那么如果有更优解，绝对不会包含之前的突出结点，所以可以永久 visited 这个结点。
+
+对这些结点使用 dfs 探索，途中的 visited 作为回溯使用。
+再选择某一个方向（┌ ┐ └ ┘）拐角结点（联通数量为 2 的拐角结点，且不是一条直线）作为入口。
+如果含有突出结点的不是最优解，那么相当于没有突出结点。
+没有突出结点，意味着可以形成回路，从拐角结点开始探索，必能访问所有。
+因为要保证回路，所以任一个方向的拐角结点都可以，不需要全部方向。
+可以通过下面的用例来验证。
+
+对这些结点使用 dfs 探索，途中的 visited 作为回溯使用。
+
+上代码：
+class Solution {
+public:
+    int getNextNum(vector<vector<int>>& grid, int x, int y, vector<vector<int>>& dd, vector<vector<int>>& m)
+    {
+        int i = 0;	
+        int flag = 0;
+        for (auto& d : dd)
+        {
+            int dx = x + d[0];
+            int dy = y + d[1];
+            if (dx < 0 || dx >= grid.size()) continue;
+            if (dy < 0 || dy >= grid[0].size()) continue;
+            if (grid[dx][dy] == 0) continue;
+            i += 1;
+            flag += d[0] + d[1];
+        }
+        if (flag == 2)	// 记录拐角结点
+        {
+            m.push_back({ x, y });
+        }
+        return i;
+    }
+
+    void dfs(vector<vector<int>>& grid, int x, int y, vector<vector<int>>& dd, vector<vector<int>>& vi, int gain, int &ans)
+    {
+        gain += grid[x][y];
+        ans = max(ans, gain);
+        for (auto &d : dd)
+        {
+            int dx = x + d[0];
+            int dy = y + d[1];
+            if (dx < 0 || dx >= grid.size()) continue;
+            if (dy < 0 || dy >= grid[0].size()) continue;
+            if (grid[dx][dy] == 0) continue;
+            if (vi[dx][dy] == 1) continue;
+            vi[dx][dy] = 1;	// 回溯
+            dfs(grid, dx, dy, dd, vi, gain, ans);
+            vi[dx][dy] = 0;
+        }
+    }
+
+    int getMaximumGold(vector<vector<int>>& grid) 
+    {
+        vector<vector<int>> dd = { {0,1},{0,-1},{1,0},{-1,0} };
+        vector<vector<int>> vi(grid.size(), vector<int>(grid[0].size(), 0));
+
+        vector<vector<int>> m;
+        int ans = 0;
+        for (size_t i = 0; i < grid.size(); i++)
+        {
+            for (size_t j = 0; j < grid[0].size(); j++)
+            {
+                if (grid[i][j] == 0) continue;
+                int nextNum = getNextNum(grid, i, j, dd, m);
+                if (nextNum == 0)
+                {
+                    ans = max(ans, grid[i][j]);
+                    continue;
+                }
+                if (nextNum > 1) continue;
+                // 处理突出结点
+                vi[i][j] = 1;	// 永久
+                dfs(grid, i, j, dd, vi, 0, ans);
+            }
+        }
+        if (!m.empty())	// 处理拐角结点
+        {
+            for (auto &v : m)
+            {
+                int i = v[0];
+                int j = v[1];
+                vi[i][j] = 1;	// 回溯
+                dfs(grid, i, j, dd, vi, 0, ans);
+                vi[i][j] = 0;	// 回溯
+            }
+        }
+        return ans;
+    }
+};
