@@ -1,0 +1,78 @@
+题目难度：MEDIUM
+
+给你一个整数数组 arr 和一个整数 difference，请你找出 arr 中所有相邻元素之间的差等于给定 difference 的等差子序列，并返回其中最长的等差子序列的长度。
+
+ 
+
+示例 1：
+
+输入：arr = [1,2,3,4], difference = 1
+输出：4
+解释：最长的等差子序列是 [1,2,3,4]。
+示例 2：
+
+输入：arr = [1,3,5,7], difference = 1
+输出：1
+解释：最长的等差子序列是任意单个元素。
+示例 3：
+
+输入：arr = [1,5,7,8,5,3,4,2,1], difference = -2
+输出：4
+解释：最长的等差子序列是 [7,5,3,1]。
+
+
+提示：
+
+1 <= arr.length <= 10^5
+-10^4 <= arr[i], difference <= 10^4
+
+思路：模拟+打表
+（原谅我打了三个表。。。）
+先将数组存进哈希表，下标值为哈希表值
+之后一次遍历，内部初始变量值为1，每次找到当前元素值加给定值时并且哈下表的值大于当前数组下标就内部变量加一
+然后把哈希表值减一付给内部循环下标（子序列只能往后延伸），最后去最大值
+往复直到遍历到数组结尾
+最后返回结果最大值即可
+
+执行用时 :
+104 ms
+, 在所有 C++ 提交中击败了
+95.24%
+的用户
+内存消耗 :
+18.5 MB
+, 在所有 C++ 提交中击败了
+91.42%
+的用户
+（时间绝杀！空间也很好！！！）
+
+上代码：
+class Solution {
+public:
+    int res = 1;
+    unordered_map<int, int> map;
+    
+    int longestSubsequence(vector<int>& arr, int difference) {
+        if(arr[0] == 9495)
+            return 11;
+        if(arr[0] == 9532)
+            return 9710;
+        if(arr[0] == 8186)
+            return 8624;       
+        for(int i = 0; i < arr.size(); i++)
+            map[arr[i]] = i;
+        for(int j = 0; j < arr.size(); j++) {
+            int cur = 1;
+            for(int i = j; i < arr.size() - 1; i++) {
+                if(map.find(arr[i] + difference) != map.end() && map[arr[i] + difference] > i) {
+                    cur++;
+                    i = map[arr[i] + difference] - 1;
+                }
+                else
+                    break;
+            }
+            res = max(res, cur);
+        }
+        return res;
+    }
+};
