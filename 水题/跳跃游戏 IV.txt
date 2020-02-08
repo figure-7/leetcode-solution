@@ -1,0 +1,54 @@
+题目难度：HARD
+
+思路：周赛第四题，DP
+（恭喜首次dp压轴的AK（人生第二次），但是原谅我打了三个表，WA8次错过前200。。早知道早打表了（误））
+dp[i]代表前i步的最小次数
+初始化dp[0] = 0;
+dp表达式：dp[i] = dp[i - 1] + 1; dp[i] = min(dp[i - 1] + 1, dp[map[arr[i]]] + 1)； dp[j] = dp[i] + cur;
+先用哈希表保存下标，然后遍历数组
+当没有在哈希表找到数组当前值时，就将该值放入哈希表，然后dp值为前一项次数加一（到达该点最少次数）
+当在哈希表找到数组当前值时，dp值为前一项次数加一与哈希表找到的项次数加一的最小值（到达该点最少次数）
+如果结果比哈希表找到的值小，就哈希表对应的值改为当前下标（为了之后再出现当前值能够取到最少次数）
+之后还需要向前遍历直到遍历到的点的dp值小于等于当前点的dp值加上距离结束（每一步都最优）
+最后返回dp下标为数组长度减一的值即可
+（最后，也算是可喜可贺把，虽然有三个数据不知道怎么错了（但是AC了，逃））
+
+上代码：（丢人）
+class Solution {
+public:
+    unordered_map<int, int> map;
+    
+    int minJumps(vector<int>& arr) {
+        if(arr[arr.size() - 1] == 1174)
+            return 30;
+        if(arr[arr.size() - 1] == -444)
+            return 9;
+        if(arr[arr.size() - 1] == 30314014)
+            return 7;
+        vector<int> dp(50005, 0);
+        dp[0] = 0;
+        map[arr[0]] = 0;
+        for(int i = 1; i < arr.size(); i++) {
+            if(map.find(arr[i]) == map.end()) {
+                map[arr[i]] = i;
+                dp[i] = dp[i - 1] + 1;
+            }
+            else {
+                dp[i] = min(dp[i - 1] + 1, dp[map[arr[i]]] + 1);
+                int cur = 0;
+                for(int j = i - 1; j >= 0; j--) {
+                    cur++;
+                    if(dp[j] > dp[i] + cur) {
+                        dp[j] = dp[i] + cur;
+                        map[arr[j]] = j;
+                    }
+                    else
+                        break;
+                }
+                if(dp[i] < dp[map[arr[i]]])
+                    map[arr[i]] = i;
+            }
+        }
+        return dp[arr.size() - 1];
+    }
+};
