@@ -1,0 +1,82 @@
+模板1：:组内相邻，组间拓扑
+公司共有 n 个项目和  m 个小组，每个项目要不没有归属，要不就由其中的一个小组负责。
+我们用 group[i] 代表第 i 个项目所属的小组，如果这个项目目前无人接手，那么 group[i] 就等于 -1。
+（项目和小组都是从零开始编号的）
+请你帮忙按要求安排这些项目的进度，并返回排序后的项目列表：
+同一小组的项目，排序后在列表中彼此相邻。
+项目之间存在一定的依赖关系，我们用一个列表 beforeItems 来表示，其中 beforeItems[i] 表示在进行第 i 个项目前（位于第 i 个项目左侧）应该完成的所有项目。
+结果要求：
+如果存在多个解决方案，只需要返回其中任意一个即可。
+如果没有合适的解决方案，就请返回一个 空列表。
+示例 1：
+输入：n = 8, m = 2, group = [-1,-1,1,0,0,1,0,-1], beforeItems = [[],[6],[5],[6],[3,6],[],[],[]]
+输出：[6,3,4,1,5,2,0,7]
+vector<int> sortItems(int n, int m, vector<int>& group, vector<vector<int>>& beforeItems) {
+        vector<vector<int>> gitem(m,vector<int>());
+        int g=m;
+        for(int i=0;i<group.size();++i){
+            if(group[i] == -1){
+                group[i] = g;
+            }
+            if(group[i] >= gitem.size()){
+                gitem.push_back(vector<int>());
+            }
+            gitem[group[i]].push_back(i);
+        }
+        
+        g=gitem.size();
+        
+        vector<vector<int>> ggrid(g,vector<int>());      
+        vector<vector<int>> igrid(n,vector<int>());
+                
+        for(int i=0;i<n;++i){
+            for(int j=0;j<beforeItems[i].size();++j){
+                int k=beforeItems[i][j];
+                if(group[i] == group[k]){
+                    igrid[k].push_back(i);
+                }else{
+                    ggrid[group[k]].push_back(group[i]);
+                }
+            }
+        }
+        
+        vector<int> gtopo(g,-1);
+        vector<int> vis(g,0);
+        int cur=g;
+        for(int u=0;u<g;++u){
+            if(!vis[u]){
+                bool r=dfs(ggrid,vis,u,cur,gtopo);
+                if(!r) return vector<int>();
+            }
+        }
+        
+        vector<int> itopo(n,-1);
+        vector<int> ivis(n,0);
+        int icur=n;
+        for(int i=g-1;i>=cur;--i){
+            for(int j=0;j<gitem[gtopo[i]].size();++j){
+                int u=gitem[gtopo[i]][j];
+                if(!ivis[u]){
+                    bool r=dfs(igrid,ivis,u,icur,itopo);
+                    if(!r) return vector<int>();
+                }
+            }
+        }
+        
+        return itopo;
+    }
+    
+    bool dfs(vector<vector<int>>& grid,
+             vector<int>& vis,
+             int u,
+             int& cur,vector<int>& topo){
+        vis[u]=-1;
+        for(int i=0;i<grid[u].size();++i){
+            int v=grid[u][i];
+            if(vis[v] < 0) return false;
+            else if(!vis[v] && !dfs(grid,vis,v,cur,topo)) return false;
+        }
+        topo[--cur]=u;
+        vis[u]=1;
+        return true;
+    }
