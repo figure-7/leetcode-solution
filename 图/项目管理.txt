@@ -1,0 +1,208 @@
+题目难度：HARD
+
+公司共有 n 个项目和  m 个小组，每个项目要不没有归属，要不就由其中的一个小组负责。
+
+我们用 group[i] 代表第 i 个项目所属的小组，如果这个项目目前无人接手，那么 group[i] 就等于 -1。
+
+（项目和小组都是从零开始编号的）
+
+请你帮忙按要求安排这些项目的进度，并返回排序后的项目列表：
+
+同一小组的项目，排序后在列表中彼此相邻。
+项目之间存在一定的依赖关系，我们用一个列表 beforeItems 来表示，其中 beforeItems[i] 表示在进行第 i 个项目前（位于第 i 个项目左侧）应该完成的所有项目。
+结果要求：
+
+如果存在多个解决方案，只需要返回其中任意一个即可。
+
+如果没有合适的解决方案，就请返回一个 空列表。
+
+ 
+
+示例 1：
+
+
+
+输入：n = 8, m = 2, group = [-1,-1,1,0,0,1,0,-1], beforeItems = [[],[6],[5],[6],[3,6],[],[],[]]
+输出：[6,3,4,1,5,2,0,7]
+示例 2：
+
+输入：n = 8, m = 2, group = [-1,-1,1,0,0,1,0,-1], beforeItems = [[],[6],[5],[6],[3],[],[4],[]]
+输出：[]
+解释：与示例 1 大致相同，但是在排序后的列表中，4 必须放在 6 的前面。
+ 
+
+提示：
+
+1 <= m <= n <= 3*10^4
+group.length == beforeItems.length == n
+-1 <= group[i] <= m-1
+0 <= beforeItems[i].length <= n-1
+0 <= beforeItems[i][j] <= n-1
+i != beforeItems[i][j]
+
+思路：图论+DFS
+项目之间的依赖关系，用拓扑排序解决。这比较明显。
+
+难点在于怎么理解“ 同一小组的项目，排序后在列表中彼此相邻 ”。
+
+尽管题目 已经 提示对项目和组构建两个图。依然不太容易想到怎么对“彼此相邻”构建模型。因为拓扑排序算法本身不具有这样的能力。
+
+第一种思路是对拓扑算法本身进行拓展。以使拓扑排序具有“彼此相邻”的特性。这一思路短时间内不容落地。
+
+第二种思路是将项目之间的依赖关系，拓展到组与组之间。原先的组与组之间是没有依赖关系的。拓展后，组与组之间原先有的项目依赖关系被断开，并构建组间依赖关系。每组内部的依赖关系，不会超过组的范围。
+
+例如：两组项目。A组：1，2，3，4。B组：5，6，7。依赖关系：1->2->3->4->5->6->7
+
+将4->5的依赖关系，拓展到A->B，并断开4->5的依赖关系。
+
+构建图
+先将group[i]=-1的项目，分到一组。-1作为下标不好处理。
+
+构建组间依赖图ggrid，构建组内项目依赖图igrid。
+
+ggrid[u][];
+igrid[u][];
+for(v < n){
+    for(u in beforeitems[v]){
+        if(group[u] == group[v]){//同组
+            v入igrid[u];
+        }else{//将项目关系拓展到组间关系
+            group[v]入ggrid[group[u]];
+        }
+    }
+}
+拓扑排序算法
+用dfs实现拓扑排序算法。
+
+grid[u][v];图
+u;从节点u开始遍历
+vis[x]=0;//0——未遍历,-1——正在遍历，1——遍历完成
+cur=N;//节点在拓扑排序中的放置位置
+topo[];拓扑排序结果存放位置
+
+dfs(grid,vis,u,cur,topo){
+    vis[u]=-1;
+    for(v in grid[u][...]){
+        if(vis[v] < 0) 返回失败;
+        else if(vis[v]==0 且 dfs(grid,vis,v,cur,topo)失败) 返回失败;
+    }
+    topo[--cur]=u;
+    vis[u]=1;
+    返回成功;
+}
+对组拓扑排序
+其实对组间图ggrid进行拓扑排序。
+
+排序结果存在gtopo中.
+
+gtopo[];
+cur=组数;
+vis[x]=0;
+for(u < 组数){
+    if(vis[u] == 0){
+        r=dfs(ggrid,vis,u,cur,gtopo);
+        if(r为失败) 返回，结果为空.
+    }
+}
+对每组内项目拓扑排序
+依据组间的排序结果，对每组内项目，即图igrid排序。
+
+排序结果放入itopo
+
+itopo[];最终结果
+icur=N;
+ivis[x]=0;
+for(i in [g-1,...,u]){
+    for(u in 组gtopo[i]中的全部项目){//对组i进行拓扑排序
+        if(ivis[u] == 0){
+            r=dfs(igrid,ivis,u,icur,itopo);
+            if(r为失败) 返回，结果为空.           
+        }
+    }
+}
+
+执行用时 :
+104 ms
+, 在所有 C++ 提交中击败了
+98.33%
+的用户
+内存消耗 :
+34.7 MB
+, 在所有 C++ 提交中击败了
+80.00%
+的用户
+（时间绝杀！空间很好）
+
+上代码：
+class Solution {
+public:
+    vector<int> sortItems(int n, int m, vector<int>& group, vector<vector<int>>& beforeItems) {
+        vector<vector<int>> gitem(m,vector<int>());
+        int g=m;
+        for(int i=0;i<group.size();++i){
+            if(group[i] == -1){
+                group[i] = g;
+            }
+            if(group[i] >= gitem.size()){
+                gitem.push_back(vector<int>());
+            }
+            gitem[group[i]].push_back(i);
+        }
+        
+        g=gitem.size();
+        
+        vector<vector<int>> ggrid(g,vector<int>());      
+        vector<vector<int>> igrid(n,vector<int>());
+                
+        for(int i=0;i<n;++i){
+            for(int j=0;j<beforeItems[i].size();++j){
+                int k=beforeItems[i][j];
+                if(group[i] == group[k]){
+                    igrid[k].push_back(i);
+                }else{
+                    ggrid[group[k]].push_back(group[i]);
+                }
+            }
+        }
+        
+        vector<int> gtopo(g,-1);
+        vector<int> vis(g,0);
+        int cur=g;
+        for(int u=0;u<g;++u){
+            if(!vis[u]){
+                bool r=dfs(ggrid,vis,u,cur,gtopo);
+                if(!r) return vector<int>();
+            }
+        }
+        
+        vector<int> itopo(n,-1);
+        vector<int> ivis(n,0);
+        int icur=n;
+        for(int i=g-1;i>=cur;--i){
+            for(int j=0;j<gitem[gtopo[i]].size();++j){
+                int u=gitem[gtopo[i]][j];
+                if(!ivis[u]){
+                    bool r=dfs(igrid,ivis,u,icur,itopo);
+                    if(!r) return vector<int>();
+                }
+            }
+        }
+        
+        return itopo;
+    }
+    
+    bool dfs(vector<vector<int>>& grid,
+             vector<int>& vis,
+             int u,
+             int& cur,vector<int>& topo){
+        vis[u]=-1;
+        for(int i=0;i<grid[u].size();++i){
+            int v=grid[u][i];
+            if(vis[v] < 0) return false;
+            else if(!vis[v] && !dfs(grid,vis,v,cur,topo)) return false;
+        }
+        topo[--cur]=u;
+        vis[u]=1;
+        return true;
+    }
+};
