@@ -138,7 +138,8 @@ dp表达式：for(i=0;i<n;i++)for(j=0;j<n;j++)if(words[i].size()+1==words[j].siz
             		f[x]=max(f[x],f[i]+1);              //有连着的就加一，取最大。
        		 }
     	}
-	模板9：最少删除（增加字符）次数是的字符串为回文
+	
+模板9：最少删除（增加字符）次数是的字符串为回文
 dp表达式：for(int i = 0; i <= n + 5; i++)
             for(int j = 0; j <= n; j++)
                 dp[i][j] = -1;
@@ -152,3 +153,67 @@ int dfs(int l, int r, const string &s) {
         
         return dp[l][r] = cur;
     }
+
+模板10：最长公共子序列（LCS）
+int lcs(string str1, string str2, vector<vector<int>>& vec) {
+	int len1 = str1.size();
+	int len2 = str2.size();
+	vector<vector<int>> c(len1 + 1, vector<int>(len2 + 1, 0));
+	for (int i = 0; i <= len1; i++) {
+		for (int j = 0; j <= len2; j++) {
+			if (i == 0 || j == 0) {
+				c[i][j] = 0;
+			}
+			else if (str1[i - 1] == str2[j - 1]) {
+				c[i][j] = c[i - 1][j - 1] + 1;
+				vec[i][j] = 0;
+			}
+			else if (c[i - 1][j] >= c[i][j - 1]) {
+				c[i][j] = c[i - 1][j];
+				vec[i][j] = 1;
+			}
+			else {
+				c[i][j] = c[i][j - 1];
+				vec[i][j] = 2;
+			}
+		}
+	}
+
+	return c[len1][len2];
+}
+
+void print_lcs(vector<vector<int>>& vec, string str, int i, int j)
+{
+	if (i == 0 || j == 0)
+	{
+		return;
+	}
+	if (vec[i][j] == 0)
+	{
+		print_lcs(vec, str, i - 1, j - 1);
+		printf("%c", str[i - 1]);
+	}
+	else if (vec[i][j] == 1)
+	{
+		print_lcs(vec, str, i - 1, j);
+	}
+	else
+	{
+		print_lcs(vec, str, i, j - 1);
+	}
+}
+
+int main(int argc, char argv[])
+{
+	string str1 = "123456";
+	string str2 = "2456";
+	vector<vector<int>> vec(str1.size() + 1, vector<int>(str2.size() + 1, -1));
+	int result = lcs(str1, str2, vec);
+
+	cout << "result = " << result << endl;
+
+	print_lcs(vec, str1, str1.size(), str2.size());
+
+	getchar();
+	return 0;
+}
