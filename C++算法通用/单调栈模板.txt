@@ -37,3 +37,37 @@ while(~scanf("%d",&n))
 	}
 printf("%lu\n",ans);
 }
+
+数组内比8大的数大于比8小的数最大长度：
+int longestWPI(vector<int>& hours) {
+        vector<int> days;
+        for (int i = 0; i < hours.size(); i++) {
+            if (hours[i] > 8) {
+                days.push_back(1);
+            } else {
+                days.push_back(-1);
+            }
+        }
+        vector<int> sum(days.size() + 1, 0);
+        for (int i = 0; i < days.size(); i++) {
+            sum[i+1] = sum[i] + days[i];
+        }
+        stack<int> decreaseStack;
+        for (int i = 0; i < sum.size(); i++) {
+            if (decreaseStack.empty()) {
+                decreaseStack.push(i);
+            } else {
+                if (sum[decreaseStack.top()] > sum[i]) {
+                    decreaseStack.push(i);
+                }
+            }
+        }
+        int maxDays = 0;
+        for (int i = sum.size() - 1; i > 0; i--) {
+            while(! decreaseStack.empty() && sum[decreaseStack.top()] < sum[i]) {
+                maxDays = max(maxDays, i - decreaseStack.top());
+                decreaseStack.pop();
+            }
+        }
+        return maxDays;
+    }
