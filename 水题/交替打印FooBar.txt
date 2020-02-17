@@ -1,0 +1,87 @@
+题目难度：MEDIUM
+
+我们提供一个类：
+
+class FooBar {
+  public void foo() {
+    for (int i = 0; i < n; i++) {
+      print("foo");
+    }
+  }
+
+  public void bar() {
+    for (int i = 0; i < n; i++) {
+      print("bar");
+    }
+  }
+}
+两个不同的线程将会共用一个 FooBar 实例。其中一个线程将会调用 foo() 方法，另一个线程将会调用 bar() 方法。
+
+请设计修改程序，以确保 "foobar" 被输出 n 次。
+
+ 
+
+示例 1:
+
+输入: n = 1
+输出: "foobar"
+解释: 这里有两个线程被异步启动。其中一个调用 foo() 方法, 另一个调用 bar() 方法，"foobar" 将被输出一次。
+示例 2:
+
+输入: n = 2
+输出: "foobarfoobar"
+解释: "foobar" 将被输出两次。
+
+思路：设计问题+锁
+设立一个信号量然后两个函数内部轮换值即可实现异步
+剩下的用模板锁即可
+
+执行用时 :
+324 ms
+, 在所有 C++ 提交中击败了
+29.68%
+的用户
+内存消耗 :
+10.7 MB
+, 在所有 C++ 提交中击败了
+6.19%
+的用户
+（时间不咋地，空间炸了）
+
+上代码：
+class FooBar {
+private:
+    int n;
+    std::condition_variable g_cv;
+    std::mutex mt;
+    bool ze;
+
+public:
+    FooBar(int n) : g_cv(), mt(), ze(false) {
+        this->n = n;
+    }
+
+    void foo(function<void()> printFoo) {
+        
+        for (int i = 0; i < n; i++) {
+            std::unique_lock<std::mutex> lk(mt);
+            g_cv.wait(lk, [=](){return !ze;});
+        	// printFoo() outputs "foo". Do not change or remove this line.
+        	printFoo();
+            ze = true;
+            g_cv.notify_all();
+        }
+    }
+
+    void bar(function<void()> printBar) {
+        
+        for (int i = 0; i < n; i++) {
+            std::unique_lock<std::mutex> lk(mt);
+            g_cv.wait(lk, [=](){return ze;});
+        	// printBar() outputs "bar". Do not change or remove this line.
+        	printBar();
+            ze = false;
+            g_cv.notify_all();
+        }
+    }
+};
