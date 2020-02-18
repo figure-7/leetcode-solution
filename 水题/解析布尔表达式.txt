@@ -1,0 +1,103 @@
+题目难度：HARD
+
+给你一个以字符串形式表述的 布尔表达式（boolean） expression，返回该式的运算结果。
+
+有效的表达式需遵循以下约定：
+
+"t"，运算结果为 True
+"f"，运算结果为 False
+"!(expr)"，运算过程为对内部表达式 expr 进行逻辑 非的运算（NOT）
+"&(expr1,expr2,...)"，运算过程为对 2 个或以上内部表达式 expr1, expr2, ... 进行逻辑 与的运算（AND）
+"|(expr1,expr2,...)"，运算过程为对 2 个或以上内部表达式 expr1, expr2, ... 进行逻辑 或的运算（OR）
+ 
+
+示例 1：
+
+输入：expression = "!(f)"
+输出：true
+示例 2：
+
+输入：expression = "|(f,t)"
+输出：true
+示例 3：
+
+输入：expression = "&(t,f)"
+输出：false
+示例 4：
+
+输入：expression = "|(&(t,f,t),!(t))"
+输出：false
+ 
+
+提示：
+
+1 <= expression.length <= 20000
+expression[i] 由 {'(', ')', '&', '|', '!', 't', 'f', ','} 中的字符组成。
+expression 是以上述形式给出的有效表达式，表示一个布尔值。
+
+思路：栈
+（很成功，一遍过！）建立一个栈
+从后向前遍历字符串，当遇到't'或者'f'或者')'就进栈
+然后当遇到'!'时，记录栈顶字符，出栈两次，把栈顶字符的非入栈
+之后当遇到'|'时，初始化一个字符为'f'，当栈顶不是')'时，记录栈顶字符并出栈，当栈顶字符为't'时，初始化字符为't'
+内部循环结束后把初始化字符的入栈
+再当遇到'&'时，初始化一个字符为't'，当栈顶不是')'时，记录栈顶字符并出栈，当栈顶字符为'f'时，初始化字符为'f'
+内部循环结束后把初始化字符的入栈
+最后外部遍历结束返回栈顶字符即可
+
+执行用时 :
+12 ms
+, 在所有 C++ 提交中击败了
+68.81%
+的用户
+内存消耗 :
+9.6 MB
+, 在所有 C++ 提交中击败了
+51.56%
+的用户
+（时间不错，空间一般）
+
+上代码：
+class Solution {
+public:
+    stack<char> s;
+    
+    bool parseBoolExpr(string expression) {
+        for(int i = expression.size(); i >= 0; i--) {
+            if(expression[i] == ')' || expression[i] == 't' || expression[i] == 'f')
+                s.push(expression[i]);
+            else if(expression[i] == '!') {
+                char c = s.top();
+                s.pop();
+                s.pop();
+                if(c == 'f')
+                    s.push('t');
+                else
+                    s.push('f');
+            }
+            else if(expression[i] == '|'){
+                char c = 'f';
+                while(s.top() != ')') {
+                    char ch = s.top();
+                    s.pop();
+                    if(ch == 't')
+                        c = 't';
+                }
+                s.pop();
+                s.push(c);
+            }
+            else if(expression[i] == '&'){
+                char c = 't';
+                while(s.top() != ')') {
+                    char ch = s.top();
+                    s.pop();
+                    if(ch == 'f')
+                        c = 'f';
+                }
+                s.pop();
+                s.push(c);
+            }
+        }
+        return s.top() == 'f' ? false : true;
+    }
+};
