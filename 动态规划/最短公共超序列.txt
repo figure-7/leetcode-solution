@@ -1,0 +1,219 @@
+题目难度：HARD
+
+给出两个字符串 str1 和 str2，返回同时以 str1 和 str2 作为子序列的最短字符串。
+
+如果答案不止一个，则可以返回满足条件的任意一个答案。
+
+（如果从字符串 T 中删除一些字符（也可能不删除，并且选出的这些字符可以位于 T 中的 任意位置），可以得到字符串 S，那么 S 就是 T 的子序列）
+
+ 
+
+示例：
+
+输入：str1 = "abac", str2 = "cab"
+输出："cabac"
+解释：
+str1 = "abac" 是 "cabac" 的一个子串，因为我们可以删去 "cabac" 的第一个 "c"得到 "abac"。 
+str2 = "cab" 是 "cabac" 的一个子串，因为我们可以删去 "cabac" 末尾的 "ac" 得到 "cab"。
+最终我们给出的答案是满足上述属性的最短字符串。
+ 
+
+提示：
+
+1 <= str1.length, str2.length <= 1000
+str1 和 str2 都由小写英文字母组成。
+
+思路：DP
+接下来上题解区题解：
+本题在求解两个序列的最长公共子序列的过程中，生成最短公共超序列。
+
+leetcode718 最长重复子数组 也借助于最长公共子序列算法。
+
+设A(i)表示串A的长度为i的前缀串。A[i-1]是前缀串的最后一个字符. 同理B(j).
+
+设d[i][j]表示A(i)与B(j)分别以A[i-1]和B[j-1]结尾的最长公共子序列的长度.
+
+初始d[i][j]=0。
+
+设s[i][j]表示A(i)与B(j)分别以A[i-1]和B[j-1]结尾的最短公共超序列。
+
+初始s[i][j]=空串。
+
+分情况讨论:
+
+当 i==0 或 j==0 时，A(i)或B(j)为空串。则d[i][j]=0.
+
+此时，最短公共超序列，必然要包含另一个非空的串。
+
+如果i>0时，s[i][j]=A(i). 如果j>0时，s[i][j]=B(j).
+
+当i>0 且 j>0时， A(i)，B(j)非空。
+
+A(i)与B(j)的公共子序列，有三个源头。
+
+1，A(i-1)与B(j)，即d[i][j]=d[i-1][j];
+
+因没考虑A[i-1]，要将其加在s[i-1][j]之后。即，s[i][j]=s[i-1][j] + A[i-1].
+
+2，A(i)与B(j-1)，即d[i][j]=d[i][j-1];
+
+因没考虑B[j-1]，要将其加在s[i][j-1]之后。即，s[i][j]=s[i][j-1] + B[j-1].
+
+3，当A[i-1]==B[j-1]时，A(i-1)与B(j-1)。 即d[i][j]=d[i-1][j-1]+1;
+
+此时， A[i-1]与B[j-1] 相等，考虑一个即可。
+
+即，s[i][j]=s[i-1][j-1] + B[j-1].
+
+综上，d[i][j]=max(d[i-1][j],d[i][j-1],d[i-1][j-1]+1)。
+
+当d[i][j]从三个中选择一个最大值时，s[i][j]选择最大值对应的串。
+
+for(i < A.length){
+    for(j < B.length){
+        if(i == 0 或 j==0){
+            d[i][j]=0;
+            if(i) s[i][j] = A(i);
+            if(j) s[i][j] = B(j);
+        }else{
+            if(d[i-1][j] <= d[i][j-1]){
+                d[i][j]=d[i][j-1];
+                s[i][j] = s[i][j-1]+B[j-1];
+            }else{
+                d[i][j]=d[i-1][j];
+                s[i][j] = s[i-1][j]+A[i-1];
+            }
+            if(A[i-1]==B[j-1]){
+                if(d[i][j] < d[i-1][j-1]+1){
+                    d[i][j]=d[i-1][j-1]+1;
+                    s[i][j] = s[i-1][j-1]+B[j-1];    
+                }
+            }
+        }
+    }
+}
+代码（超内存）：
+
+    string shortestCommonSupersequence(string str1, string str2) {
+        vector<vector<int>> d(str1.size()+1,vector<int>(str2.size()+1,0));
+        vector<vector<string>> s(str1.size()+1,vector<string>(str2.size()+1,""));
+        for(int i=0;i<=str1.size();++i){
+            for(int j=0;j<=str2.size();++j){
+                if(i==0 || j==0){
+                    d[i][j] = 0;
+                    if(i) s[i][j] = str1.substr(0,i);
+                    if(j) s[i][j] = str2.substr(0,j);
+                }else{
+                    int& a=d[i-1][j];
+                    int& b=d[i][j-1];
+                    if(a < b){
+                        d[i][j] = b;
+                        s[i][j] = s[i][j-1]+str2[j-1];
+                    }else{
+                        d[i][j] = a;
+                        s[i][j] = s[i-1][j]+str1[i-1];
+                    }
+                    if(str1[i-1] == str2[j-1]){
+                        if(d[i][j] < d[i-1][j-1]+1){
+                            d[i][j]=d[i-1][j-1]+1;
+                            s[i][j]=s[i-1][j-1]+str2[j-1];
+                        }
+                    }
+                }
+            }
+        }
+        return s[str1.size()][str2.size()];
+    }
+降到滚动数组
+显然d[i][j]只与d[i-1][j]，d[i][j-1]和d[i-1][j-1]有关。
+因此d只需要两行即可。
+
+数组s同理。
+
+    string shortestCommonSupersequence(string str1, string str2) {
+        vector<vector<int>> d(2,vector<int>(str2.size()+1,0));
+        vector<vector<string>> s(2,vector<string>(str2.size()+1,""));
+        for(int i=0;i<=str1.size();++i){
+            for(int j=0;j<=str2.size();++j){
+                if(i==0 || j==0){
+                    d[i&1][j] = 0;
+                    if(i) s[i&1][j] = str1.substr(0,i);
+                    if(j) s[i&1][j] = str2.substr(0,j);
+                }else{
+                    int& a=d[(i-1)&1][j];
+                    int& b=d[i&1][j-1];
+                    if(a <= b){
+                        d[i&1][j] = b;
+                        s[i&1][j] = s[i&1][j-1]+str2[j-1];
+                    }else{
+                        d[i&1][j] = a;
+                        s[i&1][j] = s[(i-1)&1][j]+str1[i-1];
+                    }
+                    if(str1[i-1] == str2[j-1]){
+                        if(d[i&1][j] < d[(i-1)&1][j-1]+1){
+                            d[i&1][j]=d[(i-1)&1][j-1]+1;
+                            s[i&1][j]=s[(i-1)&1][j-1]+str2[j-1];
+                        }
+                    }
+                }
+            }
+        }
+        return s[str1.size()&1][str2.size()];
+    }
+进一步可将d从二维降到一维。唯一要注意的是d[i-1][j-1],对应到一维时，会被d[i][j-1]的值冲掉。
+因此在一维时，每次更新d[i][j]时，将其备份，用于计算d[i+1][j+1]。
+
+执行用时 :
+2192 ms
+, 在所有 C++ 提交中击败了
+5.62%
+的用户
+内存消耗 :
+685.9 MB
+, 在所有 C++ 提交中击败了
+18.52%
+的用户
+（时间炸了，空间不咋地）
+
+上代码：
+class Solution {
+public:
+    string shortestCommonSupersequence(string str1, string str2) {
+        vector<int> d(str2.size()+1,0);
+        vector<string> s(str2.size()+1,"");
+        int pre;
+        string pres;
+        int b;
+        string t;
+        for(int i=0;i<=str1.size();++i){
+            for(int j=0;j<=str2.size();++j){
+                b=d[j];
+                t=s[j];
+                if(i==0 || j==0){
+                    d[j] = 0;
+                    if(i) s[j] = str1.substr(0,i);
+                    if(j) s[j] = str2.substr(0,j);
+                }else{
+                    int a=d[j];
+                    int b=d[j-1];
+                    if(a <= b){
+                        d[j] = b;
+                        s[j] = s[j-1]+str2[j-1];
+                    }else{
+                        d[j] = a;
+                        s[j] = s[j]+str1[i-1];
+                    }
+                    if(str1[i-1] == str2[j-1]){
+                        if(d[j] < pre+1){
+                            d[j]=pre+1;
+                            s[j]=pres+str2[j-1];
+                        }
+                    }
+                }
+                pre=b;
+                pres=t;
+            }
+        }
+        return s[str2.size()]; 
+    }
+};
