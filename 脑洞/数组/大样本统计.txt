@@ -1,0 +1,82 @@
+题目难度：MEDIUM
+
+我们对 0 到 255 之间的整数进行采样，并将结果存储在数组 count 中：
+
+count[k] 就是整数 k 的采样个数。
+
+我们以 浮点数 数组的形式，分别返回样本的最小值、最大值、平均值、中位数和众数。
+
+其中，众数是保证唯一的。
+
+我们先来回顾一下中位数的知识：
+
+如果样本中的元素有序，并且元素数量为奇数时，中位数为最中间的那个元素；
+如果样本中的元素有序，并且元素数量为偶数时，中位数为中间的两个元素的平均值。
+ 
+
+示例 1：
+
+输入：count = [0,1,3,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+输出：[1.00000,3.00000,2.37500,2.50000,3.00000]
+示例 2：
+
+输入：count = [0,4,3,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+输出：[1.00000,4.00000,2.18182,2.00000,1.00000]
+ 
+
+提示：
+
+count.length == 256
+1 <= sum(count) <= 10^9
+计数表示的众数是唯一的
+答案与真实值误差在 10^-5 以内就会被视为正确答案
+
+思路：模拟
+（先MLE再TLE，后来想到正解实在不想写了，太麻烦）接下来上题解区题解：（高能）
+Logic for median
+If total count is odd, median is the number at totalCount/2+1. 
+If total count is even, median is average of number at totalCount/2 and totalCount/2+1.
+Use currentCount to accumulate count until it reaches totalCount/2. 
+If currentCount is greater than totalCount/2, median is that number no matter totalCount is odd or even. 
+Tricky case is currentCount is same as totalCount/2. If totalCount is odd, median is the next number. 
+If totalCount is even, median is average of current and next number.
+
+执行用时 :
+8 ms
+, 在所有 C++ 提交中击败了
+44.19%
+的用户
+内存消耗 :
+8.8 MB
+, 在所有 C++ 提交中击败了
+36.96%
+的用户
+（时间一般，空间不咋地）
+
+上代码：
+class Solution {
+public:
+    vector<double> sampleStats(vector<int>& count) {
+        double MIN=-1,MAX=0,AVE,MED,MOD,acc=0;
+        int maxCnt = 0, totalCnt = 0;
+        for(int i=0;i<256;++i){
+            if(MIN==-1&&count[i])   MIN=i;
+            if(count[i])    MAX=i;
+            acc+=i*count[i];
+            if(count[i]>maxCnt) {maxCnt=count[i];MOD=i;}
+            totalCnt += count[i];
+        }
+        AVE = acc/totalCnt;
+        int curCnt = 0;
+        for(int i=0;i<256;++i){
+            curCnt+=count[i];
+            if(curCnt>=totalCnt/2){
+                if(curCnt>totalCnt/2)   {MED=i;break;}
+                //i.e. curCnt == totalCnt/2
+                if(totalCnt%2==0)   {MED=(i+i+1)/2.0;break;}
+                else    {MED=i+1;break;}
+            }
+        }
+        return {MIN,MAX,AVE,MED,MOD};
+    }
+};
