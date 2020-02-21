@@ -1,0 +1,14 @@
+数组值两个取减所得最小结果：
+上代码：
+	int sum = accumulate(stones.begin(), stones.end(), 0);
+        vector<bool> dp(sum / 2 + 1, false);    // dp[i] - 是否可以找到一部分石头，其总重量为i
+        dp[0] = true;                           // dp[0] - 不拿石头时，其总重量为0
+
+        for(int i = 0; i < stones.size(); ++i)
+            for(int w = dp.size() - 1; w >= stones[i]; --w)
+                dp[w] = dp[w] | dp[w - stones[i]];
+
+        // 找到可以放的最大重量假设为i, 则两部分的差值为 (sum - i) - i
+        for(int i = dp.size() - 1; i >= 0; --i)
+            if(dp[i] == true)
+                return sum - 2 * i;
