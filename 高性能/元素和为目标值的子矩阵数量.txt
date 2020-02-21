@@ -1,0 +1,106 @@
+题目难度：HARD
+
+
+给出矩阵 matrix 和目标值 target，返回元素总和等于目标值的非空子矩阵的数量。
+
+子矩阵 x1, y1, x2, y2 是满足 x1 <= x <= x2 且 y1 <= y <= y2 的所有单元 matrix[x][y] 的集合。
+
+如果 (x1, y1, x2, y2) 和 (x1', y1', x2', y2') 两个子矩阵中部分坐标不同（如：x1 != x1'），那么这两个子矩阵也不同。
+
+ 
+
+示例 1：
+
+输入：matrix = [[0,1,0],[1,1,1],[0,1,0]], target = 0
+输出：4
+解释：四个只含 0 的 1x1 子矩阵。
+示例 2：
+
+输入：matrix = [[1,-1],[-1,1]], target = 0
+输出：5
+解释：两个 1x2 子矩阵，加上两个 2x1 子矩阵，再加上一个 2x2 子矩阵。
+ 
+
+提示：
+
+1 <= matrix.length <= 300
+1 <= matrix[0].length <= 300
+-1000 <= matrix[i] <= 1000
+-10^8 <= target <= 10^8
+
+思路：二维前缀和+SlidingWindows+哈希表
+接下来上题解区题解：
+主要思路：
+对于每一行计算前缀和，对于每一列计算行累加和，然后这个问题就变成和目标和子数组相同了。
+
+算法步骤：
+1）排除特殊情况，初始化行、列、存放结果的值
+2）然后我们计算每一行的前缀和
+3）接下来就是利用滑动窗口来进行扫描了,固定i，然后移动j，来寻找target值。
+注：把这里的i和j想成两个竖着的线，也就是列。
+
+执行用时 :
+4952 ms
+, 在所有 C++ 提交中击败了
+82.50%
+的用户
+内存消耗 :
+510.3 MB
+, 在所有 C++ 提交中击败了
+6.66%
+的用户
+（时间很好，空间炸了）
+
+上代码：
+class Solution {
+private:
+    unordered_map<int,int> mp;
+public:
+    //对于每一行计算前缀和，对于每一列计算行累加和，然后这个问题就变成和目标和子数组相同了
+    int numSubmatrixSumTarget(vector<vector<int>>& matrix, int target) {
+        //特殊情况直接排除
+        if(matrix.size()==0||matrix[0].size()==0)return 0;
+        
+        //矩阵的长宽以及结果值
+        int m=matrix.size(),n=matrix[0].size();
+        int result=0;
+        
+        //对于每一行计算前缀和，对于每一列计算行累加的数组
+        vector<vector<int>> sum(m,vector<int>(n,0));
+        
+        //计算每一行的前缀和
+        for(int i=0;i<m;i++)
+        {
+            sum[i][0]=matrix[i][0];
+            for(int j=1;j<n;j++)
+            {
+                sum[i][j]=sum[i][j-1]+matrix[i][j];
+            }
+        }
+        
+        for(int i=0;i<n;i++)
+        {
+            for(int j=i;j<n;j++)
+            {
+                mp.clear();
+                int temp=0;
+                
+                //滑动窗口寻找目标值
+                for(int k=0;k<m;k++)
+                {
+                    //代码中最关键的部分，计算扫描线i和j之间的矩阵值
+                    temp+=(sum[k][j]-sum[k][i]+matrix[k][i]);  
+                    
+                    //此矩阵值为target，增加result
+                    if(temp==target) result++;
+                    
+                    //每次是一个矩阵值，mp里面保存着子矩阵值
+                    if(mp.find(temp-target)!=mp.end())
+                        result+= mp[temp-target];
+                    mp[temp]++;
+                }    
+            }
+        }
+        return result;
+    }
+};
