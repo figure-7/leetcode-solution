@@ -1,0 +1,61 @@
+题目难度：MEDIUM
+
+给你一个字符串 s ，它只包含三种字符 a, b 和 c 。
+
+请你返回 a，b 和 c 都 至少 出现过一次的子字符串数目。
+
+ 
+
+示例 1：
+
+输入：s = "abcabc"
+输出：10
+解释：包含 a，b 和 c 各至少一次的子字符串为 "abc", "abca", "abcab", "abcabc", "bca", "bcab", "bcabc", "cab", "cabc" 和 "abc" (相同字符串算多次)。
+示例 2：
+
+输入：s = "aaacb"
+输出：3
+解释：包含 a，b 和 c 各至少一次的子字符串为 "aaacb", "aacb" 和 "acb" 。
+示例 3：
+
+输入：s = "abc"
+输出：1
+ 
+
+提示：
+
+3 <= s.length <= 5 x 10^4
+s 只包含字符 a，b 和 c 。
+
+思路：双周赛第三题，SlidingWindows
+设三个空间的数组分别保存当前窗口三个字符的个数，初始化0
+外部遍历一次字符串，同是对应字符数目加一
+当三个下标对应的值都大于1时，结果值加上窗口右指针到字符串结尾个长度的值（往右延伸都是符合条件的子串）
+（WA点1：这里我傻了，没看好题是所有的子字符串，我还用哈希表去重了，结果...）
+（WA点2：这里我又傻了，遍历数组剩下的长度然后结果值依次加一了，直接超时...（笨到家了！））
+然后窗口左指针开始向右遍历，同时左指针的字符对应下标数组值减一，结果加一，直到不满足三个下标值都大于0
+直至遍历结束返回结果即可
+
+上代码：
+class Solution {
+public:
+    int begin = 0, end = 0, res = 0;
+    int curr[3] = {0};
+    
+    int numberOfSubstrings(string s) {
+        for(int i = begin; i < s.size(); i++) {
+            curr[s[i] - 'a']++;
+            if(curr[0] > 0 && curr[1] > 0 && curr[2] > 0) {
+                res += s.size() - i;
+                begin++;
+                curr[s[begin - 1] - 'a']--;
+                while(curr[0] > 0 && curr[1] > 0 && curr[2] > 0) {
+                    begin++;
+                    curr[s[begin - 1] - 'a']--;
+                    res += s.size() - i;
+                }
+            }
+        }
+        return res;
+    }
+};
