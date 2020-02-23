@@ -1,0 +1,73 @@
+题目难度：MEDIUM
+
+给你一个整数 num，请你找出同时满足下面全部要求的两个整数：
+
+两数乘积等于  num + 1 或 num + 2
+以绝对差进行度量，两数大小最接近
+你可以按任意顺序返回这两个整数。
+
+ 
+
+示例 1：
+
+输入：num = 8
+输出：[3,3]
+解释：对于 num + 1 = 9，最接近的两个因数是 3 & 3；
+对于 num + 2 = 10, 最接近的两个因数是 2 & 5，因此返回 3 & 3 。
+示例 2：
+
+输入：num = 123
+输出：[5,25]
+示例 3：
+
+输入：num = 999
+输出：[40,25]
+ 
+
+提示：
+
+1 <= num <= 10^9
+
+思路：周赛第三题，模拟
+先取一个最大值（值没取最大WA了两发，也是服了233），然后遍历100000（即大于给定最大范围的平方根）次
+当给定值加一余当前遍历值等于时（能形成整除），取被除后的数与当前数的差的绝对值，设一个内部数组
+然后当该值比最大值小就将这两个数放入内部数组并继承给结果数组
+之后在遍历一次看给定值加二的情况，同上
+结束后返回结果数组即可
+
+上代码：
+class Solution {
+public:
+    vector<int> res;
+    int ress = 1000000000;
+    
+    vector<int> closestDivisors(int num) {
+        for(int i = 1; i < 100000; i++) {
+            if((num + 1) % i == 0) {
+                int cur = (num + 1) / i;
+                int curmodtwo = abs(cur - i);
+                if(ress > curmodtwo) {
+                    vector<int> curr;
+                    curr.push_back(cur);
+                    curr.push_back(i);
+                    res = curr;
+                    ress = curmodtwo;
+                }
+            }
+        }
+        for(int i = 1; i < 100000; i++) {
+            if((num + 2) % i == 0) {
+                int cur = (num + 2) / i;
+                int curmodtwo = abs(cur - i);
+                if(ress > curmodtwo) {
+                    vector<int> curr;
+                    curr.push_back(cur);
+                    curr.push_back(i);
+                    res = curr;
+                    ress = curmodtwo;
+                }
+            }
+        }
+        return res;
+    }
+};
