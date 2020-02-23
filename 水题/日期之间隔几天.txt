@@ -1,0 +1,64 @@
+题目难度：EASY
+
+请你编写一个程序来计算两个日期之间隔了多少天。
+
+日期以字符串形式给出，格式为 YYYY-MM-DD，如示例所示。
+
+ 
+
+示例 1：
+
+输入：date1 = "2019-06-29", date2 = "2019-06-30"
+输出：1
+示例 2：
+
+输入：date1 = "2020-01-15", date2 = "2019-12-31"
+输出：15
+ 
+
+提示：
+
+给定的日期是 1971 年到 2100 年之间的有效日期。
+
+思路：周赛第一题，模拟
+（这题拿到手就一愣，麻烦死，真的照顾python和java玩家了，可以用简单函数处理）
+我直接上网搜板子写了，不同的就是先对日期预处理，取到对应两个字符串的年月日然后带入
+最后返回相差天数即可（之前还有个错了的板子，网上真的有的不靠谱，害我20多分钟AC）
+
+上代码：
+class Solution {
+public:
+    struct MyDate {
+        int year;
+        int month;
+        int day;
+    };
+    
+    int GetAbsDays(MyDate x) {
+         int i;
+         int month_day[] = {31,28,31,30,31,30,31,31,30,31,30,31};
+         int year = x.year-1;
+         int days = year * 365 + year/4 - year/100 + year/400;
+         if(x.year%4==0 && x.year%100!=0 || x.year%400==0)
+             month_day[1]++;
+         for(i=0; i<x.month-1; i++)
+             days += month_day[i];
+         days += x.day-1;
+         return days;
+    }
+
+    int GetDiffDays(MyDate a, MyDate b) {
+        return GetAbsDays(b) - GetAbsDays(a);
+    }
+
+    int daysBetweenDates(string date1, string date2) {
+        int days = 0;
+        int by = stoi(date1.substr(0, 4)), ey = stoi(date2.substr(0, 4));
+        int bm = stoi(date1.substr(5, 2)), em = stoi(date2.substr(5, 2));
+        int bd = stoi(date1.substr(8, 2)), ed = stoi(date2.substr(8, 2));
+        MyDate a = {by, bm, bd};
+        MyDate b = {ey, em, ed};
+        int n = GetDiffDays(a,b);
+        return abs(n);
+    }
+};
