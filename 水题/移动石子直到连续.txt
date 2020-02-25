@@ -1,0 +1,77 @@
+题目难度：EASY
+
+三枚石子放置在数轴上，位置分别为 a，b，c。
+
+每一回合，我们假设这三枚石子当前分别位于位置 x, y, z 且 x < y < z。
+
+从位置 x 或者是位置 z 拿起一枚石子，并将该石子移动到某一整数位置 k 处，其中 x < k < z 且 k != y。
+
+当你无法进行任何移动时，即，这些石子的位置连续时，游戏结束。
+
+要使游戏结束，你可以执行的最小和最大移动次数分别是多少？ 
+
+以长度为 2 的数组形式返回答案：answer = [minimum_moves, maximum_moves]
+
+ 
+
+示例 1：
+
+输入：a = 1, b = 2, c = 5
+输出：[1, 2]
+解释：将石子从 5 移动到 4 再移动到 3，或者我们可以直接将石子移动到 3。
+示例 2：
+
+输入：a = 4, b = 3, c = 2
+输出：[0, 0]
+解释：我们无法进行任何移动。
+ 
+
+提示：
+
+1 <= a <= 100
+1 <= b <= 100
+1 <= c <= 100
+a != b, b != c, c != a
+
+思路：先将三个数进数组然后排序
+之后每相邻两个值取差，则最小移动次数为：
+1.差 / 2 + 差 % 2：最小次数为1
+2.0，全相邻（WA点1）
+3.2，最大值（WA点2）
+最小值为数组最大值减去最小值减二
+然后把最小最大值一次入结果数组，返回结果数组即可
+
+执行用时 :
+4 ms
+, 在所有 C++ 提交中击败了
+68.65%
+的用户
+内存消耗 :
+8.6 MB
+, 在所有 C++ 提交中击败了
+5.73%
+的用户
+（时间不错，空间炸了）
+
+上代码：
+class Solution {
+public:
+    vector<int> res, curr;
+    int res1 = 0, res2 = 0;
+    
+    vector<int> numMovesStones(int a, int b, int c) {
+        curr.push_back(a);
+        curr.push_back(b);
+        curr.push_back(c);
+        sort(curr.begin(), curr.end());
+        int cha = min(curr[1] - curr[0], curr[2] - curr[1]);
+        res1 = cha / 2 + cha % 2;
+        if(curr[1] - curr[0] == 1 && curr[2] - curr[1] == 1)
+            res1 = 0;
+        res1 = min(2, res1);
+        res2 = curr[2] - curr[0] - 2;
+        res.push_back(res1);
+        res.push_back(res2);
+        return res;
+    }
+};
