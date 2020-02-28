@@ -1,0 +1,72 @@
+题目难度：EASY
+
+给定由若干 0 和 1 组成的数组 A。我们定义 N_i：
+
+从 A[0] 到 A[i] 的第 i 个子数组被解释为一个二进制数（从最高有效位到最低有效位）。
+
+返回布尔值列表 answer，只有当 N_i 可以被 5 整除时，答案 answer[i] 为 true，否则为 false。
+
+ 
+
+示例 1：
+
+输入：[0,1,1]
+输出：[true,false,false]
+解释：
+输入数字为 0, 01, 011；也就是十进制中的 0, 1, 3 。
+只有第一个数可以被 5 整除，因此 answer[0] 为真。
+示例 2：
+
+输入：[1,1,1]
+输出：[false,false,false]
+示例 3：
+
+输入：[0,1,1,1,1,1]
+输出：[true,false,false,false,true,false]
+示例 4：
+
+输入：[1,1,1,0,1]
+输出：[false,false,false,false,false]
+ 
+
+提示：
+
+1 <= A.length <= 30000
+A[i] 为 0 或 1
+
+思路：模拟
+直接遍历数组用中间变量值计算当前结果，之后余10（WA点1,2：int和long long 都溢出）
+然后判断是不是5的倍数，是的话结果数组放入true，否则放入false
+最后返回结果数组即可（五分钟题）
+
+执行用时 :
+8 ms
+, 在所有 C++ 提交中击败了
+96.90%
+的用户
+内存消耗 :
+16 MB
+, 在所有 C++ 提交中击败了
+5.24%
+的用户
+（时间绝杀！空间炸了）
+
+上代码：
+class Solution {
+public:
+    vector<bool> res;
+    long long cur = 0;
+    
+    vector<bool> prefixesDivBy5(vector<int>& A) {
+        for(int i = 0; i < A.size(); i++) {
+            cur *= 2;
+            cur += A[i];
+            cur %= 10;
+            if(cur % 5 == 0)
+                res.push_back(true);
+            else
+                res.push_back(false);
+        }
+        return res;
+    }
+};
