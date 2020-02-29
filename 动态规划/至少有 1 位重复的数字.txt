@@ -1,0 +1,71 @@
+题目难度：HARD
+
+给定正整数 N，返回小于等于 N 且具有至少 1 位重复数字的正整数。
+
+ 
+
+示例 1：
+
+输入：20
+输出：1
+解释：具有至少 1 位重复数字的正数（<= 20）只有 11 。
+示例 2：
+
+输入：100
+输出：10
+解释：具有至少 1 位重复数字的正数（<= 100）有 11，22，33，44，55，66，77，88，99 和 100 。
+示例 3：
+
+输入：1000
+输出：262
+
+思路：数位DP
+接下来上题解区题解：
+equal_flag记录i之前的数字取值是否都与nums中数值相同
+front_zero_flag记录是否处于前导零状态
+front_state记录i之前的所有不同的数字的集合
+
+按照以上状态进行记忆化DFS搜索就是一种标准的数位dp解法了
+
+执行用时 :
+12 ms
+, 在所有 C++ 提交中击败了
+48.80%
+的用户
+内存消耗 :
+8.5 MB
+, 在所有 C++ 提交中击败了
+18.33%
+的用户
+（时间一般，空间不咋地）
+
+上代码：
+class Solution {
+public:
+    int MEMO[10][2][2][1 << 10];
+    int dfs(vector<int>& nums, int i, bool equal_flag, bool front_zero_flag, int front_state) {
+        if (i == nums.size()) return 1;
+        if (MEMO[i][equal_flag][front_zero_flag][front_state] != -1) {
+            return MEMO[i][equal_flag][front_zero_flag][front_state];
+        }
+        int res = 0;
+        for (int j = 0; j <= (equal_flag ? nums[i] : 9); ++j) {
+            if (front_state >> j & 1) continue;
+            bool ef = equal_flag && j == nums[i];
+            bool fzf = front_zero_flag && j == 0;
+            int state = fzf ? front_state : (front_state | (1 << j));
+            res += dfs(nums, i + 1, ef, fzf, state);
+        }
+        MEMO[i][equal_flag][front_zero_flag][front_state] = res;
+        return res;
+    }
+    int numDupDigitsAtMostN(int N) {
+        memset(MEMO, -1, sizeof(MEMO));
+        vector<int> nums;
+        for (int t = N; t > 0; t /= 10) {
+            nums.push_back(t % 10);
+        }
+        reverse(nums.begin(), nums.end());
+        return 1 + N - dfs(nums, 0, true, true, 0);
+    }
+};
