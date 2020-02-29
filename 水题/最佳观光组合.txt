@@ -1,0 +1,76 @@
+题目难度：MEDIUM
+
+给定正整数数组 A，A[i] 表示第 i 个观光景点的评分，并且两个景点 i 和 j 之间的距离为 j - i。
+
+一对景点（i < j）组成的观光组合的得分为（A[i] + A[j] + i - j）：
+
+景点的评分之和减去它们两者之间的距离。
+
+返回一对观光景点能取得的最高分。
+
+ 
+
+示例：
+
+输入：[8,1,5,2,6]
+输出：11
+解释：i = 0, j = 2, A[i] + A[j] + i - j = 8 + 5 + 0 - 2 = 11
+ 
+
+提示：
+
+2 <= A.length <= 50000
+1 <= A[i] <= 1000
+
+思路：SlidingWindows
+先初始变量值最大值为数组第一个元素，结果值初始化0，开始下标为0，然后从第二个元素遍历数组
+当数组当前值大于变量值时，先取结果值与最大值加当前值加开始下标减当前下标的最大值（WA点1，有可能是当前元素跟最大值组成的组合对是最大的）,然后continue
+否则变量值减一，再取结果值与最大值加当前值加开始下标减当前下标的最大值
+然后双向，另一个方向再遍历判断一次，注意各个变量的初值及转换即可（WA点2,3，要双向才能取得所有最大可能情况）
+最后返回结果值即可
+
+执行用时 :
+60 ms
+, 在所有 C++ 提交中击败了
+70.38%
+的用户
+内存消耗 :
+39.7 MB
+, 在所有 C++ 提交中击败了
+5.26%
+的用户
+（时间不错，空间炸了（原地...））
+
+上代码：
+class Solution {
+public:
+    int begin = 0, res = 0,cur = 0;
+    
+    int maxScoreSightseeingPair(vector<int>& A) {
+        int big = A[0], cur = A[0];
+        for(int i = 1; i < A.size(); i++) {
+            if(A[i] > cur) {
+                res = max(big + A[i] + begin - i, res);
+                big = A[i];
+                cur = A[i];
+                begin = i;
+                continue;
+            }
+            res = max(big + A[i] + begin - i, res);
+            cur--;
+        }
+        big = A[A.size() - 1], cur = A[A.size() - 1], begin = A.size() - 1;
+        for(int i = A.size() - 2; i >= 0; i--) {
+            if(A[i] > cur) {
+                res = max(big + A[i] + i - begin, res);
+                big = A[i];
+                cur = A[i];
+                begin = i;
+                continue;
+            }
+            res = max(big + A[i] + i - begin, res);
+            cur--;
+        }
+        return res;
+    }
+};
