@@ -1,0 +1,11 @@
+输出的是IOI比赛中S1/S2的模
+long long Power(long long x,long long y,long long z){
+    long long ret=1;
+    while(y){
+        if(y&1)ret=ret*x%z;
+        y>>=1;
+        x=x*x%z;
+    }
+    return ret;
+}
+printf("%lld\n",s1*Power(s2,mod-2,mod)%mod);
