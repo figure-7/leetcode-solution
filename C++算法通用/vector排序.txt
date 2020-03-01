@@ -10,6 +10,17 @@ inline bool cmp(const vector<int> &a, const vector<int> &b){
 }
 按照次数进行排序，cnt是string类型哈希表，重写sort方法实现数组按主出现次数频率有小到大次按字典序排列
 
+bool cmp(char a, char b){
+    a -= 'A'; b -= 'A';
+    for (int i = 0; i < 26; i++){
+        if (cnt[a][i] > cnt[b][i]) return true;
+        if (cnt[a][i] < cnt[b][i]) return false;
+    }
+    return a < b;
+}
+排名次序依照其所获「排位第一」的票的多少决定。如果存在多个团队并列的情况，将继续考虑其「排位第二」的票的数量。以此类推，直到不再存在并列的情况。
+如果在考虑完所有投票情况后仍然出现并列现象，则根据团队字母的字母顺序进行排名。
+
 按指定范围排序（一下是实现从10到80个数的排序）
 vector<int>::iterator left,right;
 left = right = vv.begin();
