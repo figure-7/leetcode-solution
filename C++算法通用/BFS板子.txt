@@ -1,0 +1,65 @@
+基本函数递归：
+void bfs(vector<vector<int>>& grid, int x, int y) {
+        if (x >= 0 && x < grid.size() && y >= 0 && y < grid[0].size()) {
+            flag[x][y] = 1;
+        }
+        if(x == 0 || x == grid.size() - 1 || y == 0 || y == grid[0].size() - 1) {
+            if (x >= 0 && x < grid.size() && y >= 0 && y < grid[0].size()) {
+                if(grid[x][y] == 0) {
+                    res = 0;
+                }
+            }
+        }
+	    if (x >= 0 && x < grid.size() && y >= 0 && y < grid[0].size() && grid[x][y] == 0) {
+            grid[x][y] = 1;
+            bfs(grid, x - 1, y);
+            bfs(grid, x + 1, y);
+            bfs(grid, x, y - 1);
+            bfs(grid, x, y + 1);
+	    }
+    }
+
+改进队列形式：
+queue<pair<int, int> > que;
+        que.push(make_pair(r0, c0));
+        while (!que.empty()) {
+            int a = que.front().first, b = que.front().second;
+            que.pop();
+            vector<int> curr;
+            curr.push_back(a);
+            curr.push_back(b);
+            flag[a][b] = true;
+            res.push_back(curr);
+            for (int i = 0; i < 4; i++) {
+                int c = a + dict[i][0], d = b + dict[i][1];
+                if (c >= 0 && c < R && d >= 0 && d < C && flag[c][d] == false) {
+                    que.push(make_pair(c, d));
+                    flag[c][d] = true;
+                }
+            }
+        }
+
+高级双端队列形式（也可单源最短路径处理，但时间较慢）：
+memset(dist, -1, sizeof(dist));
+        memset(inQue, false, sizeof(inQue));
+        while(!que.empty()) que.pop_back();
+        dist[0][0] = 0; que.push_back(make_pair(0, 0));
+        
+        while(!que.empty()){
+            pair<int, int> cur = que.front(); que.pop_front();
+            int x = cur.first, y = cur.second;
+            
+            if (inQue[x][y]) continue;
+            inQue[x][y] = true;
+            
+            for (int k = 0; k < 4; k++){
+                int tx = x + dx[k], ty = y + dy[k], cost = dist[x][y] + (grid[x][y] - 1 == k ? 0 : 1);
+                if (tx < 0 || tx >= n || ty < 0 || ty >= m) continue;
+                if (dist[tx][ty] == -1 || dist[tx][ty] > cost){
+                    dist[tx][ty] = cost;
+                    if (dist[x][y] == dist[tx][ty]){
+                        que.push_front(make_pair(tx, ty));
+                    }else que.push_back(make_pair(tx, ty));
+                }
+            }
+        }
