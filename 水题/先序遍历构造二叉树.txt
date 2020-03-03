@@ -1,0 +1,76 @@
+题目难度：MEDIUM
+
+返回与给定先序遍历 preorder 相匹配的二叉搜索树（binary search tree）的根结点。
+
+(回想一下，二叉搜索树是二叉树的一种，其每个节点都满足以下规则，对于 node.left 的任何后代，值总 < node.val，而 node.right 的任何后代，值总 > node.val。
+
+此外，先序遍历首先显示节点的值，然后遍历 node.left，接着遍历 node.right。）
+
+ 
+
+示例：
+
+输入：[8,5,1,7,10,12]
+输出：[8,5,10,1,7,null,12]
+
+ 
+
+提示：
+
+1 <= preorder.length <= 100
+先序 preorder 中的值是不同的。
+
+思路：二叉搜索树+DFS+哈希表
+（WA点1,2：最开始算层数限制数组不取重复数字，麻烦了，直接哈希表就行）
+建立一个哈希表，DFS先把数组当前下标入哈希表，然后构造节点
+然后找到下一个比当前节点值大（左子节点）和相邻小的元素（可定是前一个的右侧节点）
+如果哈希表没有找到当前元素的下标，那么就把当前节点进入DFS，否则继续
+最后返回DFS函数返回的节点即可
+
+执行用时 :
+8 ms
+, 在所有 C++ 提交中击败了
+56.38%
+的用户
+内存消耗 :
+15.6 MB
+, 在所有 C++ 提交中击败了
+5.29%
+的用户
+（时间一般，空间炸了）
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    unordered_map<int,int> map;
+    
+    TreeNode* buildTree(vector<int>& preorder, int cur) {
+        map[cur] = 1;
+        TreeNode* node = new TreeNode(preorder[cur]);
+        for(int i = cur + 1; i < preorder.size(); i++) {
+            if(preorder[i] > preorder[cur]) {
+                if(map.find(i) == map.end()) {
+                    node->right = buildTree(preorder, i);
+                    break;
+                }
+            }
+        }
+        if(cur + 1 < preorder.size() && preorder[cur + 1] < preorder[cur])
+            if(map.find(cur + 1) == map.end())
+                node->left = buildTree(preorder, cur + 1);
+        return node;
+    }
+    
+    TreeNode* bstFromPreorder(vector<int>& preorder) {
+        return buildTree(preorder, 0);
+    }
+};
