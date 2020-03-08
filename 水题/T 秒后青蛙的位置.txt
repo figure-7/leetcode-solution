@@ -1,0 +1,92 @@
+题目难度：HARD
+
+给你一棵由 n 个顶点组成的无向树，顶点编号从 1 到 n。
+
+青蛙从 顶点 1 开始起跳。
+
+规则如下：
+
+在一秒内，青蛙从它所在的当前顶点跳到另一个 未访问 过的顶点（如果它们直接相连）。
+青蛙无法跳回已经访问过的顶点。
+如果青蛙可以跳到多个不同顶点，那么它跳到其中任意一个顶点上的机率都相同。
+如果青蛙不能跳到任何未访问过的顶点上，那么它每次跳跃都会停留在原地。
+无向树的边用数组 edges 描述，其中 edges[i] = [fromi, toi] 意味着存在一条直接连通 fromi 和 toi 两个顶点的边。
+
+返回青蛙在 t 秒后位于目标顶点 target 上的概率。
+
+ 
+
+示例 1：
+
+
+
+输入：n = 7, edges = [[1,2],[1,3],[1,7],[2,4],[2,6],[3,5]], t = 2, target = 4
+输出：0.16666666666666666 
+解释：上图显示了青蛙的跳跃路径。
+青蛙从顶点 1 起跳，第 1 秒 有 1/3 的概率跳到顶点 2 ，然后第 2 秒 有 1/2 的概率跳到顶点 4，因此青蛙在 2 秒后位于顶点 4 的概率是 1/3 * 1/2 = 1/6 = 0.16666666666666666 。 
+示例 2：
+
+
+
+输入：n = 7, edges = [[1,2],[1,3],[1,7],[2,4],[2,6],[3,5]], t = 1, target = 7
+输出：0.3333333333333333
+解释：上图显示了青蛙的跳跃路径。
+青蛙从顶点 1 起跳，有 1/3 = 0.3333333333333333 的概率能够 1 秒 后跳到顶点 7 。 
+示例 3：
+
+输入：n = 7, edges = [[1,2],[1,3],[1,7],[2,4],[2,6],[3,5]], t = 20, target = 6
+输出：0.16666666666666666
+ 
+
+提示：
+
+1 <= n <= 100
+edges.length == n-1
+edges[i].length == 2
+1 <= edges[i][0], edges[i][1] <= n
+1 <= t <= 50
+1 <= target <= n
+与准确值误差在 10^-5 之内的结果将被判定为正确。
+
+思路：周赛第四题，DFS（由于三题晚14分钟AK，www）（WA点1忘了）
+先建立一个二维数组，遍历给定二维数组，将对应两个值的小值作为下标，大值放入小值对应下标的建立的二维数组中
+然后DFS传入当前位置（1），次数（初值0）加一
+遍历二维数组，找当前值的一维下标下的所有值，DFS进去，并且总和乘以当前下标的一维数组长度
+当当前位置等于目标位置时，把次数给结果次数，总和当做分母，拿1除给结果
+然后判断结果次数大于给定次数（无法到达）返回0
+否则如果小于给定次数并求当前下标二维数组长度不为0（会继续往下走）返回0
+否则返回结果值即可
+
+上代码：
+class Solution {
+public:
+    double res = 0;
+    int cntmodtwo = 0;
+    
+    void DFS(int cur, vector<vector<int> > curr, double sum, int target, int cnt) {
+        if(cur == target) {
+            res = 1 / sum;
+            cntmodtwo = cnt;
+            return ;
+        }
+        for(int i = 0; i < curr[cur].size(); i++)
+            DFS(curr[cur][i], curr, sum * curr[cur].size(), target, cnt + 1);
+    }
+    
+    double frogPosition(int n, vector<vector<int>>& edges, int t, int target) {
+        vector<vector<int> > curr(n + 1);
+        for(int i = 0; i < edges.size(); i++) {
+            int a = min(edges[i][0], edges[i][1]), b = max(edges[i][0], edges[i][1]);
+            curr[a].push_back(b);
+        }
+        DFS(1, curr, 1, target, 0);
+        if(t < cntmodtwo)
+            return 0;
+        if(t > cntmodtwo) {
+            if(curr[target].size() != 0)
+                return 0;
+            return res;
+        }
+        return res;
+    }
+};
