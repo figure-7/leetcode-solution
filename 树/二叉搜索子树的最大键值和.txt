@@ -1,0 +1,90 @@
+题目难度：HARD
+
+给你一棵以 root 为根的 二叉树 ，请你返回 任意 二叉搜索子树的最大键值和。
+
+二叉搜索树的定义如下：
+
+任意节点的左子树中的键值都 小于 此节点的键值。
+任意节点的右子树中的键值都 大于 此节点的键值。
+任意节点的左子树和右子树都是二叉搜索树。
+ 
+
+示例 1：
+
+
+
+输入：root = [1,4,3,2,4,2,5,null,null,null,null,null,null,4,6]
+输出：20
+解释：键值为 3 的子树是和最大的二叉搜索树。
+示例 2：
+
+
+
+输入：root = [4,3,null,1,2]
+输出：2
+解释：键值为 2 的单节点子树是和最大的二叉搜索树。
+示例 3：
+
+输入：root = [-4,-2,-5]
+输出：0
+解释：所有节点键值都为负数，和最大的二叉搜索树为空。
+示例 4：
+
+输入：root = [2,1,3]
+输出：6
+示例 5：
+
+输入：root = [5,4,8,3,null,6,3]
+输出：7
+ 
+
+提示：
+
+每棵树最多有 40000 个节点。
+每个节点的键值在 [-4 * 10^4 , 4 * 10^4] 之间。
+
+思路：双周赛第四题（前面题没过根本没看），二叉搜索树+DFS
+其实我觉得可以直接套验证二叉搜索树的板子，然后是的话遍历节点和，最后取最大即可
+下面思路同上，两个pair一个判断左节点最大值（用于判断是否大于当前根节点（是不是符合二叉搜索树））以及右节点最小值（用于判断是否小于当前根节点（是不是符合二叉搜索树））
+同时pair返回是不是二叉搜索树一斤键值和同时更新最大值
+最后返回最大值即可
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+const int INF = 4e4 + 50;
+#define MP(a, b, c, d) make_pair(make_pair(a, b), make_pair(c, d))
+#define PIIBI pair<pair<int, int>, pair<bool, int>>
+class Solution {
+public:
+    int ans = 0;
+    
+    pair<pair<int, int>, pair<bool, int>> dfs(TreeNode * root){
+        if (root == NULL) return MP(INF, -INF, true, 0);
+        
+        PIIBI r = dfs(root->right);
+        PIIBI l = dfs(root->left);
+        
+        if ((l.second.first && r.second.first) == false) return MP(0, 0, false, 0);
+        
+        if (l.first.second < root->val && root->val < r.first.first){
+            int sum = root->val + l.second.second + r.second.second;
+            int mx = max(root->val, r.first.second);
+            int mi = min(root->val, l.first.first);
+            ans = max(ans, sum);
+            return MP(mi, mx, true, sum);
+        }else return MP(0, 0, false, 0);
+    }
+    
+    int maxSumBST(TreeNode* root) {
+        dfs(root);
+        return ans;
+    }
+};
