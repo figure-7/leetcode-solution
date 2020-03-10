@@ -1,0 +1,80 @@
+题目难度：HARD
+
+给定一个非负整数数组 A，如果该数组每对相邻元素之和是一个完全平方数，则称这一数组为正方形数组。
+
+返回 A 的正方形排列的数目。
+
+两个排列 A1 和 A2 不同的充要条件是存在某个索引 i，使得 A1[i] != A2[i]。
+
+ 
+
+示例 1：
+
+输入：[1,17,8]
+输出：2
+解释：
+[1,8,17] 和 [17,8,1] 都是有效的排列。
+示例 2：
+
+输入：[2,2,2]
+输出：1
+ 
+
+提示：
+
+1 <= A.length <= 12
+0 <= A[i] <= 1e9
+
+思路：回溯
+（TLE：暴力）
+直接套全排列的板子，然后再剪枝
+剪枝：DFS内部开头判断当临时数组元素大于等于2个时，如果最后两项（最新的）的和不是完全平方数就直接结束DFS即可
+最后返回结果二维数组长度即可
+
+执行用时 :
+4 ms
+, 在所有 C++ 提交中击败了
+76.74%
+的用户
+内存消耗 :
+10.7 MB
+, 在所有 C++ 提交中击败了
+12.50%
+的用户
+（时间不错，空间不咋地）
+
+上代码：
+class Solution {
+public:
+    int res = 0;
+    
+    void DFS(vector<vector<int>>& permutations, vector<int> curr, vector<int> nums, vector<bool> isVisited) {
+        if(curr.size() >= 2 && sqrt(curr[curr.size() - 1] + curr[curr.size() - 2]) != (int)sqrt(curr[curr.size() - 1] + curr[curr.size() - 2]))
+            return ;
+        if(curr.size() == nums.size()) {
+            permutations.push_back(curr);
+            return;
+        }
+        for(int i = 0; i < nums.size(); i++) {
+            if(isVisited[i] == false) {
+                isVisited[i] = true;
+                curr.push_back(nums[i]);
+                DFS(permutations, curr, nums, isVisited);
+                isVisited[i] = false;
+                curr.pop_back();
+                while(i < nums.size() - 1 && nums[i] == nums[i + 1]) {
+                    i++;
+                }
+            }
+        }
+    }
+    
+    int numSquarefulPerms(vector<int>& A) {
+        vector<vector<int>> permutations;
+        vector<int> curr;
+        vector<bool> isVisited(A.size(), false);
+        sort(A.begin(), A.end());
+        DFS(permutations, curr, A, isVisited);
+        return permutations.size();
+    }
+};
