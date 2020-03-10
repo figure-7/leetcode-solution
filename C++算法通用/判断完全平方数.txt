@@ -1,0 +1,2 @@
+if(sqrt(n)==(int)sqrt(n))
+判断N是不是完全能平方数
