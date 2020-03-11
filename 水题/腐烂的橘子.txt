@@ -1,0 +1,122 @@
+题目难度：EASY
+
+在给定的网格中，每个单元格可以有以下三个值之一：
+
+值 0 代表空单元格；
+值 1 代表新鲜橘子；
+值 2 代表腐烂的橘子。
+每分钟，任何与腐烂的橘子（在 4 个正方向上）相邻的新鲜橘子都会腐烂。
+
+返回直到单元格中没有新鲜橘子为止所必须经过的最小分钟数。
+
+如果不可能，返回 -1。
+
+ 
+
+示例 1：
+
+
+
+输入：[[2,1,1],[1,1,0],[0,1,1]]
+输出：4
+示例 2：
+
+输入：[[2,1,1],[0,1,1],[1,0,1]]
+输出：-1
+解释：左下角的橘子（第 2 行， 第 0 列）永远不会腐烂，因为腐烂只会发生在 4 个正向上。
+示例 3：
+
+输入：[[0,2]]
+输出：0
+解释：因为 0 分钟时已经没有新鲜橘子了，所以答案就是 0 。
+ 
+
+提示：
+
+1 <= grid.length <= 10
+1 <= grid[0].length <= 10
+grid[i][j] 仅为 0、1 或 2
+
+思路：BFS+队列（这就不像是简单题！）
+先套对应板子，然后先判断有没有好的橘子，没有直接返回0（WA点1：否则返回-1了）
+然后BFS前把所有值为2的下标入队，并且对应布尔数组值更改，中间变量记录当前队列中元素个数之后继承给另一个变量，再赋值0
+BFS内部每当取到一个号橘子时变量加一，队列运行次数不断累加并记录
+如果运行次数等于另一个变量别的值（已经走完了一秒），那么结果（初值0）加一，另一个变量的值加上中间变量的值
+之后再把中间变量赋0（下一层开始），如此直到BFS结束
+（WA点2：多个坏橘子能够相连，次数不能算上2再加，所以用到以上比较麻烦的操作）
+（WA点3：多个坏橘子能够相连，之间的坏橘子次数不是单向的，可以向多方向扩充，因而结果可能会取大，所以同理用到以上比较麻烦的操作）
+然后BFS结束判断有无好橘子，有就返回-1
+最后返回结果减一即可
+
+执行用时 :
+12 ms
+, 在所有 C++ 提交中击败了
+44.30%
+的用户
+内存消耗 :
+15.1 MB
+, 在所有 C++ 提交中击败了
+5.42%
+的用户
+（时间一般，空间炸了）
+
+上代码：
+class Solution {
+public:
+    bool inQue[15][15];
+    queue<pair<int, int> > que;
+    int dx[4] = {0, 0, 1, -1};
+    int dy[4] = {1, -1, 0, 0};
+    int cnt = 0, res = 0, curmodtwo = 0, sum = 0;
+    
+    int orangesRotting(vector<vector<int>>& grid) {
+        int n = grid.size(), m = grid[0].size();
+        memset(inQue, false, sizeof(inQue));
+        for(int i = 0; i < n; i++)
+            for(int j = 0; j < m; j++)
+                if(grid[i][j] == 1)
+                    sum++;
+        if(sum == 0)
+            return 0;
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < m; j++) {
+                if(grid[i][j] == 2) {
+                    inQue[i][j] = true;
+                    curmodtwo++;
+                    que.push(make_pair(i, j));
+                }
+            }
+        }
+        int curmodthree = curmodtwo;
+        curmodtwo = 0;
+        while(!que.empty()) {
+            pair<int, int> cur = que.front();
+            que.pop();
+            int x = cur.first, y = cur.second;
+            inQue[x][y] = true;
+            bool flag = false;
+            for (int k = 0; k < 4; k++) {
+                int tx = x + dx[k], ty = y + dy[k];
+                if (tx < 0 || tx >= n || ty < 0 || ty >= m || inQue[tx][ty])
+                    continue;
+                if(grid[tx][ty] == 1) {
+                    curmodtwo++;
+                    flag = true;
+                    grid[tx][ty] = 2;
+                    que.push(make_pair(tx, ty));
+                }
+            }
+            cnt++;
+            if(cnt == curmodthree) {
+                res++;
+                curmodthree += curmodtwo;
+                curmodtwo = 0;
+            }
+        }
+        for(int i = 0; i < n; i++)
+            for(int j = 0; j < m; j++)
+                if(grid[i][j] == 1)
+                    return -1;
+        return res - 1;
+    }
+};
