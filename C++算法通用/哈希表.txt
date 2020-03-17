@@ -23,3 +23,16 @@ map<string, set<pair<int, string> > > v;
 v[user[i]].insert(make_pair(time[i], web[i]));
 插入这样插
 注意用auto形式遍历值的时候如果是pair类型或多值对类型要用指针
+例如下面这段使用：
+unordered_map<string, map<int, string>> m;
+map<int, string>*t_s_m = &m[key]; // 关键：要使用引用，不使用引用频繁内存拷贝会导致超时
+        if ((*t_s_m).find(timestamp) == (*t_s_m).end()) { // 查找失败
+            (*t_s_m)[timestamp] = ""; // 零时插入，map 会根据 timestamp 排序。
+            auto it = (*t_s_m).find(timestamp); it--; // 那么 it-- ，就是比当前插入的 timestamp 小的值
+            string result = (*it).second;
+            (*t_s_m).erase(timestamp); // 删除零时插入值。
+            return result;
+        }
+        else { // 查找成功
+            return (*t_s_m)[timestamp];
+        }
