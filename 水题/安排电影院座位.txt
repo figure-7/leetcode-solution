@@ -1,0 +1,99 @@
+题目难度：MEDIUM
+
+
+如上图所示，电影院的观影厅中有 n 行座位，行编号从 1 到 n ，且每一行内总共有 10 个座位，列编号从 1 到 10 。
+
+给你数组 reservedSeats ，包含所有已经被预约了的座位。
+
+比如说，researvedSeats[i]=[3,8] ，它表示第 3 行第 8 个座位被预约了。
+
+请你返回 最多能安排多少个 4 人家庭 。
+
+4 人家庭要占据 同一行内连续 的 4 个座位。
+
+隔着过道的座位（比方说 [3,3] 和 [3,4]）不是连续的座位，但是如果你可以将 4 人家庭拆成过道两边各坐 2 人，这样子是允许的。
+
+ 
+
+示例 1：
+
+
+
+输入：n = 3, reservedSeats = [[1,2],[1,3],[1,8],[2,6],[3,1],[3,10]]
+输出：4
+解释：上图所示是最优的安排方案，总共可以安排 4 个家庭。
+蓝色的叉表示被预约的座位，橙色的连续座位表示一个 4 人家庭。
+示例 2：
+
+输入：n = 2, reservedSeats = [[2,1],[1,8],[2,6]]
+输出：2
+示例 3：
+
+输入：n = 4, reservedSeats = [[4,3],[1,4],[4,6],[1,7]]
+输出：4
+ 
+
+提示：
+
+1 <= n <= 10^9
+1 <= reservedSeats.length <= min(10*n, 10^4)
+reservedSeats[i].length == 2
+1 <= reservedSeats[i][0] <= n
+1 <= reservedSeats[i][1] <= 10
+所有 reservedSeats[i] 都是互不相同的。
+
+思路：双周赛第二题，模拟
+（一开始开空间数组存储，后来方法错的，考虑到新思路，审错题了，换了个方法）
+先对给定数组排序，然后遍历数组，内部设立一个数组，将给定数组对应下标的第二个值发乳中间数组
+然后循环当给定数组的第一个值一致相等时，就把数组对应第二个值放入中间数组
+再遍历10列座位，中间变量初值true，遍历数组，如果当前值等于列数，布尔值改为false，中间变量值（初值0）清零，下标加一
+否则下标等于数组长度（后面都是空座位）就中间变量加一
+如果中间变量大于等于4并且不是隔着过道（一开是审错题了，没判断这个...）并且布尔变量值为true（避免上面数组清理的值被加上）（WA点1：这里没判断结果大了）
+否则如果中间变量大于等于4，中间变量值（初值0）清零，结果值（初值0）加一，否则继续循环
+然后内部最后判断如果数组跟下一项中间有行数全是空座位时要加上对应行数乘二的值给结果
+注意开头结尾全是空座位时要加上对应行数乘二的值给结果（因为是从遍历只从数组开始到结束）（WA点2：缺少此处判断）
+最后返回结果值即可
+
+上代码：
+class Solution {
+public:
+    int res = 0;
+    
+    int maxNumberOfFamilies(int n, vector<vector<int>>& reservedSeats) {
+        sort(reservedSeats.begin(), reservedSeats.end());
+        res += 2 * (reservedSeats[0][0] - 1);
+        for(int i = 0; i < reservedSeats.size(); i++) {
+            vector<int> curr;
+            curr.push_back(reservedSeats[i][1]);
+            while(i + 1 < reservedSeats.size() &&  reservedSeats[i + 1][0] == reservedSeats[i][0]) {
+                curr.push_back(reservedSeats[i + 1][1]);
+                i++;
+            }
+            int sum = 0, cur = 0;
+            for(int j = 1; j <= 10; j++) {
+                bool flag = true;
+                if(cur < curr.size()) {
+                    if(curr[cur] != j)
+                        sum++;
+                    else {
+                        flag = false;
+                        sum = 0;
+                        cur++;
+                    }
+                } else
+                    sum++;
+                if(flag && sum >= 4 && (j == 4 || j == 6 || j == 8 || j == 10))
+                    sum++;
+                else if(sum >= 4) {
+                    res++;
+                    sum = 0;
+                } else
+                    continue;
+            }
+            if(i + 1 < reservedSeats.size())
+                res += 2 * (reservedSeats[i + 1][0] - reservedSeats[i][0] - 1);
+        }
+        res += 2 * (n - reservedSeats[reservedSeats.size() - 1][0]);
+        return res;
+    }
+};
