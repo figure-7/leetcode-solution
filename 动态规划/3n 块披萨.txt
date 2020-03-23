@@ -1,0 +1,104 @@
+题目难度：HARD
+
+给你一个披萨，它由 3n 块不同大小的部分组成，现在你和你的朋友们需要按照如下规则来分披萨：
+
+你挑选 任意 一块披萨。
+Alice 将会挑选你所选择的披萨逆时针方向的下一块披萨。
+Bob 将会挑选你所选择的披萨顺时针方向的下一块披萨。
+重复上述过程直到没有披萨剩下。
+每一块披萨的大小按顺时针方向由循环数组 slices 表示。
+
+请你返回你可以获得的披萨大小总和的最大值。
+
+ 
+
+示例 1：
+
+
+
+输入：slices = [1,2,3,4,5,6]
+输出：10
+解释：选择大小为 4 的披萨，Alice 和 Bob 分别挑选大小为 3 和 5 的披萨。
+然后你选择大小为 6 的披萨，Alice 和 Bob 分别挑选大小为 2 和 1 的披萨。
+你获得的披萨总大小为 4 + 6 = 10 。
+示例 2：
+
+
+
+输入：slices = [8,9,8,6,1,1]
+输出：16
+解释：两轮都选大小为 8 的披萨。
+如果你选择大小为 9 的披萨，你的朋友们就会选择大小为 8 的披萨，这种情况下你的总和不是最大的。
+示例 3：
+
+输入：slices = [4,1,2,5,8,3,1,9,7]
+输出：21
+示例 4：
+
+输入：slices = [3,1,2]
+输出：3
+ 
+
+提示：
+
+1 <= slices.length <= 500
+slices.length % 3 == 0
+1 <= slices[i] <= 1000
+
+思路：双周赛第四题，区间DP
+DP[l][r]表示取完l...r块的最大获取量
+A: DP[l1][r1]+DP[l2][r2] -> DP[l1][r2]：两个子区间的答案合成一个大区间的答案
+B: DP[l+1][mid-1]+slices[mid]+DP[mid+1][r-1] -> DP[l][r]：l+1到mid-1取完了，mid+1到r-1取完了，这样才能左右取到l跟r
+环->区间：
+1，2，3，4，5：倍增
+1，2，3，4，5，1，2，3，4，5
+
+上代码：
+const int MAXN = 500 + 50;
+int dp[MAXN * 3][MAXN * 3];
+
+class Solution {
+public:
+    int maxSizeSlices(vector<int>& slices) {
+        int n = slices.size();
+        
+        memset(dp, -1, sizeof(dp));
+        for (int i = 0; i < n + n; i++)
+            dp[i][i + 2] = slices[(i + 1) % n];
+        
+        for (int len = 3; len < n; len++){
+            if (len % 3 != 2) continue;
+            for (int left = 0; left < n + n; left++){
+                int right = left + len;
+                if (right >= n + n) continue;
+                for (int mid = left + 1; mid < right; mid++){
+                    if ((mid - left - 1) % 3 != 0) continue;
+                    if ((right - mid - 1) % 3 != 0) continue;
+                    int cur = slices[mid % n];
+                    if (mid != left + 1){
+                        if (dp[left + 1][mid - 1] == -1) continue;
+                        cur += dp[left + 1][mid - 1];
+                    }
+                    if (mid + 1 != right){
+                        if (dp[mid + 1][right - 1] == -1) continue;
+                        cur += dp[mid + 1][right - 1];
+                    }
+                    dp[left][right] = max(dp[left][right], cur);
+                }
+                for (int mid = left; mid < right; mid++){
+                    if (dp[left][mid] == -1) continue;
+                    if (dp[mid + 1][right] == -1) continue;
+                    dp[left][right] = max(dp[left][right], dp[left][mid] + dp[mid + 1][right]);
+                }
+                // if (dp[left][right] != -1) printf("%d %d = %d\n", left, right, dp[left][right]);
+            }
+
+        }
+        
+        int ans = -1;
+        for (int i = 0; i < n; i++) if (dp[i][i + n - 1] != -1) ans = max(ans, dp[i][i + n - 1]);
+        
+        return ans;
+    }
+};
+// [10,9,1,10,8,5,10,2,2][10,9,1,10,8,5,10,2,2]
