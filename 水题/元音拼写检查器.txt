@@ -1,0 +1,111 @@
+题目难度：MEDIUM
+
+在给定单词列表 wordlist 的情况下，我们希望实现一个拼写检查器，将查询单词转换为正确的单词。
+
+对于给定的查询单词 query，拼写检查器将会处理两类拼写错误：
+
+大小写：如果查询匹配单词列表中的某个单词（不区分大小写），则返回的正确单词与单词列表中的大小写相同。
+例如：wordlist = ["yellow"], query = "YellOw": correct = "yellow"
+例如：wordlist = ["Yellow"], query = "yellow": correct = "Yellow"
+例如：wordlist = ["yellow"], query = "yellow": correct = "yellow"
+元音错误：如果在将查询单词中的元音（‘a’、‘e’、‘i’、‘o’、‘u’）分别替换为任何元音后，能与单词列表中的单词匹配（不区分大小写），则返回的正确单词与单词列表中的匹配项大小写相同。
+例如：wordlist = ["YellOw"], query = "yollow": correct = "YellOw"
+例如：wordlist = ["YellOw"], query = "yeellow": correct = "" （无匹配项）
+例如：wordlist = ["YellOw"], query = "yllw": correct = "" （无匹配项）
+此外，拼写检查器还按照以下优先级规则操作：
+
+当查询完全匹配单词列表中的某个单词（区分大小写）时，应返回相同的单词。
+当查询匹配到大小写问题的单词时，您应该返回单词列表中的第一个这样的匹配项。
+当查询匹配到元音错误的单词时，您应该返回单词列表中的第一个这样的匹配项。
+如果该查询在单词列表中没有匹配项，则应返回空字符串。
+给出一些查询 queries，返回一个单词列表 answer，其中 answer[i] 是由查询 query = queries[i] 得到的正确单词。
+
+ 
+
+示例：
+
+输入：wordlist = ["KiTe","kite","hare","Hare"], queries = ["kite","Kite","KiTe","Hare","HARE","Hear","hear","keti","keet","keto"]
+输出：["kite","KiTe","KiTe","Hare","hare","","","KiTe","","KiTe"]
+ 
+
+提示：
+
+1 <= wordlist.length <= 5000
+1 <= queries.length <= 5000
+1 <= wordlist[i].length <= 7
+1 <= queries[i].length <= 7
+wordlist 和 queries 中的所有字符串仅由英文字母组成。
+
+思路：哈希表
+建立三个哈希表，利用两个中间字符串，分别用那个来遍历两个数组时：
+第一个数组的原字符串存入，值随意；第二个数组找到就把字符串进结果数组
+第一个数组的字符串全小写存入，值为第一个字符串下标；第二个数组找到就把下标对应第一个数组字符串进结果数组
+第一个数组的字符串全小写再把元音字母都变为一个字符存入，值为第一个字符串下标；第二个数组找到就把下标对应第一个数组字符串进结果数组
+否则第二个数组中的字符串无法匹配就存空字符串进结果数组
+最后返回结果数组即可
+
+执行用时 :
+252 ms
+, 在所有 C++ 提交中击败了
+12.00%
+的用户
+内存消耗 :
+32.4 MB
+, 在所有 C++ 提交中击败了
+29.03%
+的用户
+（时空都不咋地）
+
+上代码：
+class Solution {
+public:
+    unordered_map<string, int> map, m, mapper;
+    vector<string> res;
+    
+    vector<string> spellchecker(vector<string>& wordlist, vector<string>& queries) {
+        for(int i = 0; i < wordlist.size(); i++) {
+            if(map.find(wordlist[i]) == map.end())
+                map[wordlist[i]] = 1;
+            string curr = wordlist[i];
+            for(int j = 0; j < curr.size(); j++)
+                if(curr[j] >= 'A' && curr[j] <= 'Z')
+                    curr[j] += 32;
+            if(m.find(curr) == m.end())
+                m[curr] = i;
+            string cur = "";
+            for(int j = 0; j < curr.size(); j++) {
+                if(curr[j] != 'a' && curr[j] != 'e' && curr[j] != 'i' && curr[j] != 'o' && curr[j] != 'u')
+                    cur += curr[j];
+                else
+                    cur += '!';
+            }
+            if(mapper.find(cur) == mapper.end())
+                mapper[cur] = i;
+        }
+        for(int i = 0; i < queries.size(); i++) {
+            if(map.find(queries[i]) != map.end())
+                res.push_back(queries[i]);
+            else {
+                for(int j = 0; j < queries[i].size(); j++)
+                    if(queries[i][j] >= 'A' && queries[i][j] <= 'Z')
+                        queries[i][j] += 32;
+                if(m.find(queries[i]) != m.end())
+                    res.push_back(wordlist[m[queries[i]]]);
+                else {
+                    string curr = queries[i], cur = "";
+                    for(int j = 0; j < curr.size(); j++) {
+                        if(curr[j] != 'a' && curr[j] != 'e' && curr[j] != 'i' && curr[j] != 'o' && curr[j] != 'u')
+                            cur += curr[j];
+                        else
+                            cur += '!';
+                    }
+                    if(mapper.find(cur) != mapper.end())
+                        res.push_back(wordlist[mapper[cur]]);
+                    else
+                        res.push_back("");
+                }
+            }
+        }
+        return res;
+    }
+};
