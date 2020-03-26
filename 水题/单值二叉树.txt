@@ -1,0 +1,78 @@
+题目难度：EASY
+
+如果二叉树每个节点都具有相同的值，那么该二叉树就是单值二叉树。
+
+只有给定的树是单值二叉树时，才返回 true；
+
+否则返回 false。
+
+ 
+
+示例 1：
+
+
+
+输入：[1,1,1,1,1,null,1]
+输出：true
+示例 2：
+
+
+
+输入：[2,2,2,5,2]
+输出：false
+ 
+
+提示：
+
+给定树的节点数范围是 [1, 100]。
+每个节点的值都是整数，范围为 [0, 99] 。
+
+思路：树+DFS
+先取根节点的值，DFS套基本板子
+当值不等于根节点返回false，否则返回true即可
+（2分钟题）
+
+执行用时 :
+4 ms
+, 在所有 C++ 提交中击败了
+75.95%
+的用户
+内存消耗 :
+9.8 MB
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+（时间很好，空间完杀！！！）
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    int cur = 0;
+    bool flag = true;
+    
+    void DFS(TreeNode* node) {
+        if(node->val != cur) {
+            flag = false;
+            return;
+        }
+        if(node->left)
+            DFS(node->left);
+        if(node->right)
+            DFS(node->right);
+    }
+    
+    bool isUnivalTree(TreeNode* root) {
+        cur = root->val;
+        DFS(root);
+        return flag;
+    }
+};
