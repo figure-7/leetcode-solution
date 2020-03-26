@@ -1,0 +1,107 @@
+题目难度：HARD
+
+给定一个正整数 x，我们将会写出一个形如 x (op1) x (op2) x (op3) x ... 的表达式，其中每个运算符 op1，op2，… 可以是加、减、乘、除（+，-，*，或是 /）之一。
+
+例如，对于 x = 3，我们可以写出表达式 3 * 3 / 3 + 3 - 3，该式的值为 3 。
+
+在写这样的表达式时，我们需要遵守下面的惯例：
+
+除运算符（/）返回有理数。
+任何地方都没有括号。
+我们使用通常的操作顺序：
+乘法和除法发生在加法和减法之前。
+不允许使用一元否定运算符（-）。
+例如，“x - x” 是一个有效的表达式，因为它只使用减法，但是 “-x + x” 不是，因为它使用了否定运算符。 
+我们希望编写一个能使表达式等于给定的目标值 target 且运算符最少的表达式。
+返回所用运算符的最少数量。
+
+ 
+
+示例 1：
+
+输入：x = 3, target = 19
+输出：5
+解释：3 * 3 + 3 * 3 + 3 / 3 。
+表达式包含 5 个运算符。
+示例 2：
+
+输入：x = 5, target = 501
+输出：8
+解释：5 * 5 * 5 * 5 - 5 * 5 * 5 + 5 / 5 。
+表达式包含 8 个运算符。
+示例 3：
+
+输入：x = 100, target = 100000000
+输出：3
+解释：100 * 100 * 100 * 100 。
+表达式包含 3 个运算符。
+ 
+
+提示：
+
+2 <= x <= 100
+1 <= target <= 2 * 10^8
+
+思路：DP+哈希表
+接下来上题解区题解：
+无
+
+
+执行用时 :
+16 ms
+, 在所有 C++ 提交中击败了
+37.25%
+的用户
+内存消耗 :
+14.4 MB
+, 在所有 C++ 提交中击败了
+6.25%
+的用户
+（时间不太好，空间炸了）
+
+上代码：
+class Solution {
+public:
+    int leastOpsExpressTarget(int x, int target) {
+        if (x == target)
+            return 1;
+        std::unordered_map<int, int> dp;
+        dp[0] = 0;
+        for (int i = 1; i <= (x / 2) && i <= target; i++) {
+            dp[i] = i * 2 - 1;
+        }
+        for (int i = x / 2 + 1; i < x && i <= target; i++) {
+            dp[i] = (x - i) * 2;
+        }
+        if (target < x)
+            return dp[target];
+        for (long t = x, i = 0; t <= target + x + 1; t *= x, i++) {
+            dp[t] = i;
+        }
+        return dfs(x, target, dp);
+    }
+    
+    int dfs(int x, int i, std::unordered_map<int, int>& dp) {
+        if (dp.count(i) > 0)
+            return dp[i];
+        
+        long t = x;
+        int c = 1;
+        int ans = INT_MAX;
+        while (t < i) {
+            t *= x;
+            c++;
+        }
+        if (t == i)
+            ans = c - 1;
+        else if (std::abs(t - i) < i) {
+            ans = std::min(ans, dfs(x, std::abs(t - i), dp) + c);
+            ans = std::min(ans, dfs(x, std::abs(t / x - i), dp) + c - 1);
+        }
+        else 
+            ans = std::min(ans, dfs(x, std::abs(t / x - i), dp) + c - 1);
+        
+        dp[i] = ans;
+        return ans;
+    }
+};
