@@ -1,0 +1,101 @@
+题目难度：MEDIUM
+
+给定一个二叉树，确定它是否是一个完全二叉树。
+
+百度百科中对完全二叉树的定义如下：
+
+若设二叉树的深度为 h，除第 h 层外，其它各层 (1～h-1) 的结点数都达到最大个数，第 h 层所有的结点都连续集中在最左边，这就是完全二叉树。
+
+（注：第 h 层可能包含 1~ 2h 个节点。）
+
+ 
+
+示例 1：
+
+
+
+输入：[1,2,3,4,5,6]
+输出：true
+解释：最后一层前的每一层都是满的（即，结点值为 {1} 和 {2,3} 的两层），且最后一层中的所有结点（{4,5,6}）都尽可能地向左。
+示例 2：
+
+
+
+输入：[1,2,3,4,5,null,7]
+输出：false
+解释：值为 7 的结点没有尽可能靠向左侧。
+ 
+
+提示：
+
+树中将会有 1 到 100 个结点。
+
+思路：树+DFS
+（WA点1,2,3,4,5：一开始路径判断写的错的算法）
+后来考虑到可以使用层序遍历开数组实现
+套二叉树层序遍历的板子
+然后遍历层序DFS时，内部当前节点为空改为插入-1到数组
+更改当层数等于树的高度时结束DFS
+主函数二维遍历数组，当出现一行的前一个值为-1后一个值为1时返回false，（不是完全二叉树）
+此外当一行出现-1并且该行小于二叉树的高度时返回false（WA点6：不是完全二叉树，没考虑到）
+最后返回true即可
+
+执行用时 :
+20 ms
+, 在所有 C++ 提交中击败了
+20.29%
+的用户
+内存消耗 :
+12 MB
+, 在所有 C++ 提交中击败了
+5.63%
+的用户
+（时间不太好，空间炸了）
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    int num = 0;
+    
+    void getsolution(vector<vector<int>>& ret, TreeNode* root, int level) {
+        if(num == level) return ;
+        if(root == nullptr) {
+            ret[level].push_back(-1);
+            return ;
+        }
+        ret[level].push_back(root->val);
+        getsolution(ret, root->left, level+1);
+        getsolution(ret, root->right, level+1);
+    }
+    
+    void traval(TreeNode *node, int level) {
+        if(node->left) traval(node->left, level+1);
+        if(node->right) traval(node->right, level+1);
+        if(!node->left && !node->right) {
+            num = max(num, level);
+            return ;
+        }
+    }
+    
+    bool isCompleteTree(TreeNode* root) {
+        traval(root,1);
+        vector<vector<int>> m(num);
+        getsolution(m,root,0);
+        for(int i = 0; i < m.size(); i++) {
+            for(int j = 0; j < m[i].size() - 1; j++) {
+                if(m[i][j] == -1 && m[i][j + 1] != -1) return false;
+                if(m[i][j + 1] == -1 && i < num - 1) return false;
+            }
+        }
+        return true;
+    }
+};
