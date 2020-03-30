@@ -1,0 +1,131 @@
+题目难度：HARD
+
+给你两个长度为 n 的字符串 s1 和 s2 ，以及一个字符串 evil 。
+
+请你返回 好字符串 的数目。
+
+好字符串 的定义为：它的长度为 n ，字典序大于等于 s1 ，字典序小于等于 s2 ，且不包含 evil 为子字符串。
+
+由于答案可能很大，请你返回答案对 10^9 + 7 取余的结果。
+
+ 
+
+示例 1：
+
+输入：n = 2, s1 = "aa", s2 = "da", evil = "b"
+输出：51 
+解释：总共有 25 个以 'a' 开头的好字符串："aa"，"ac"，"ad"，...，"az"。
+还有 25 个以 'c' 开头的好字符串："ca"，"cc"，"cd"，...，"cz"。
+最后，还有一个以 'd' 开头的好字符串："da"。
+示例 2：
+
+输入：n = 8, s1 = "leetcode", s2 = "leetgoes", evil = "leet"
+输出：0 
+解释：所有字典序大于等于 s1 且小于等于 s2 的字符串都以 evil 字符串 "leet" 开头。
+所以没有好字符串。
+示例 3：
+
+输入：n = 2, s1 = "gx", s2 = "gz", evil = "x"
+输出：2
+ 
+
+提示：
+
+s1.length == n
+s2.length == n
+1 <= n <= 500
+1 <= evil.length <= 50
+所有字符串都只包含小写英文字母。
+
+思路：周赛第四题，数位DP+DFS
+从前往后确认字符串的内容，匹配Evil部分，匹配上就是不合法的，利用KMP
+dp[i][j]表示我们已经合法的确定了[0,i)位
+初始化-1
+且当前确定的部分已经匹配了部分 Evil，下一个字符从Evil的第j为进行匹配
+[i,n)位随意填且符合还能符合题目的方案数
+dp[i][j] i->c
+dp[i+1][k]
+DFS内部先判断大于Evil长度（子串）返回0（不行）
+确认完就返回1
+flag限制字符的上边界
+内部循环匹配Evil，能匹配指针不断向后加一，以后从next位开始匹配
+否则KMP原字符串加一遍历
+剩下的根据上下界记忆化搜索
+主函数两次DFS字典序小于S2的串减去字典序小于S1的串的数目就是结果
+最后返回结果即可
+
+上代码：
+#define LL long long
+const int MAXN = 500 + 50;
+const int MAXM = 50 + 10;
+const LL MOD = 1e9 + 7;
+
+namespace KMP{
+    vector<int> next;
+ 
+    void build(const string &pattern){
+        int n = pattern.length();
+        next.resize(n + 1);
+        for (int i = 0, j = next[0] = -1; i < n; next[++i] = ++j){
+            while(~j && pattern[j] != pattern[i]) j = next[j];
+        }
+    }
+ 
+    vector<int> match(const string &pattern, const string &text){
+        vector<int> res;
+        int n = pattern.length(), m = text.length();
+        build(pattern);
+        for (int i = 0, j = 0; i < m; ++i){
+            while(j > 0 && text[i] != pattern[j]) j = next[j];
+            if (text[i] == pattern[j]) ++j;
+            if (j == n) res.push_back(i - n + 1), j = next[j];
+        }
+        return res;
+    }
+};
+
+int len, m;
+string limStr, evilStr;
+LL dp[MAXN][MAXM];
+
+LL dfs(int x, int match, bool flag){
+    if (match >= m) return 0;
+    if (x >= len) return 1;
+    
+    if (!flag && dp[x][match] != -1) return dp[x][match];
+    
+    char lim = 'z';
+    if (flag) lim = limStr[x];
+    
+    LL ret = 0;
+    for (char c = 'a'; c <= lim; c++){
+        int nxt = match;
+        while(nxt > 0 && evilStr[nxt] != c) nxt = KMP::next[nxt];
+        if (c == evilStr[nxt]) nxt += 1;
+        ret = (ret + dfs(x + 1, nxt, flag && (c == lim)) ) % MOD;
+    }
+    
+    if (!flag) dp[x][match] = ret;
+    
+    return ret;
+}
+
+class Solution {
+public:
+    
+    int findGoodStrings(int n, string s1, string s2, string evil) {
+        len = n; m = evil.length();
+        evilStr = evil;
+        KMP::build(evil);
+        
+        memset(dp, -1, sizeof(dp));
+        limStr = s2;
+        LL ans = dfs(0, 0, true) % MOD;
+        limStr = s1;
+        ans = ans - dfs(0, 0, true) % MOD + MOD;
+        
+        if (s1.find(evil) == s1.npos) ++ans;
+        
+        return ans % MOD;
+    }
+};
