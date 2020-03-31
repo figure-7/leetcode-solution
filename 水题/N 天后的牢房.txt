@@ -1,0 +1,94 @@
+题目难度：MEDIUM
+
+8 间牢房排成一排，每间牢房不是有人住就是空着。
+
+每天，无论牢房是被占用或空置，都会根据以下规则进行更改：
+
+如果一间牢房的两个相邻的房间都被占用或都是空的，那么该牢房就会被占用。
+否则，它就会被空置。
+（请注意，由于监狱中的牢房排成一行，所以行中的第一个和最后一个房间无法有两个相邻的房间。）
+
+我们用以下方式描述监狱的当前状态：如果第 i 间牢房被占用，则 cell[i]==1，否则 cell[i]==0。
+
+根据监狱的初始状态，在 N 天后返回监狱的状况（和上述 N 种变化）。
+
+ 
+
+示例 1：
+
+输入：cells = [0,1,0,1,1,0,0,1], N = 7
+输出：[0,0,1,1,0,0,0,0]
+解释：
+下表概述了监狱每天的状况：
+Day 0: [0, 1, 0, 1, 1, 0, 0, 1]
+Day 1: [0, 1, 1, 0, 0, 0, 0, 0]
+Day 2: [0, 0, 0, 0, 1, 1, 1, 0]
+Day 3: [0, 1, 1, 0, 0, 1, 0, 0]
+Day 4: [0, 0, 0, 0, 0, 1, 0, 0]
+Day 5: [0, 1, 1, 1, 0, 1, 0, 0]
+Day 6: [0, 0, 1, 0, 1, 1, 0, 0]
+Day 7: [0, 0, 1, 1, 0, 0, 0, 0]
+
+示例 2：
+
+输入：cells = [1,0,0,1,0,0,1,0], N = 1000000000
+输出：[0,0,1,1,1,1,1,0]
+ 
+
+提示：
+
+cells.length == 8
+cells[i] 的值为 0 或 1 
+1 <= N <= 10^9
+
+思路：模拟
+先计算第一次的情况保存进数组（因为之后循环的时候第一次相等肯定等于这一项，边界没有0），两边放0
+然后把第一次结果给原数组，保存进二维数组
+之后死循环内部不断向下遍历，两边放0，当情况不等于第一次的情况就进二维数组，并且更新当前为给定数组
+否则退出循环
+最后三元运算符返回给定天数余二维数组长度是否等于0
+等于0返回二维数组最后一项即可
+否则返回给定值余二维数组长度减一作为下标的一维数组即可
+
+执行用时 :
+12 ms
+, 在所有 C++ 提交中击败了
+27.18%
+的用户
+内存消耗 :
+13 MB
+, 在所有 C++ 提交中击败了
+7.14%
+的用户
+（时间不太好，空间炸了）
+
+上代码：
+class Solution {
+public:
+    vector<vector<int> > res;
+    
+    vector<int> prisonAfterNDays(vector<int>& cells, int N) {
+        vector<int> curr;
+        curr.push_back(0);
+        for(int i = 1; i < cells.size() - 1; i++) {
+            if(cells[i - 1] == cells[i + 1]) curr.push_back(1);
+            else curr.push_back(0);
+        }
+        curr.push_back(0);
+        cells = curr;
+        res.push_back(curr);
+        while(1) {
+            vector<int> currmodthree;
+            currmodthree.push_back(0);
+            for(int i = 1; i < cells.size() - 1; i++) {
+                if(cells[i - 1] == cells[i + 1]) currmodthree.push_back(1);
+                else currmodthree.push_back(0);
+            }
+            currmodthree.push_back(0);
+            if(currmodthree == curr) break;
+            cells = currmodthree;
+            res.push_back(currmodthree);
+        }
+        return N % res.size() == 0 ? res[res.size() - 1] : res[N % res.size() - 1];
+    }
+};
