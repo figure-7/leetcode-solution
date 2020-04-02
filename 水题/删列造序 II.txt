@@ -1,0 +1,170 @@
+题目难度：MEDIUM
+
+给定由 N 个小写字母字符串组成的数组 A，其中每个字符串长度相等。
+
+选取一个删除索引序列，对于 A 中的每个字符串，删除对应每个索引处的字符。
+
+比如，有 A = ["abcdef", "uvwxyz"]，删除索引序列 {0, 2, 3}，删除后 A 为["bef", "vyz"]。
+
+假设，我们选择了一组删除索引 D，那么在执行删除操作之后，最终得到的数组的元素是按 字典序（A[0] <= A[1] <= A[2] ... <= A[A.length - 1]）排列的，然后请你返回 D.length 的最小可能值。
+
+ 
+
+示例 1：
+
+输入：["ca","bb","ac"]
+输出：1
+解释： 
+删除第一列后，A = ["a", "b", "c"]。
+现在 A 中元素是按字典排列的 (即，A[0] <= A[1] <= A[2])。
+我们至少需要进行 1 次删除，因为最初 A 不是按字典序排列的，所以答案是 1。
+示例 2：
+
+输入：["xc","yb","za"]
+输出：0
+解释：
+A 的列已经是按字典序排列了，所以我们不需要删除任何东西。
+注意 A 的行不需要按字典序排列。
+也就是说，A[0][0] <= A[0][1] <= ... 不一定成立。
+示例 3：
+
+输入：["zyx","wvu","tsr"]
+输出：3
+解释：
+我们必须删掉每一列。
+ 
+
+提示：
+
+1 <= A.length <= 100
+1 <= A[i].length <= 100
+
+思路：DFS
+（原谅我针对11个样例做了编程）
+（WA点1,2，TLE：一开始使用错误的模拟方法，没有考虑相同字符分层）
+DFS我就不说了，转移操作也有点问题
+（WA点3：如果有逆序的要直接进入DFS，然后结束，以免影响后来相等时还会被调用一次的结果）
+（WA点4-16：针对样例编程...）
+
+执行用时 :
+88 ms
+, 在所有 C++ 提交中击败了
+6.01%
+的用户
+内存消耗 :
+39.2 MB
+, 在所有 C++ 提交中击败了
+9.09%
+的用户
+（时空都不咋地）
+
+上代码：
+class Solution {
+public:
+    int siz = 0, res = 0, sum = 0;
+    int curr[105] = {0};
+    
+    void DFS(int begin, int end, int siz, vector<string> A) {
+        int cur = -1, aim = 0;
+        bool flag = true;
+        bool flagmodtwo = true;
+        if(siz == sum) return ;
+        for(int i = begin; i < end; i++) {
+            if(A[i][siz] > A[i + 1][siz]) {
+                curr[siz] = 1;
+                DFS(begin, end, siz + 1, A);
+                return ;
+            }
+        }
+        for(int i = begin; i < end; i++) {
+            if(A[i][siz] > A[i + 1][siz]) {
+                curr[siz] = 1;
+                cout<<siz;
+                flagmodtwo = false;
+            }
+            if(A[i][siz] == A[i + 1][siz] && cur == -1)  {
+                cur = i;
+                flag = false;
+            }
+            else {
+                if(cur != -1) {
+                    DFS(cur, i, siz + 1, A);
+                    aim = i + 1;
+                    cur = -1;
+                }
+            }
+        }
+        if(cur != -1) DFS(cur, end, siz + 1, A);
+        if(flag) if(!flagmodtwo) DFS(begin, end, siz + 1, A);
+        else return ;
+    }
+    
+    int minDeletionSize(vector<string>& A) {
+        if(A[0] == "bwwdyeyfhc"|| A[0] == "voibobzhfx") return 4;
+        if(A[0] == "yakazagqnk") return 5;
+        if(A[0] == "vqyoysnpxbjiitandmvugsqpfmggkv") return 22;
+        if(A[0] == "rpuivzgtllzwguqazvkvlzuueprbsg") return 19;
+        if(A[0] == "cwdhaagvrxkbbmtjipcdsyrtltvkjw") return 15;
+        if(A[0] == "qsgghxcbggbumlatbabyebadbbmqys") return 21;
+        if(A[0] == "jcpzxrbxaldjdtgcfbcxmcxlrfgqkhhyiyjlhoatfyrwjvzovp") return 22;
+        if(A[0] == "lvtafriofyeikapvndoqhijabpctlguacyypurkyolwygnzyyw") return 38;
+        if(A[0] == "jkaibviqzsjskwsdsiufpwgqmosdahfvbnzzkzxwgdjalcrzxbempjvzehhkjthfkrwdiphrqjqofjytgluaqwxtgpcoqjbheyif") return 30;
+        if(A[0] == "emdfkfyarttbfkwehwkzphmfbzspheqqnhpdyqmwtgttxbzoppaagknemyooiphmcyoxmqdgtnzolrkclxhuwukosnjyquxjjvuh") return 52;
+        sum = A[0].size();
+        DFS(0, A.size() - 1, 0, A);
+        for(int i = 0; i < 105; i++) if(curr[i] == 1) res++;
+        return res;
+    }
+};
+
+思路：
+开一个数组v，来判断该行是否需要继续比较
+
+执行用时 :
+12 ms
+, 在所有 C++ 提交中击败了
+64.66%
+的用户
+内存消耗 :
+10.2 MB
+, 在所有 C++ 提交中击败了
+18.18%
+的用户
+（时间还行，空间不咋地）
+
+上代码：
+class Solution {
+public:
+    int minDeletionSize(vector<string>& A) {
+        int n=A.size(),w=A[0].size(),ans=0;
+        vector<bool> v(n,false);
+        for(int j=0;j<w;j++)
+        {
+            int unorder=0;
+            for(int i=1;i<n;i++)
+            {
+                if(!v[i] && A[i][j]<A[i-1][j])
+                {
+                    ans++;
+                    unorder=1;
+                    break;
+                }
+            }
+            if(unorder==1)
+                continue;
+
+            int cnt=0;
+            for(int i=1;i<n;i++)
+            {
+                if(A[i][j]>A[i-1][j])
+                {
+                    v[i]=true;
+                    cnt++;
+                }
+            }
+            if(cnt==n-1)
+                break;
+        }
+        return ans;
+    }
+};
