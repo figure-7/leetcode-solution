@@ -1,0 +1,101 @@
+题目难度：MEDIUM
+
+我们可以为二叉树 T 定义一个翻转操作，如下所示：
+
+选择任意节点，然后交换它的左子树和右子树。
+
+只要经过一定次数的翻转操作后，能使 X 等于 Y，我们就称二叉树 X 翻转等价于二叉树 Y。
+
+编写一个判断两个二叉树是否是翻转等价的函数。
+
+这些树由根节点 root1 和 root2 给出。
+
+ 
+
+示例：
+
+输入：root1 = [1,2,3,4,5,6,null,null,null,7,8], root2 = [1,3,2,null,6,4,5,null,null,null,null,8,7]
+输出：true
+解释：我们翻转值为 1，3 以及 5 的三个节点。
+
+ 
+
+提示：
+
+每棵树最多有 100 个节点。
+每棵树中的每个值都是唯一的、在 [0, 99] 范围内的整数。
+
+思路：树+DFS
+针对节点范围值建立二维数组，（WA点1：先看一个数是否为空，空的话如果另一个是空返回true，否则返回false）
+（WA点2：注意另一个数也要优先判断）
+套DFS板子，内部相邻节点值构成两种组合下标和有两个孩子的节点值构成两种组合下标数组值赋值1
+并记录节点个数
+再套DFS板子，内部判断有两个孩子的节点值构成的下标数组值是不是1，不是结果值为false
+（WA点3：之后判断内部相邻节点值构成两种组合下标对应数组值是不是1，不是结果值为false）
+并记录节点个数
+然后返回三元运算符（WA点4：如果两个树节点数不等返回false）否则返回结果值即可
+
+执行用时 :
+8 ms
+, 在所有 C++ 提交中击败了
+48.90%
+的用户
+内存消耗 :
+12 MB
+, 在所有 C++ 提交中击败了
+6.45%
+的用户
+（时间一般，空间不咋地）
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    int curr[105][105];
+    bool res = true;
+    int cnt = 0, sum = 0;
+    
+    void DFS1(TreeNode* node1) {
+        sum++;
+        if(node1->left != nullptr && node1->right != nullptr) curr[node1->left->val][node1->right->val] = 1;
+        if(node1->left) {
+            curr[node1->val][node1->left->val] = 1;
+            curr[node1->left->val][node1->val] = 1;
+            DFS1(node1->left);
+        }
+        if(node1->right) {
+            curr[node1->val][node1->right->val] = 1;
+            curr[node1->right->val][node1->val] = 1;
+            DFS1(node1->right);
+        }
+    }
+    
+    void DFS2(TreeNode* node2) {
+        cnt++;
+        if(node2->left != nullptr && node2->right != nullptr) if(!curr[node2->left->val][node2->right->val] && !curr[node2->right->val][node2->left->val]) res = false;;
+        if(node2->left) {
+            if(!curr[node2->left->val][node2->val]) res = false;
+            DFS2(node2->left);
+        }
+        if(node2->right) {
+            if(!curr[node2->right->val][node2->val]) res = false;
+            DFS2(node2->right);
+        }
+    }
+    
+    bool flipEquiv(TreeNode* root1, TreeNode* root2) {
+        if(root1 == nullptr) return root2 == nullptr ? true : false;
+        if(root2 == nullptr) return false;
+        DFS1(root1);
+        DFS2(root2);
+        return cnt == sum ? res : false;
+    }
+};
