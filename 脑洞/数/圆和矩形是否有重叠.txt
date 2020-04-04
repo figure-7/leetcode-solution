@@ -1,0 +1,32 @@
+题目难度：MEDIUM
+
+思路：双周赛第三题，模拟
+（我——不——会——模——拟——！）
+先判断圆心再矩形给定两个横纵坐标之间，在的话看对应圆心另外的两个坐标之间，在的话返回true（圆心再矩阵中）
+否则判断是不是对应圆心另外的两个坐标之间距离绝对值，小于半径就返回true（外交的特殊情况）
+（完了我就一直想着怎么判断外交，就卡在怎么不开根号（误差）了，，，脑子不好使）
+之后分别算出矩阵四个点与圆心的距离平方与半径平方差，有小于0的返回true
+否则返回false即可
+（艹，平方啊啊啊啊，见到坐标题真的是傻，服了，3个月来头一次垫底比赛，服了（主要还是1题））
+
+上代码：
+class Solution {
+public:
+    bool checkOverlap(int radius, int x_center, int y_center, int x1, int y1, int x2, int y2) {
+        int x3 = x1, y3 = y2, x4 = x2, y4 = y1;
+        if(x1 <= x_center && x2 >= x_center) {
+            if(y1 <= y_center && y2 >= y_center) return true;
+            if(abs(y1 - y_center) <= radius || abs(y2 - y_center) <= radius){
+                cout<<"aa";
+             return true;
+            }
+        }
+        if(y1 <= y_center && y2 >= y_center) if(abs(x1 - x_center) <= radius || abs(x2 - x_center) <= radius) return true;
+        int cur1 = abs(x1 - x_center) * abs(x1 - x_center) + abs(y1 - y_center) * abs(y1 - y_center) - radius * radius;
+        int cur2 = abs(x2 - x_center) * abs(x2 - x_center) + abs(y2 - y_center) * abs(y2 - y_center) - radius * radius;
+        int cur3 = abs(x3 - x_center) * abs(x3 - x_center) + abs(y3 - y_center) * abs(y3 - y_center) - radius * radius;
+        int cur4 = abs(x4 - x_center) * abs(x4 - x_center) + abs(y4 - y_center) * abs(y4 - y_center) - radius * radius;
+        if(cur1 <= 0 || cur2 <= 0 || cur3 <= 0 || cur4 <= 0) return true;
+        return false;
+    }
+};
