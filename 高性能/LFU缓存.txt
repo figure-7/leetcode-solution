@@ -1,0 +1,209 @@
+题目难度：HARD
+
+设计并实现最不经常使用（LFU）缓存的数据结构。
+它应该支持以下操作：
+get 和 put。
+
+get(key) - 如果键存在于缓存中，则获取键的值（总是正数），否则返回 -1。
+put(key, value) - 如果键不存在，请设置或插入值。
+当缓存达到其容量时，它应该在插入新项目之前，使最不经常使用的项目无效。
+在此问题中，当存在平局（即两个或更多个键具有相同使用频率）时，最近最少使用的键将被去除。
+
+进阶：
+你是否可以在 O(1) 时间复杂度内执行两项操作？
+
+示例：
+
+LFUCache cache = new LFUCache( 2 /* capacity (缓存容量) */ );
+
+cache.put(1, 1);
+cache.put(2, 2);
+cache.get(1);       // 返回 1
+cache.put(3, 3);    // 去除 key 2
+cache.get(2);       // 返回 -1 (未找到key 2)
+cache.get(3);       // 返回 3
+cache.put(4, 4);    // 去除 key 1
+cache.get(1);       // 返回 -1 (未找到 key 1)
+cache.get(3);       // 返回 3
+cache.get(4);       // 返回 4
+
+思路：设计问题+链表+哈希表
+接下来上题解区题解：
+结构设计
+cache 基于两层list实现。
+第一层为出现的次数，第二层为具体的元素。
+router 是一个 unordered_map。
+记录每个 key 在 cache 中的位置。
+具体结构如下图所示：
+功能设计
+GET
+时间复杂度：O(1)
+直接访问 router，判断 key 是否存在：
+不存在，返回 -1。
+存在，通过router中缓存的位置，直接访问对应的数据链表结点，返回数据。
+PUT
+时间复杂度：O(1)
+首先判断 key 是否在 router 中：
+如果在，直接更新对应数据链表结点的值，并调用 updateFreq 更新访问次数。
+PUT结束。
+如果不存在。
+则判断是否已满：
+若已满先调用 swapOut (该函数会按LFU规则淘汰一个元素，后面会讨论)。
+判断次数为1的频次链表结点是否存在，不存在则创建。
+将数据插入到次数为 1 的数据链表。并更新 router。
+PUT 结束。
+以插入(key = 5, val = 5) 为例，图示如下：
+updateFreq
+时间复杂度：
+O(1)
+每次更新或查询，对应元素的频次只会增加一，也就是说对应的数据结点应从当前的数据链表移动到下一个数据链表，如果下一个数据链表不存在或者对应的频次不符，则应创建新的数据链表。
+以更新(key=5, val = 5)为例，过程如下图示：
+1 / 2
+swapOut
+时间复杂度：
+O(1)
+弹出频次最小的数据链表的最后一个元素，并删除router。
+
+执行用时 :
+332 ms
+, 在所有 C++ 提交中击败了
+5.72%
+的用户
+内存消耗 :
+37 MB
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+（时间炸了，空间完杀！！！）
+
+上代码：
+//为 list 自定义一个内存管理类模板
+template<typename T>
+class SingleAlloctor {
+	enum {
+		MAXN = 5000,
+	};
+	static T *data;    //内存池为全局变量，防止重复申请。
+	static int current;
+	static int pool[MAXN]; //pool本质上是一个链表；current 为头结点，标记了哪些data可用。
+	public:
+		typedef T value_type;
+		T * allocate(int num) {
+			int cur = current;
+			current = pool[current];
+			return data + cur;
+		}
+		void deallocate(T *p, std::size_t) {
+			ptrdiff_t offset = p-data;
+			pool[offset] = current;
+			current = offset;
+		}
+		SingleAlloctor() {
+            if(data != nullptr) { //应该还有对应的delete，哈哈偷懒了。
+                return;
+            }
+			data = static_cast<T*>(::operator new (MAXN * sizeof(T)));
+			for(int i = 0; i < MAXN; i++) {
+				pool[i] = i-1;
+			}
+			current = MAXN-1;
+		}
+};
+
+template<typename T>
+int SingleAlloctor<T>::current;
+
+template<typename T>
+int SingleAlloctor<T>::pool[SingleAlloctor<T>::MAXN];
+
+template<typename T>
+T *SingleAlloctor<T>::data = nullptr;
+
+class LFUCache {
+    struct FreqNode;
+	typedef list<FreqNode, SingleAlloctor<FreqNode>> FreqList;
+
+	struct DataNode {
+		int key;     //索引
+		int value;   //数据
+		FreqList::iterator fit; //对应的频次链表的结点
+		DataNode(int k = 0, int v = 0, FreqList::iterator f = FreqList::iterator())
+			: key(k), value(v), fit(f) {}
+	};
+	typedef list<DataNode, SingleAlloctor<DataNode>> DataList;
+
+    struct FreqNode {
+        int cnt;      //频次
+        DataList dataList;  //对应的数据结点列表
+		FreqNode(int c = 0) : cnt(c) {}
+    };
+	FreqList cache;
+	unordered_map<int, DataList::iterator> router;
+
+	size_t capacity;
+
+	void updateCache(int key) {
+		auto rit = router.find(key);
+		auto it = rit->second;
+		if(it->fit == cache.begin()) {
+			cache.push_front(FreqNode(it->fit->cnt+1)); //更高频次的结点不存在，创建它！
+		} else {
+			FreqList::iterator pre = it->fit; --pre;    
+			if(pre->cnt != it->fit->cnt+1) {       // 更高频次的结点频次不匹配，插入一个新的。
+				cache.insert(it->fit, FreqNode(it->fit->cnt+1));
+			}
+		}
+		auto curIt = it->fit;          //从当前数据链表断开，插入到更高频次的数据链表。
+		auto preIt = it->fit; --preIt;
+		preIt->dataList.push_front(DataNode(key, it->value, preIt));
+		curIt->dataList.erase(it);
+		rit->second = preIt->dataList.begin(); //更新 router
+	}
+
+	void swapOut() {
+		for(auto it = --cache.end(); ;) {
+			if(it->dataList.size()) { //删除最后一个
+				auto out = it->dataList.back();
+				router.erase(out.key);
+				it->dataList.pop_back();
+				break;
+			} else {       //可能存在若干个空的数据链表，清楚它。均摊 O(1)。
+				cache.erase(it--);
+			}
+		}
+	}
+    
+public:
+    LFUCache(int capacity) : capacity(capacity) {}
+    
+    int get(int key) {
+		auto it = router.find(key);
+		if(it == router.end()) {
+			return -1;
+		}
+		int val = it->second->value;
+		updateCache(key);
+		return val;
+    }
+
+    void put(int key, int value) {
+		if(capacity == 0) {
+			return;
+		}
+		auto rit = router.find(key);
+		if(rit != router.end()) {
+			rit->second->value = value; //key已存在，更新value。
+			updateCache(key);
+		} else {
+			if(router.size() == capacity) {
+				swapOut();
+			}
+			if(cache.empty() || cache.back().cnt != 1) {
+				cache.push_back(FreqNode(1)); //不存在频次为 1 的数据链表，创建一个。
+			}
+			auto it = --cache.end();
+			it->dataList.push_front(DataNode(key, value, it)); //插入到数据链表。
+			router.insert(make_pair(key, it->dataList.begin())); //更新router
+		}
+    }
+};
