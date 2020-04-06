@@ -1,0 +1,68 @@
+题目难度：HARD
+
+给定一个由不同正整数的组成的非空数组 A，考虑下面的图：
+
+有 A.length 个节点，按从 A[0] 到 A[A.length - 1] 标记；
+只有当 A[i] 和 A[j] 共用一个大于 1 的公因数时，A[i] 和 A[j] 之间才有一条边。
+返回图中最大连通组件的大小。
+
+ 
+
+示例 1：
+
+输入：[4,6,15,35]
+输出：4
+
+示例 2：
+
+输入：[20,50,9,63]
+输出：2
+
+示例 3：
+
+输入：[2,3,6,7,4,12,21,39]
+输出：8
+
+ 
+
+提示：
+
+1 <= A.length <= 20000
+1 <= A[i] <= 100000
+
+思路：并查集+哈希表
+接下来上题解区题解：
+通过连自己的因子来优化
+
+执行用时 :
+1200 ms
+, 在所有 C++ 提交中击败了
+13.79%
+的用户
+内存消耗 :
+43.4 MB
+, 在所有 C++ 提交中击败了
+16.67%
+的用户
+（时空都不咋地）
+
+上代码：
+class Solution {
+public:
+    int largestComponentSize(vector<int>& A) {
+        unordered_map<int, int> p;
+        for (auto a : A) 
+            for (int k = 2; k <= sqrt(a); ++k) 
+                if (a % k == 0) 
+                    p[find(p, k)] = p[find(p, a/k)] = p[find(p, a)];
+        unordered_map<int, int> cnt;
+        int ans = 0;
+        for (auto a : A)
+            ans = max(ans, ++cnt[find(p, a)]);
+        return ans;
+    }
+    int find(unordered_map<int, int> &p, int n) {
+        if (!p.count(n)) return p[n] = n;
+        return p[n] == n ? n : p[n] = find(p, p[n]);
+    }
+};
