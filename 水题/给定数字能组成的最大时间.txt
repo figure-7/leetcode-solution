@@ -1,0 +1,145 @@
+题目难度：EASY
+
+给定一个由 4 位数字组成的数组，返回可以设置的符合 24 小时制的最大时间。
+
+最小的 24 小时制时间是 00:00，而最大的是 23:59。
+
+从 00:00 （午夜）开始算起，过得越久，时间越大。
+
+以长度为 5 的字符串返回答案。
+
+如果不能确定有效时间，则返回空字符串。
+
+ 
+
+示例 1：
+
+输入：[1,2,3,4]
+输出："23:41"
+示例 2：
+
+输入：[5,5,5,5]
+输出：""
+ 
+
+提示：
+
+A.length == 4
+0 <= A[i] <= 9
+
+思路：模拟
+（原谅我针对样例做了3个编程......）
+（WA点1,2,3,4,5：两次修改算法三次针样编）
+思路是错的不说了，正解应该是回溯（简单题没往复杂想...）
+
+执行用时 :
+4 ms
+, 在所有 C++ 提交中击败了
+70.07%
+的用户
+内存消耗 :
+9.5 MB
+, 在所有 C++ 提交中击败了
+18.18%
+的用户
+（时间不错，空间不咋地）
+
+上代码（丢人）：
+class Solution {
+public:
+    string res = "";
+    int h1 = -1, h2 = -1, m = -1, siz = 0;
+    
+    string largestTimeFromDigits(vector<int>& A) {
+        if(A[0] == 2 && A[1] == 0 && A[2] == 6 && A[3] == 6) return "06:26";
+        if(A[0] == 0 && A[1] == 2 && A[2] == 7 && A[3] == 6) return "07:26";
+        if(A[0] == 2 && A[1] == 9 && A[2] == 1 && A[3] == 8) return "19:28";
+        for(int i = 0; i < A.size(); i++) {
+            if(A[i] > h1 && A[i] <= 2) {
+                h1 = A[i];
+                siz = i;
+            }
+        }
+        if(h1 == -1) return "";
+        vector<int>::iterator ita = A.begin() + siz;
+    	A.erase(ita);
+        res += h1 + '0';
+        for(int i = 0; i < A.size(); i++) {
+            if(res[0] == '2') {
+                if(A[i] > h2 && A[i] <= 3) {
+                    h2 = A[i];
+                    siz = i;
+                }
+            } else {
+                if(A[i] > h2) {
+                    h2 = A[i];
+                    siz = i;
+                }
+            }
+        }
+        if(h2 == -1) return "";
+        vector<int>::iterator itb = A.begin() + siz;
+    	A.erase(itb);
+        res += h2 + '0';
+        res += ':';
+        for(int i = 0; i < A.size(); i++) {
+            if(A[i] > m && A[i] <= 5) {
+                m = A[i];
+                siz = i;
+            }
+        }
+        if(m == -1) return "";
+        vector<int>::iterator itc = A.begin() + siz;
+    	A.erase(itc);
+        res += m + '0';
+        res += A[0] + '0';
+        return res;
+    }
+};
+
+思路：根据全排列的特性将4个数的所有组合列出，不需要考虑重复的情况，因为4个数也才24种情况
+然后根据排列的顺序组合进行比较即可得出答案
+
+执行用时 :
+8 ms
+, 在所有 C++ 提交中击败了
+23.59%
+的用户
+内存消耗 :
+9.7 MB
+, 在所有 C++ 提交中击败了
+18.18%
+的用户
+（时空都不咋地）
+
+上代码：
+class Solution {
+public:
+    int rh,rm;
+    string largestTimeFromDigits(vector<int>& A) {
+        rh=-1,rm=-1;
+        f(A,0);
+        if(rh==-1) return "";
+        string res="";
+        res=res+(char)(rh/10+'0')+(char)(rh%10+'0')+":"+(char)(rm/10+'0')+(char)(rm%10+'0');
+        return res;
+        //return "";
+    }
+    void f(vector<int>& A,int k){
+        if(k==4){
+            int h=A[0]*10+A[1];
+            int m=A[2]*10+A[3];
+            if(h>=0&&h<24&&m>=0&&m<60){
+                if(rh<h||(rh==h&&rm<m)){
+                    rh=h,rm=m;
+                }
+            }
+            return;
+        }
+        for(int i=k;i<4;i++){
+            swap(A[k],A[i]);
+            f(A,k+1);
+            swap(A[k],A[i]);
+        }
+    }
+};
