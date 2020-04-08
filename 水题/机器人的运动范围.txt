@@ -1,0 +1,60 @@
+题目难度：MEDIUM
+
+地上有一个m行n列的方格，从坐标 [0,0] 到坐标 [m-1,n-1] 。
+
+一个机器人从坐标 [0, 0] 的格子开始移动，它每次可以向左、右、上、下移动一格（不能移动到方格外），也不能进入行坐标和列坐标的数位之和大于k的格子。
+
+例如，当k为18时，机器人能够进入方格 [35, 37] ，因为3+5+3+7=18。
+
+但它不能进入方格 [35, 38]，因为3+5+3+8=19。
+
+请问该机器人能够到达多少个格子？
+
+ 
+
+示例 1：
+
+输入：m = 2, n = 3, k = 1
+输出：3
+示例 1：
+
+输入：m = 3, n = 1, k = 0
+输出：1
+提示：
+
+1 <= n,m <= 100
+0 <= k <= 20
+
+思路：BFS
+（WA点：没审好题）
+套BFS板子，BFS内部要加上针对当前坐标按位求和
+然后判断不走BFS要加上该和大于给定值的条件
+遍历布尔数组
+最后返回布尔数组改过值的个数即可
+
+上代码：
+class Solution {
+public:
+    int vis[105][105] = {false};
+    int dict[4][2] = {{0,1}, {1,0}, {0,-1}, {-1,0}};
+    int res = 0;
+    
+    void BFS(int a, int b, int x, int y, int di) {
+        vis[a][b] = true;
+        for(int i = 0; i < 4; i++) {
+            int cura = 0, curb = 0;
+            int aa = a + dict[i][0], bb = b + dict[i][1];
+            string s1 = to_string(aa), s2 = to_string(bb);
+            for(int j = 0; j < s1.size(); j++) cura += s1[j] - '0';
+            for(int j = 0; j < s2.size(); j++) curb += s2[j] - '0';
+            if(cura + curb > di || aa < 0 || bb < 0 || aa == x || bb == y || vis[aa][bb]) continue;
+            BFS(aa, bb, x, y, di);
+        }
+    }
+    
+    int movingCount(int m, int n, int k) {
+        BFS(0, 0, m, n, k);
+        for(int i = 0; i < 105; i++) for(int j = 0; j < 105; j++) if(vis[i][j]) res++;
+        return res;
+    }
+};
