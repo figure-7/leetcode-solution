@@ -1,0 +1,75 @@
+题目难度：EASY
+
+给定二叉搜索树的根结点 root，返回 L 和 R（含）之间的所有结点的值的和。
+
+二叉搜索树保证具有唯一的值。
+
+ 
+
+示例 1：
+
+输入：root = [10,5,15,3,7,null,18], L = 7, R = 15
+输出：32
+示例 2：
+
+输入：root = [10,5,15,3,7,13,18,1,null,6], L = 6, R = 10
+输出：23
+ 
+
+提示：
+
+树中的结点数量最多为 10000 个。
+最终的答案保证小于 2^31。
+
+思路：树+DFS
+套中序遍历板子，遍历得到的数组计算出给定两个值之间的和给结果
+返回结果即可
+
+执行用时 :
+248 ms
+, 在所有 C++ 提交中击败了
+16.06%
+的用户
+内存消耗 :
+67.5 MB
+, 在所有 C++ 提交中击败了
+6.82%
+的用户
+（时间不咋地，空间炸了）
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    bool flag = false;
+    int res = 0;
+    vector<int> curr;
+    
+    void DFS(TreeNode* node) {
+        if(node->left) DFS(node->left);
+        curr.push_back(node->val);
+        if(node->right) DFS(node->right);
+    }
+    
+    int rangeSumBST(TreeNode* root, int L, int R) {
+        DFS(root);
+        for(int i = 0; i < curr.size(); i++) {
+            if(curr[i] == L) {
+                res+= curr[i];
+                flag = true;
+            } else if(flag) {
+                res += curr[i];
+                if(curr[i] == R) break;
+            } else continue;
+        }
+        return res;
+    }
+};
