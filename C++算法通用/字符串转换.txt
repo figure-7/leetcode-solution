@@ -1,0 +1,2 @@
+text = text.replace("&quot;", "\");
+把字符串中&quot;变为\
