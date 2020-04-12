@@ -1,0 +1,156 @@
+题目难度：HARD
+
+给定两条线段（表示为起点start = {X1, Y1}和终点end = {X2, Y2}），如果它们有交点，请计算其交点，没有交点则返回空值。
+
+要求浮点型误差不超过10^-6。
+
+若有多个交点（线段重叠）则返回 X 值最小的点，X 坐标相同则返回 Y 值最小的点。
+
+ 
+
+示例 1：
+
+输入：
+line1 = {0, 0}, {1, 0}
+line2 = {1, 1}, {0, -1}
+输出： {0.5, 0}
+示例 2：
+
+输入：
+line1 = {0, 0}, {3, 3}
+line2 = {1, 1}, {2, 2}
+输出： {1, 1}
+示例 3：
+
+输入：
+line1 = {0, 0}, {1, 1}
+line2 = {1, 0}, {2, 1}
+输出： {}，两条线段没有交点
+ 
+
+提示：
+
+坐标绝对值不会超过 2^7
+输入的坐标均是有效的二维坐标
+
+思路：高精度
+（这题好狗啊）
+接下来上题解区题解：
+大体思路
+先求两直线的交点，然后判断交点是否在两条线段上。为了避免斜率为零时出现除零的运行时错误，需要使用直线的一般式进行计算。
+直线的一般式为 Ax + By + C = 0Ax+By+C=0
+特别的，如果有多个交点，即两直线平行的时候，需要求 x 最小的一个。
+
+需要实现的函数
+总结上面的思路，我们需要实现:
+
+根据两点求一般式的 A，B，C 三个系数的函数
+判断两直线是否平行的函数
+求平行的两线段 x 坐标最小的交点的函数
+判断点是否在线段上的函数
+不平行的两线段求交点的函数
+根据两点求解一般式的系数
+设两个点为 (x1, y1) , (x2, y2)，则有：
+A = y2 - y1
+B = x1 - x2
+C = x2y1-x1y2
+具体推导过程点这里~
+
+判断线段是否平行
+如果两直线平行，则有 A1/B1 == A2/B2。
+为了避免除零的问题，可转化为 A1*B2 == A2*B1
+
+求平行两线段的x最小的交点
+如果这个交点存在，那该交点必为两个线段的某一个端点。
+所以可以判断一个线段的端点是否在另一个线段上，如果在，则该点为一个候选答案。
+然后返回x最小的候选答案。
+两直线位置如下图：
+
+
+判断点是否在线段上
+设线段的两端点为 s， e，如果点 p 在该线段上，
+那么 distance(p,s) + distance(p,e) == distance(s, e)，
+否则p就不在该线段上。
+
+不平行的两线段求交点
+首先设交点坐标为(x, y)，两线段对应直线的一般式为：
+a1x + b1y + c1 = 0
+a2x + b2y + c2 = 0
+那么对1式乘a2, 对2式乘a1得：
+a2*a1x + a2*b1y + a2*c1 = 0
+a1*a2x + a1*b2y + a1*c2 = 0
+两式相减得：
+y = (c1 * a2 - c2 * a1) / (a1 * b2 - a2 * b1)
+
+同样可以推得：
+x = (c2 * b1 - c1 * b2) / (a1 * b2 - a2 * b1)
+
+如果(x,y)在两线段上，则(x,y)即为答案，否则交点不存在。
+
+上代码：
+class Solution {
+public:
+    const double EPS = 1e-7;
+    template<typename T1, typename T2, typename T3>
+    bool isPointInLine(const T1 &p, const T2 &s, const T3 &e) {
+        double d1 = sqrt((p[0] - s[0])*(p[0] - s[0]) + (p[1] - s[1])*(p[1] - s[1])); 
+        double d2 = sqrt((p[0] - e[0])*(p[0] - e[0]) + (p[1] - e[1])*(p[1] - e[1]));
+        double d3 = sqrt((s[0] - e[0])*(s[0] - e[0]) + (s[1] - e[1])*(s[1] - e[1]));
+        if(fabs(d1 + d2 - d3) <= EPS) {
+            return true;
+        }
+        return false;
+    }
+    vector<double> getIntersectionOfParallelLine(vector<int> &s1, vector<int> &e1, vector<int> &s2, vector<int> &e2) {
+        vector<vector<double>> res;
+        if(isPointInLine(s1, s2, e2)) {
+            res.push_back(vector<double>{double(s1[0]), double(s1[1])});
+        }
+        if(isPointInLine(e1, s2, e2)) {
+            res.push_back(vector<double>{double(e1[0]), double(e1[1])});
+        }
+        if(isPointInLine(s2, s1, e1)) {
+            res.push_back(vector<double>{double(s2[0]), double(s2[1])});
+        }
+        if(isPointInLine(e2, s1, e1)) {
+            res.push_back(vector<double>{double(e2[0]), double(e2[1])});
+        }
+        if(res.size() == 0) {
+            return vector<double>{};
+        }
+        sort(res.begin(), res.end(), [](const vector<double> &l, const vector<double> &r)->bool {
+            return l[0] < r[0];
+        });
+        return res[0];
+    }
+    vector<double> getParam(const vector<int> &point1, const vector<int> &point2) {
+        //A = y2-y1, B = x1-x2, C = x2y1-x1y2
+        double a = point2[1] - point1[1];
+        double b = point1[0] - point2[0];
+        double c = point2[0]*point1[1] - point1[0]*point2[1];
+        return vector<double>{a, b, c};
+    }
+    vector<double> intersection(vector<int>& start1, vector<int>& end1, vector<int>& start2, vector<int>& end2) {
+        int dx1 = end1[0] - start1[0];
+        int dy1 = end1[1] - start1[1];
+
+        int dx2 = end2[0] - start2[0];
+        int dy2 = end2[1] - start2[1];
+
+        if(dx1*dy2 == dx2*dy1) {
+            return getIntersectionOfParallelLine(start1, end1, start2, end2);
+        }
+
+        vector<double> p1 = getParam(start1, end1);
+        vector<double> p2 = getParam(start2, end2);
+
+        double x = double(p2[2]*p1[1] - p1[2]*p2[1]) / double(p1[0]*p2[1] - p2[0]*p1[1]);
+        double y = double(p1[2]*p2[0] - p2[2]*p1[0]) / double(p1[0]*p2[1] - p2[0]*p1[1]);
+
+        vector<double> point{x, y};
+        if(isPointInLine(point, start1, end1) && isPointInLine(point, start2, end2)) {
+            return point;
+        }
+        return vector<double> {};
+    }
+};
