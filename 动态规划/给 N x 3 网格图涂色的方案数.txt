@@ -1,0 +1,91 @@
+题目难度：HARD
+
+
+你有一个 n x 3 的网格图 grid ，你需要用 红，黄，绿 三种颜色之一给每一个格子上色，且确保相邻格子颜色不同（也就是有相同水平边或者垂直边的格子颜色不同）。
+
+给你网格图的行数 n 。
+
+请你返回给 grid 涂色的方案数。由于答案可能会非常大，请你返回答案对 10^9 + 7 取余的结果。
+
+ 
+
+示例 1：
+
+输入：n = 1
+输出：12
+解释：总共有 12 种可行的方法：
+
+示例 2：
+
+输入：n = 2
+输出：54
+示例 3：
+
+输入：n = 3
+输出：246
+示例 4：
+
+输入：n = 7
+输出：106494
+示例 5：
+
+输入：n = 5000
+输出：30228214
+ 
+
+提示：
+
+n == grid.length
+grid[i].length == 3
+1 <= n <= 5000
+
+思路：周赛第四题，
+DP[i][j]表示到第i行颜色方案为j的方案数，6位二进制->[0,4)
+初始化dp[i][s]等于1，第一行啥颜色都行
+然后遍历行，内部遍历颜色，然后看等不等于3或者相同不合法
+当前行合法就遍历列，列不能颜色相等
+如果前一项的方案数为0continue，否则当前行对应颜色的DP值为所有上一行的继承下来的情况和
+最后对最后一维累加返回即可
+
+上代码：
+#define LL long long
+const LL MOD = 1e9+7;
+LL dp[5050][65];
+
+class Solution {
+public:
+    int get(int v, int c){
+        return (v >> (c * 2)) % 4;
+    }
+    int numOfWays(int n) {
+        
+        for (int s = 0; s < 64; s++){
+            int a = get(s, 0), b = get(s, 1), c = get(s, 2);
+            dp[1][s] = 0;
+            if (a == 3 || b == 3 || c == 3) continue;
+            if (a == b || b == c) continue;
+            dp[1][s] = 1;
+        }
+        
+        for (int i = 2; i <= n; i++){
+            for (int cur = 0; cur < 64; cur++){
+                dp[i][cur] = 0;
+                int na = get(cur, 0), nb = get(cur, 1), nc = get(cur, 2);
+                if (na == 3 || nb == 3 || nc == 3) continue;
+                if (na == nb || nb == nc) continue;
+                for (int prev = 0; prev < 64; prev++){
+                    int pa = get(prev, 0), pb = get(prev, 1), pc = get(prev, 2);
+                    if (pa == na || pb == nb || pc == nc) continue;
+                    if (dp[i - 1][prev] == 0) continue;
+                    dp[i][cur] = (dp[i][cur] + dp[i - 1][prev] ) % MOD;
+                }
+            }
+        }
+        
+        LL ans = 0;
+        for (int s = 0; s < 64; s++){
+            ans = (ans + dp[n][s]) % MOD;
+        }
+        return ans;
+    }
+};
