@@ -1,0 +1,70 @@
+题目难度：EASY
+
+写一个 RecentCounter 类来计算最近的请求。
+
+它只有一个方法：ping(int t)，其中 t 代表以毫秒为单位的某个时间。
+
+返回从 3000 毫秒前到现在的 ping 数。
+
+任何处于 [t - 3000, t] 时间范围之内的 ping 都将会被计算在内，包括当前（指 t 时刻）的 ping。
+
+保证每次对 ping 的调用都使用比之前更大的 t 值。
+
+ 
+
+示例：
+
+输入：inputs = ["RecentCounter","ping","ping","ping","ping"], inputs = [[],[1],[100],[3001],[3002]]
+输出：[null,1,2,3,3]
+ 
+
+提示：
+
+每个测试用例最多调用 10000 次 ping。
+每个测试用例会使用严格递增的 t 值来调用 ping。
+每次调用 ping 都有 1 <= t <= 10^9。
+
+思路：设计问题
+ping：依次将值保存进数组，每次结果值（初值0）加一
+当当前值与数组第一个元素值的差大于3000时，数组第一个元素出来，结果值加一
+最后返回结果值即可
+
+执行用时 :
+352 ms
+, 在所有 C++ 提交中击败了
+17.10%
+的用户
+内存消耗 :
+50.8 MB
+, 在所有 C++ 提交中击败了
+12.50%
+的用户
+（时空都不咋地）
+
+上代码：
+class RecentCounter {
+public:
+    int res = 0;
+    vector<int> curr;
+    
+    RecentCounter() {
+
+    }
+    
+    int ping(int t) {
+        res++;
+        curr.push_back(t);
+        while(t - curr[0] > 3000) {
+            vector<int>::iterator it = curr.begin();
+    	    curr.erase(it);
+            res--;
+        }
+        return res;
+    }
+};
+
+/**
+ * Your RecentCounter object will be instantiated and called as such:
+ * RecentCounter* obj = new RecentCounter();
+ * int param_1 = obj->ping(t);
+ */
