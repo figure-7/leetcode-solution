@@ -1,0 +1,98 @@
+题目难度：MEDIUM
+
+给你两个 非空 链表来代表两个非负整数。
+
+数字最高位位于链表开始位置。
+
+它们的每个节点只存储一位数字。
+
+将这两数相加会返回一个新的链表。
+
+你可以假设除了数字 0 之外，这两个数字都不会以零开头。
+
+ 
+
+进阶：
+
+如果输入链表不能修改该如何处理？
+
+换句话说，你不能对列表中的节点进行翻转。
+
+ 
+
+示例：
+
+输入：(7 -> 2 -> 4 -> 3) + (5 -> 6 -> 4)
+输出：7 -> 8 -> 0 -> 7
+
+思路：链表
+首先把两链表的值分别保存进数组，然后套两数相加的板子，内部改为数组最后一项和出数组
+然后套链表反转板子，返回结果链表即可（符合进阶要求）
+
+执行用时 :
+76 ms
+, 在所有 C++ 提交中击败了
+5.38%
+的用户
+内存消耗 :
+72.2 MB
+, 在所有 C++ 提交中击败了
+11.11%
+的用户
+（时间炸了，空间不咋地）
+
+上代码：
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> curr, currmodtwo;
+    
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        while(l1!=NULL) {
+            curr.push_back(l1->val);
+            l1 = l1->next;
+        }
+        while(l2!=NULL) {
+            currmodtwo.push_back(l2->val);
+            l2 = l2->next;
+        }
+        ListNode* head = new ListNode(-1);//存放结果的链表
+        ListNode* h = head;//移动指针
+        int sum = 0;//每个位的加和结果
+        bool carry = false;//进位标志
+        while(curr.size() != 0 || currmodtwo.size() != 0)
+        {
+            sum = 0;
+            if(curr.size() != 0)
+            {
+                sum += curr[curr.size() - 1];
+                curr.pop_back();
+            }
+            if(currmodtwo.size() != 0)
+            {
+                sum += currmodtwo[currmodtwo.size() - 1];
+                currmodtwo.pop_back();
+            }
+            if(carry) sum++;
+            h->next=new ListNode(sum%10);
+            h = h->next;
+            carry = sum >= 10 ? true : false;
+        }
+        if(carry) h->next=new ListNode(1);
+        ListNode* slow = head->next, *prev = nullptr;
+        while (slow){//reverse
+            ListNode* ovn = slow->next;
+            slow->next = prev;
+            prev = slow;
+            slow = ovn;
+        }
+        return prev;
+    }
+};
