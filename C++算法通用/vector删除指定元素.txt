@@ -7,3 +7,6 @@
 二维：
 	vector<vector<int> >::iterator it = intervals.begin() + i + 1;（下标i+1对应数值删除，包括空间也减1）
         intervals.erase(it);
+
+删除不需要的数字：
+        temp.erase(remove_if(temp.begin(), temp.end(), [=](int i) { return i > N; }), temp.end());
