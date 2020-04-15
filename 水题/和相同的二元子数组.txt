@@ -1,0 +1,88 @@
+题目难度：MEDIUM
+
+
+在由若干 0 和 1  组成的数组 A 中，有多少个和为 S 的非空子数组。
+
+ 
+
+示例：
+
+输入：A = [1,0,1,0,1], S = 2
+输出：4
+解释：
+如下面黑体所示，有 4 个满足题目要求的子数组：
+[1,0,1,0,1]
+[1,0,1,0,1]
+[1,0,1,0,1]
+[1,0,1,0,1]
+ 
+
+提示：
+
+A.length <= 30000
+0 <= S <= A.length
+A[i] 为 0 或 1
+
+思路：SlidingWindows
+先判断给定值是不是0，是的话看连续0的个数，然后从一到该个数累加进结果（初值0），最后返回结果
+否则累加值直到等于给定值，然后取两边连续0的个数，分别加以累乘给结果，窗口改为当前范围第一个不是0的位置到最后一个0的位置
+直到遍历结果返回结果即可
+（CE点：WA点1,2,3,4,5：使用了错误的方法）
+
+执行用时 :
+56 ms
+, 在所有 C++ 提交中击败了
+52.96%
+的用户
+内存消耗 :
+25 MB
+, 在所有 C++ 提交中击败了
+50.00%
+的用户
+（时空都一般）
+
+上代码：
+class Solution {
+public:
+    int begin = 0, sum = 0, res = 0;
+    
+    int numSubarraysWithSum(vector<int>& A, int S) {
+        if(S == 0) {
+            int cur = 0;
+            for(int i = 0; i < A.size(); i++) {
+                if(A[i] == 0) cur++;
+                else {
+                    while(cur > 0) {
+                        res += cur;
+                        cur--;
+                    }
+                }
+            }
+            while(cur > 0) {
+                res += cur;
+                cur--;
+            }
+            return res;
+        }
+        for(int i = 0; i < A.size(); i++) {
+            sum += A[i];
+            while(sum > S) {
+                sum -= A[begin];
+                begin++;
+            }
+            if(sum == S) {
+                int cur = 0, curmodtwo = 0;
+                while(begin < A.size() && S != 0 && A[begin] == 0) {
+                    cur++;
+                    begin++;
+                }
+                while(i + 1 < A.size() && S != 0 && A[i + 1] == 0) {
+                    curmodtwo++;
+                    i++;
+                }
+                res += (cur + 1) * (curmodtwo + 1);
+            }
+        }
+        return res;
+    }
+};
