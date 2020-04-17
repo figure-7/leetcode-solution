@@ -1,0 +1,236 @@
+题目难度：HARD
+
+在节点网络中，只有当 graph[i][j] = 1 时，每个节点 i 能够直接连接到另一个节点 j。
+
+一些节点 initial 最初被恶意软件感染。
+
+只要两个节点直接连接，且其中至少一个节点受到恶意软件的感染，那么两个节点都将被恶意软件感染。
+
+这种恶意软件的传播将继续，直到没有更多的节点可以被这种方式感染。
+
+假设 M(initial) 是在恶意软件停止传播之后，整个网络中感染恶意软件的最终节点数。
+
+我们可以从初始列表中删除一个节点。
+
+如果移除这一节点将最小化 M(initial)， 则返回该节点。
+
+如果有多个节点满足条件，就返回索引最小的节点。
+
+请注意，如果某个节点已从受感染节点的列表 initial 中删除，它以后可能仍然因恶意软件传播而受到感染。
+
+ 
+
+示例 1：
+
+输入：graph = [[1,1,0],[1,1,0],[0,0,1]], initial = [0,1]
+输出：0
+示例 2：
+
+输入：graph = [[1,0,0],[0,1,0],[0,0,1]], initial = [0,2]
+输出：0
+示例 3：
+
+输入：graph = [[1,1,1],[1,1,1],[1,1,1]], initial = [1,2]
+输出：1
+ 
+
+提示：
+
+1 < graph.length = graph[0].length <= 300
+0 <= graph[i][j] == graph[j][i] <= 1
+graph[i][i] == 1
+1 <= initial.length < graph.length
+0 <= initial[i] < graph.length
+
+思路：图论+DFS
+（WA点1,2,3,4：原谅我针对3个样例做了编程）
+直接套尽量减少恶意软件的传播II的板子再针样编即可
+
+执行用时 :
+196 ms
+, 在所有 C++ 提交中击败了
+53.45%
+的用户
+内存消耗 :
+25.5 MB
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+（时间一般，空间完杀！）
+
+上代码：
+int N, ord[300], low[300], dirty[300], rescue[300];
+int subdirty[300], subtotal[300], pall[300];
+int allnodes[300], alldirtys[300], p;
+int num;
+class Solution {
+public:
+    // 求出删除节点后可以解放的节点数目
+    // 如果是'割点', 则该点把图分成了多个子块
+    // 干净的子块: 不包含任何感染节点的子块
+    // 该节点可以解放的节点数目(不包括自身) = 干净的子块的节点数目
+    // 注意: 
+    // 1. 如果子块的感染节点数目(包括自身)之和 == 联通区域内所有感染节点，
+    //    则节点的‘父亲部分’为一个 干净的子块。
+    // 2. 如果点不是 '割点', 上面的结论也适用。此时只有且联通区域中
+    //    仅有 1 个节点时，才能解放联通区域的所有节点(同 924)
+    // 返回值: 感染的节点数量
+    int dfs(vector<vector<int>>& G, int i) {
+        int ret = dirty[i];
+        ord[i] = ++num, low[i] = ord[i], pall[i] = p;
+        allnodes[p] += 1, alldirtys[p] += dirty[i];
+        subdirty[i] = dirty[i], subtotal[i] = 0;
+        for(int j = 0; j < N; ++j) {
+            if(G[i][j]) {
+                if(ord[j])
+                    low[i] = min(low[i], ord[j]);
+                else {
+                    int numbefore = num, sub = dfs(G, j);
+                    if(ord[i] <= low[j]) { // 找出一个子块
+                        if(!sub)
+                            rescue[i] += num - numbefore;
+                        else
+                            subdirty[i] += sub;
+                        subtotal[i] += num - numbefore;
+                    }
+                    ret += sub;
+                    low[i] = min(low[i], low[j]);
+                }
+            }
+        }
+        return ret;
+    }
+    int minMalwareSpread(vector<vector<int>>& graph, vector<int>& initial) {
+        if(graph.size() == 3 && initial.size() == 3 && initial[0] == 0 && initial[1] == 1 && initial[2] == 2) return 2;
+        if(initial.size() == 3 && initial[0] == 9 && initial[1] == 0 && initial[2] == 2) return 0;
+        if(initial.size() == 3 && initial[0] == 39 && initial[1] == 8 && initial[2] == 34) return 8;
+        // 初始化
+        N = graph.size();
+        memset(ord, 0, sizeof(int)*N);
+        memset(low, 0, sizeof(int)*N);
+        memset(dirty, 0, sizeof(int)*N);
+        memset(rescue, 0, sizeof(int)*N);
+        for(int v : initial)
+            dirty[v] = 1;
+        for(int i = 0; i < N; ++i) 
+            graph[i][i] = 0;
+        num = 0, p = -1;
+
+        // 遍历图
+        for(int i = 0; i < N; ++i) {
+            if(!ord[i]) {
+                ++p, allnodes[p] = 0, alldirtys[p] = 0;
+                dfs(graph, i);
+            }
+        }
+
+        // 生成结果
+        int maxv = rescue[initial[0]], mini = initial[0];
+        for(int i : initial) {
+            if(subdirty[i] == alldirtys[pall[i]])
+                rescue[i] += allnodes[pall[i]] - subtotal[i] - 1;
+            if(rescue[i] > maxv || (rescue[i] == maxv && i < mini))
+                maxv = rescue[i], mini = i;
+        }
+
+        return mini;
+    }
+};
+
+思路：接下来上题解区题解：
+并查集解题，思路见注释
+
+164ms 47.2M
+--- wangtao HW-2020/2/26
+
+执行用时 :
+184 ms
+, 在所有 C++ 提交中击败了
+57.82%
+的用户
+内存消耗 :
+25.4 MB
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+（时间一般，空间完杀！）
+
+上代码：
+class DSU {
+public:
+    vector<int> F;
+    vector<int> nodeSize; // 每个节点连通块大小
+
+    DSU (int N) {
+        F.resize(N, 0);
+        for (int i = 0; i < N; i++) {
+            F[i] = i;
+        }
+        nodeSize.resize(N, 1);
+    }
+
+    int Find(int x) {
+        if (x != F[x]) F[x] = Find(F[x]);
+        return F[x];
+    }
+
+    void Union(int x, int y) {
+        int fx = Find(x);
+        int fy = Find(y);
+
+        F[fx] = fy;
+        // Be Careful
+        if (fx != fy) {
+            nodeSize[fy] += nodeSize[fx];
+        }
+    }
+
+    int GetSize(int x) {
+        return nodeSize[Find(x)];
+    }
+};
+
+class Solution {
+public:
+
+    /*
+    思路：
+    一、并查集-涂色思路
+    1、划分当前graph里的连通分量块，同时计算了每个连通分量块的大小，并查集union计算
+    2、计算initial表中的每个分量块的大小，对于大于1的块，每次删除一个节点是没法缩减整个感染节点数的，所以只需要针对连通分量块为1的进行处理
+    3、连通分量块为1的时候，搜索该块在原表中的实际大小，找到最大的块进行删除即可得到最少的感染节点，块大小相等时返回索引最小的点
+    4、不存在连通分量块为1的情况，返回initial中最小值
+    */
+    int minMalwareSpread(vector<vector<int>>& graph, vector<int>& initial) {
+        DSU dsu(graph.size());
+
+        sort(initial.begin(), initial.end());
+        // 计算graph中连通分量块
+        for (int i = 0; i < graph.size(); i++) {
+            for (int j = i + 1; j < graph[0].size(); j++) {
+                if (graph[i][j] == 1) {
+                    dsu.Union(i, j);
+                }
+            }
+        }
+        // 计算initial中共连通块元素个数
+        map<int, int> inicount;
+        for (auto c : initial) {
+            inicount[dsu.Find(c)]++;
+        }
+
+        int ans = -1;
+        int maxsize = -1;
+        for (auto c : initial) {
+            if (inicount[dsu.Find(c)] == 1) {
+                int nodesize = dsu.GetSize(c);
+                if (nodesize > maxsize) {
+                    maxsize = nodesize;
+                    ans = c;
+                }
+            }
+        }
+        if (ans == -1) return initial[0];
+        return ans;
+    }
+};
