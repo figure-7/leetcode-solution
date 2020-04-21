@@ -1,0 +1,73 @@
+题目难度：HARD
+
+为了给刷题的同学一些奖励，力扣团队引入了一个弹簧游戏机。
+
+游戏机由 N 个特殊弹簧排成一排，编号为 0 到 N-1。
+
+初始有一个小球在编号 0 的弹簧处。
+
+若小球在编号为 i 的弹簧处，通过按动弹簧，可以选择把小球向右弹射 jump[i] 的距离，或者向左弹射到任意左侧弹簧的位置。
+
+也就是说，在编号为 i 弹簧处按动弹簧，小球可以弹向 0 到 i-1 中任意弹簧或者 i+jump[i] 的弹簧（若 i+jump[i]>=N ，则表示小球弹出了机器）。
+
+小球位于编号 0 处的弹簧时不能再向左弹。
+
+为了获得奖励，你需要将小球弹出机器。
+
+请求出最少需要按动多少次弹簧，可以将小球从编号 0 弹簧弹出整个机器，即向右越过编号 N-1 的弹簧。
+
+示例 1：
+
+输入：jump = [2, 5, 1, 1, 1, 1]
+
+输出：3
+
+解释：小 Z 最少需要按动 3 次弹簧，小球依次到达的顺序为 0 -> 2 -> 1 -> 6，最终小球弹出了机器。
+
+限制：
+
+1 <= jump.length <= 10^6
+1 <= jump[i] <= 10000
+
+思路：力扣春季赛第四题，DP+贪心+队列
+（这题我搜索WA了：后来改过后TLE了...）
+dp[i]表示到位置i的最小弹射次数
+dp[i + jump[i]]<-dp[i] + 1
+分两种情况：
+1.从j->i->i + jump[i]
+2.从i->i + jump[i]
+优先队列维护按x次弹簧跳到y位置，为了y时取最小的x做计算（贪心）
+每次转移时找到y大于当前的i且x最小的值
+然后先计算当前能够跳到的右侧位置构成对
+然后再计算第二种情况为dp[i] + 1：上一步再按一次
+之后计算第一种情况：优先队列对应值加二（左右两次）与当前第一种情况值最小值作为当前与dp值取最小的值
+如果小于dp值了就进行转移（有更少次数），然后当前能够跳到的右侧位置构成对入队列
+最后返回dp最后一项即可
+
+上代码：
+#define PII pair<int, int>
+#define MP(x, y) make_pair(x, y)
+
+const int MAXN = 1e6 + 50;
+priority_queue<PII> que;
+int dp[MAXN];
+
+class Solution {
+public:
+    int minJump(vector<int>& jump) {
+        int n = jump.size();
+        for (int i = 0; i <= n; i++) dp[i] = n; dp[0] = 0;
+        while(!que.empty()) que.pop();
+        for (int i = 0; i < n; i++){
+            while(!que.empty() && que.top().second <= i) que.pop();
+            int nxt = min(n, i + jump[i]);
+            int cst = dp[i] + 1;
+            if (!que.empty()) cst = min(cst, -que.top().first + 2);
+            if (cst < dp[nxt]){
+                dp[nxt] = cst;
+                que.push(MP(-cst, nxt));
+            }
+        }
+        return dp[n];
+    }
+};
