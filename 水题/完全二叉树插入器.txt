@@ -1,0 +1,114 @@
+题目难度：MEDIUM
+
+完全二叉树是每一层（除最后一层外）都是完全填充（即，结点数达到最大）的，并且所有的结点都尽可能地集中在左侧。
+
+设计一个用完全二叉树初始化的数据结构 CBTInserter，它支持以下几种操作：
+
+CBTInserter(TreeNode root) 使用头结点为 root 的给定树初始化该数据结构；
+CBTInserter.insert(int v) 将 TreeNode 插入到存在值为 node.val = v  的树中以使其保持完全二叉树的状态，并返回插入的 TreeNode 的父结点的值；
+CBTInserter.get_root() 将返回树的头结点。
+ 
+
+示例 1：
+
+输入：inputs = ["CBTInserter","insert","get_root"], inputs = [[[1]],[2],[]]
+输出：[null,1,[1,2]]
+示例 2：
+
+输入：inputs = ["CBTInserter","insert","insert","get_root"], inputs = [[[1,2,3,4,5,6]],[7],[8],[]]
+输出：[null,3,4,[1,2,3,4,5,6,7,8]]
+ 
+
+提示：
+
+最初给定的树是完全二叉树，且包含 1 到 1000 个结点。
+每个测试用例最多调用 CBTInserter.insert  操作 10000 次。
+给定结点或插入结点的每个值都在 0 到 5000 之间。
+
+思路：树+队列
+各函数功能如下：
+CBTInserter：初始化全局节点继承根节点，队列存入给定树的根节点
+然后当队列不空并且队首节点的左节点不空，那个该左节点入队列
+如果右子节点也不空，那么右子节点也进队列，然后出队一次（当前节点不能再有孩子了）
+否则结束循环，布尔值更替（用来表示当前队首节点还能有几个孩子）即可
+insert：初始化结果值为0，根据布尔值：
+如果当前队首节点只能再有一个孩子了，先构造值等于给定值的节点，然后当前节点入队列，并把当前节点作为队首节点的右孩子
+结果值赋值为当前队首节点的值，然后出队一次（当前节点不能再有孩子了），再更新状态
+否则当前队首节点能再有两个孩子，先构造值等于给定值的节点，然后当前节点入队列，并把当前节点作为队首节点的右孩子
+结果值赋值为当前队首节点的值，然后更新状态
+最后返回结果值即可
+get_root：一行，返回继承的节点即可
+
+执行用时 :
+32 ms
+, 在所有 C++ 提交中击败了
+38.19%
+的用户
+内存消耗 :
+22.3 MB
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+（时间不咋地，空间完杀！）
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class CBTInserter {
+public:
+    queue<TreeNode*> q;
+    TreeNode* node = nullptr;
+    bool flag = false;
+    
+    CBTInserter(TreeNode* root) {
+        node = root;
+        q.push(root);
+        while(!q.empty() && q.front()->left != nullptr) {
+            q.push(q.front()->left);
+            if(q.front()->right != nullptr) {
+                q.push(q.front()->right);
+                q.pop();
+            } else {
+                flag = true;
+                break;
+            }
+        }
+    }
+    
+    int insert(int v) {
+        int res = 0;
+        if(flag) {
+            TreeNode* cur = new TreeNode(v);
+            q.push(cur);
+            res = q.front()->val;
+            q.front()->right = cur;
+            q.pop();
+            flag = false;
+        } else {
+            TreeNode* cur = new TreeNode(v);
+            q.push(cur);
+            res = q.front()->val;
+            q.front()->left = cur;
+            flag = true;
+        }
+        return res;
+    }
+    
+    TreeNode* get_root() {
+        return node;
+    }
+};
+
+/**
+ * Your CBTInserter object will be instantiated and called as such:
+ * CBTInserter* obj = new CBTInserter(root);
+ * int param_1 = obj->insert(v);
+ * TreeNode* param_2 = obj->get_root();
+ */
