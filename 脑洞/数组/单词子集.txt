@@ -1,0 +1,108 @@
+题目难度：MEDIUM
+
+我们给出两个单词数组 A 和 B。
+
+每个单词都是一串小写字母。
+
+现在，如果 b 中的每个字母都出现在 a 中，包括重复出现的字母，那么称单词 b 是单词 a 的子集。 
+
+例如，“wrr” 是 “warrior” 的子集，但不是 “world” 的子集。
+
+如果对 B 中的每一个单词 b，b 都是 a 的子集，那么我们称 A 中的单词 a 是通用的。
+
+你可以按任意顺序以列表形式返回 A 中所有的通用单词。
+
+ 
+
+示例 1：
+
+输入：A = ["amazon","apple","facebook","google","leetcode"], B = ["e","o"]
+输出：["facebook","google","leetcode"]
+示例 2：
+
+输入：A = ["amazon","apple","facebook","google","leetcode"], B = ["l","e"]
+输出：["apple","google","leetcode"]
+示例 3：
+
+输入：A = ["amazon","apple","facebook","google","leetcode"], B = ["e","oo"]
+输出：["facebook","google"]
+示例 4：
+
+输入：A = ["amazon","apple","facebook","google","leetcode"], B = ["lo","eo"]
+输出：["google","leetcode"]
+示例 5：
+
+输入：A = ["amazon","apple","facebook","google","leetcode"], B = ["ec","oc","ceo"]
+输出：["facebook","leetcode"]
+ 
+
+提示：
+
+1 <= A.length, B.length <= 10000
+1 <= A[i].length, B[i].length <= 10
+A[i] 和 B[i] 只由小写字母组成。
+A[i] 中所有的单词都是独一无二的，也就是说不存在 i != j 使得 A[i] == A[j]。
+
+思路：模拟
+接下来上题解区题解：
+//先计算B的特征值--b_info[26]
+特征值：即每个单词在B[i]出现的最大次数
+例如：["ec","oc","coo"]
+c, e, o 的特征值分别为 1, 1, 2
+o 在 "coo"这个单词中出现了两次，c 和 e 在 B 最多出现了 1 次
+在计算 A[i]的特征值 t_info[26]，即A[i]中每个字母出现的次数
+当 0<=j <= 25, 都有 t_info[j] >= b_info[j]时
+则A[i]为通用的
+
+执行用时 :
+236 ms
+, 在所有 C++ 提交中击败了
+72.03%
+的用户
+内存消耗 :
+43.5 MB
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+（时间不错，空间完杀！）
+
+上代码：
+class Solution {
+public:
+    vector<string> wordSubsets(vector<string>& A, vector<string>& B) {
+         vector<string> ans;
+         int b_info[26] = {};   //记录26个字母的特征值
+         //特征值：即每个单词在B[i]出现的最大次数
+         //例如：["ec","oc","coo"]
+         // c, e, o 的特征值分别为 1, 1, 2
+         // o 在 "coo"这个单词中出现了两次，c 和 e 最多出现了 1 次
+         for(auto b : B){
+             int t_info[26] = {};   //计算b 即B[i]的特征值
+             for(int i = 0; i < b.size(); i++)
+             {
+                 int k = b[i] - 'a';
+                 t_info[k]++;
+                 //记录最大的特征值
+                 b_info[k] = max(b_info[k], t_info[k]);
+             }
+         }
+
+        //计算A[i]的特征值
+         for(auto a: A)
+         {
+             int t_info[26] = {};
+             for(int i = 0; i < a.size(); i++)
+             {
+                 t_info[a[i] - 'a']++;
+             }
+             int j = 0;
+             //判断 a 的特征值是否大于等于 b
+             while(j < 26 && t_info[j] >= b_info[j])
+                    j++;
+            //说明 a 的特征值 大于等于 b
+            if(j == 26)
+                ans.push_back(a);
+         }
+         return ans;
+    }
+};
