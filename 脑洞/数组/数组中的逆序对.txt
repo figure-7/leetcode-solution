@@ -1,0 +1,64 @@
+题目难度：HARD
+
+在数组中的两个数字，如果前面一个数字大于后面的数字，则这两个数字组成一个逆序对。
+
+输入一个数组，求出这个数组中的逆序对的总数。
+
+ 
+
+示例 1:
+
+输入: [7,5,6,4]
+输出: 5
+ 
+
+限制：
+
+0 <= 数组长度 <= 50000
+
+思路：模拟
+接下来上题解区题解：
+我一开始merge()和mergesort()是分开写的，结果超时了。。。
+所以就合并merge()和mergesort(),然后通过了。。。
+
+执行用时 :
+308 ms
+, 在所有 C++ 提交中击败了
+61.61%
+的用户
+内存消耗 :
+44.4 MB
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+（时间一般，空间完杀！）
+
+上代码：
+class Solution {
+private:
+    int cnt=0;
+public:
+    void mergesort(int lo,int hi,vector<int>& nums,vector<int>& tmp){
+        if(lo>=hi) return;
+        int mid=lo+(hi-lo)/2;
+        mergesort(lo,mid,nums,tmp);
+        mergesort(mid+1,hi,nums,tmp);
+        //merge(lo,mid,hi,nums); //merge()如下
+        int i=lo,j=mid+1;
+        for(int k=lo;k<=hi;k++){
+            if(i>mid) tmp[k]=nums[j++];//nums[i]到nums[mid]已经全部填入tmp
+            else if(j>hi) tmp[k]=nums[i++];//nums[mid+1]到nums[j]已经全部填入tmp
+            else if(nums[i]>nums[j]) {
+                tmp[k]=nums[j++];
+                cnt+=mid-i+1;//i肯定小于j，且nums[i]到nums[mid]是升序排序，如果nums[i]>nums[j]，说明从nums[i]到nums[mid]和nums[j]都是逆序对
+            }
+            else tmp[k]=nums[i++];
+        }
+        for(int m=lo;m<=hi;m++) nums[m]=tmp[m];//
+    }
+    int reversePairs(vector<int>& nums) {
+        vector<int> tmp(nums.size(),0);//就是用来记录某个递归函数merge后的情况，然后复制更新nums
+        mergesort(0,nums.size()-1,nums,tmp);
+        return cnt;
+    }
+};
