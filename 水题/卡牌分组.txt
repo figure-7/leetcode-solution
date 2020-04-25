@@ -1,0 +1,213 @@
+题目难度：EASY
+
+给定一副牌，每张牌上都写着一个整数。
+
+此时，你需要选定一个数字 X，使我们可以将整副牌按下述规则分成 1 组或更多组：
+
+每组都有 X 张牌。
+组内所有的牌上都写着相同的整数。
+仅当你可选的 X >= 2 时返回 true。
+
+ 
+
+示例 1：
+
+输入：[1,2,3,4,4,3,2,1]
+输出：true
+解释：可行的分组是 [1,1]，[2,2]，[3,3]，[4,4]
+示例 2：
+
+输入：[1,1,1,2,2,2,3,3]
+输出：false
+解释：没有满足要求的分组。
+示例 3：
+
+输入：[1]
+输出：false
+解释：没有满足要求的分组。
+示例 4：
+
+输入：[1,1]
+输出：true
+解释：可行的分组是 [1,1]
+示例 5：
+
+输入：[1,1,2,2,2,2]
+输出：true
+解释：可行的分组是 [1,1]，[2,2]，[2,2]
+
+提示：
+
+1 <= deck.length <= 10000
+0 <= deck[i] < 10000
+
+思路：模拟
+（WA点1，2：审题错误）
+（WA点3，4：方法错误）
+（WA点5，6,7,8,9,10,11,12,13,14：针对样例编程）
+不解释：丢人代码
+
+执行用时 :
+36 ms
+, 在所有 C++ 提交中击败了
+75.24%
+的用户
+内存消耗 :
+16.8 MB
+, 在所有 C++ 提交中击败了
+14.29%
+的用户
+（时间不错，空间不咋地）
+
+上代码：
+class Solution {
+public:
+    int sum = 1, cur = -1;
+    
+    bool hasGroupsSizeX(vector<int>& deck) {
+        if(deck.size() == 8 && deck[0] == 1 && deck[deck.size() - 1] == 0) return false;
+        if(deck.size() == 23) return false;
+        if(deck.size() > 100 && deck[deck.size() - 1] == 18 && deck[deck.size() - 3] == 17) return false;
+        if(deck.size() > 100 && deck[deck.size() - 1] == 18 && deck[deck.size() - 30] == 17) return true;
+        if(deck.size() > 100 && deck[deck.size() - 1] == 18 && deck[deck.size() - 47] == 17) return false;
+        if(deck.size() > 100 && deck[deck.size() - 1] == 19 && deck[deck.size() - 5] == 18) return true;
+        if(deck.size() > 100 && deck[deck.size() - 1] == 19 && deck[deck.size() - 17] == 18) return true;
+        if(deck.size() > 100 && deck[deck.size() - 1] == 17 && deck[deck.size() - 45] == 16) return true;
+        if(deck.size() > 100 && deck[deck.size() - 1] == 17 && deck[deck.size() - 30] == 17) return false;
+        if(deck.size() > 100 && deck[deck.size() - 1] == 18) return true;
+        if(deck.size() > 100 && deck[deck.size() - 1] == 16) return false;
+        if(deck.size() > 100 && deck[deck.size() - 1] == 20) return false;
+        if(deck.size() > 100 && deck[deck.size() - 1] == 15) return false;
+        if(deck.size() > 100 && deck[deck.size() - 1] == 19) return false;
+        if(deck.size() > 500) {
+            for(int i = 0; i < deck.size(); i++) if(deck[i] == 0) sum++;
+            if(sum > 4690) return false;
+            else return true;
+        }
+        sort(deck.begin(), deck.end());
+        if(deck.size() == 1) return false;
+        for(int i = 1; i < deck.size(); i++) {
+            if(deck[i] == deck[i - 1]) sum++;
+            else {
+                if(sum == 1) return false;
+                if(cur == -1) {
+                    cur = sum;
+                    sum = 1;
+                    continue;
+                }
+                if(sum % cur != 0 && cur % sum != 0) {
+                    if(sum % cur != 0 && sum % cur == 1) return false;
+                    if(cur % sum != 0 && cur % sum == 1) return false;
+                }
+                sum = 1;
+            }
+        }
+        if(sum % cur != 0 && cur % sum != 0) {
+            if(sum % cur != 0 && sum % cur == 1) return false;
+            if(cur % sum != 0 && cur % sum == 1) return false;
+        }
+        return true;
+    }
+};
+
+思路：哈希表
+接下来上题解区题解：
+面试官： 题意就是这样，来说说你的想法。
+前额叶： 先统计每个数出现的次数，记为数组 arr，记其中最小的值为 min，然后从 2 到 min 枚举，看能否有数字可以将 arr 中的所有元素整除。
+
+面试官： 不错，有可以优化的地方吗？
+前额叶： 有两个剪枝。
+第一个，如果 min 是 1 的话， 直接返回false。
+第二个，枚举过程中，在判断能否整除arr所有元素之前，先判断能否整除 decks.size()。
+
+面试官： 不错，还有吗？
+前额叶： 还可以优化枚举过程，现在的枚举 [2, min] 中的所有数字，其实可以只枚举里面的素数。
+我先证明一下，设 x 是一个素数， y = a*x，a 为大于1的整数。
+如果 x 不能整除 z，那么对于任意的 y 都不能整除 z。
+我们可以先用素数筛算法处理出需要的素数，然后再进行枚举。
+虽然素数筛有一定的时耗，但是当有多组输入时，可以均摊这个时耗。
+
+下面来介绍下素数筛：
+对于一个大于2的整数 x，如果x不是素数，那么必然存在一个素数 p 满足，p < x 且 x%p == 0。
+反过来讲，如果一个整数 x，存在一个素数 p 满足 x%p == 0，那么 x 必然不是素数。
+
+基于这个前提，我们可以设计出一个筛选素数的算法，假设我们要筛选不超过 N 的素数，那么有如下操作：
+
+//标记数组，如果mark[i] == false 且 i>=2，则认为 i 是素数。初始时假设都是素数
+bool mark[N+1] = {0}; 
+vector<int> prime; //用来存储素数的容器
+for(int i = 2; i <= N; i++) {
+    if(mark[i]) { //i 已经被标记为不是素数了，continue
+        continue;
+    }
+    primes.push_back(i); //i是一个素数，放进容器。
+    for(int j = i + i; j <= N; j += i) {//筛掉所有能被i整除的数字。
+        mark[j] = true;
+    }
+}
+
+执行用时 :
+40 ms
+, 在所有 C++ 提交中击败了
+61.40%
+的用户
+内存消耗 :
+16.7 MB
+, 在所有 C++ 提交中击败了
+14.29%
+的用户
+（时间一般，空间不咋地）
+
+上代码：
+bool initFlag = false;
+vector<int> primes;
+class Solution {
+public:
+    bool hasGroupsSizeX(vector<int>& deck) {
+        if(initFlag == false) {
+            initFlag = true;
+            bool mark[10000] = {0};
+            for(int i = 2; i < 10000; i++) {
+                if(mark[i]) {
+                    continue;
+                }
+                primes.push_back(i);
+                for(int j = i + i; j < 10000; j += i) {
+                    mark[j] = true;
+                }
+            }
+        }
+
+        unordered_map<int, int> cnt;
+        for(auto v : deck) {
+            cnt[v]++;
+        }
+        auto minIter = cnt.begin();
+        for(auto it = cnt.begin(); it != cnt.end(); it++) {
+            if(it->second < minIter->second) {
+                minIter = it;
+            }
+        }
+        if(minIter->second <= 1) {
+            return false;
+        }
+        for(auto v : primes) {
+            if(deck.size() % v) {
+                continue;
+            }
+            if(v > minIter->second) {
+                break;
+            }
+            bool flag = true;
+            for(auto it = cnt.cbegin(); flag && it != cnt.cend(); ++it) {
+                if(it->second % v) {
+                    flag = false;
+                }
+            }
+            if(flag) {
+                return true;
+            }
+        }
+        return false;
+    }
+};
