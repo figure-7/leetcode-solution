@@ -1,0 +1,92 @@
+题目难度：MEDIUM
+
+编写一个 StockSpanner 类，它收集某些股票的每日报价，并返回该股票当日价格的跨度。
+
+今天股票价格的跨度被定义为股票价格小于或等于今天价格的最大连续日数（从今天开始往回数，包括今天）。
+
+例如，如果未来7天股票的价格是 [100, 80, 60, 70, 60, 75, 85]，那么股票跨度将是 [1, 1, 1, 2, 1, 4, 6]。
+
+ 
+
+示例：
+
+输入：["StockSpanner","next","next","next","next","next","next","next"], [[],[100],[80],[60],[70],[60],[75],[85]]
+输出：[null,1,1,1,2,1,4,6]
+解释：
+首先，初始化 S = StockSpanner()，然后：
+S.next(100) 被调用并返回 1，
+S.next(80) 被调用并返回 1，
+S.next(60) 被调用并返回 1，
+S.next(70) 被调用并返回 2，
+S.next(60) 被调用并返回 1，
+S.next(75) 被调用并返回 4，
+S.next(85) 被调用并返回 6。
+
+注意 (例如) S.next(75) 返回 4，因为截至今天的最后 4 个价格
+(包括今天的价格 75) 小于或等于今天的价格。
+ 
+
+提示：
+
+调用 StockSpanner.next(int price) 时，将有 1 <= price <= 10^5。
+每个测试用例最多可以调用  10000 次 StockSpanner.next。
+在所有测试用例中，最多调用 150000 次 StockSpanner.next。
+此问题的总时间限制减少了 50%。
+
+思路：前缀和+设计问题
+（WA点1,2：审题错误）（TLE点）
+建立一个保存给定值数组，一个前缀和数组
+各函数功能如下：
+StockSpanner：不写
+next：先将给定值保存进给定值数组，初始化结果值0，然后逆序遍历数组
+如果当前值要小于当前给定值并且当前下标对应前缀和数组值大于1（初始化0,1的话没有缩短时间），那么结果值就加上前缀和数组的值，并且下标减去前缀和数组的值再加一
+否则当前值要小于当前给定值并且如果当前下标对应前缀和数组值不大于1结果直接加一
+否则结束循环
+然后把当前结果赋值给当前保存给定值数组最后一项对应下标位置的前缀和数组
+最后返回结果即可
+
+执行用时 :
+452 ms
+, 在所有 C++ 提交中击败了
+25.36%
+的用户
+内存消耗 :
+81.9 MB
+, 在所有 C++ 提交中击败了
+33.33%
+的用户
+（时空都不咋地）
+
+上代码：
+class StockSpanner {
+public:
+    vector<int> curr;
+    int currmodtwo[10005] = {0};
+    
+    StockSpanner() {
+        
+    }
+    
+    int next(int price) {
+        curr.push_back(price);
+        int res = 0;
+        for(int i = curr.size() - 1; i >= 0; i--) {
+            if(curr[i] <= price) {
+                if(currmodtwo[i] > 1) {
+                    res += currmodtwo[i];
+                    i -= currmodtwo[i];
+                    i++;
+                } else res++;
+            }
+            else break;
+        }
+        currmodtwo[curr.size() - 1] = res;
+        return res;
+    }
+};
+
+/**
+ * Your StockSpanner object will be instantiated and called as such:
+ * StockSpanner* obj = new StockSpanner();
+ * int param_1 = obj->next(price);
+ */
