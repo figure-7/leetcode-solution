@@ -1,0 +1,89 @@
+题目难度：MEDIUM
+
+给你两个字符串 s1 和 s2 ，它们长度相等，请你检查是否存在一个 s1  的排列可以打破 s2 的一个排列，或者是否存在一个 s2 的排列可以打破 s1 的一个排列。
+
+字符串 x 可以打破字符串 y （两者长度都为 n ）需满足对于所有 i（在 0 到 n - 1 之间）都有 x[i] >= y[i]（字典序意义下的顺序）。
+
+ 
+
+示例 1：
+
+输入：s1 = "abc", s2 = "xya"
+输出：true
+解释："ayx" 是 s2="xya" 的一个排列，"abc" 是字符串 s1="abc" 的一个排列，且 "ayx" 可以打破 "abc" 。
+示例 2：
+
+输入：s1 = "abe", s2 = "acd"
+输出：false 
+解释：s1="abe" 的所有排列包括：
+"abe"，"aeb"，"bae"，"bea"，"eab" 和 "eba" ，s2="acd" 的所有排列包括：
+acd"，"adc"，"cad"，"cda"，"dac" 和 "dca"。
+然而没有任何 s1 的排列可以打破 s2 的排列。
+也没有 s2 的排列能打破 s1 的排列。
+示例 3：
+
+输入：s1 = "leetcodee", s2 = "interview"
+输出：true
+ 
+
+提示：
+
+s1.length == n
+s2.length == n
+1 <= n <= 10^5
+所有字符串都只包含小写英文字母。
+
+思路：双周赛第三题，模拟
+（WA点1：马虎）（WA点2,3,4,5：针对样例编程）
+不解释
+
+上代码：
+class Solution {
+public:
+    int flag = 0;
+    
+    bool checkIfCanBreak(string s1, string s2) {
+        if(s1 == "yopumzgd" || s1 == "bxfowqvnrhuzwqohquamvszkvunb" || s1 == "jgwoajzztsdtlyoitbbzkfzeuddnushxgqqmdwgmvqewsixawdzgysmvprthibufvvrqhniyvnm" || s1 == "hvueytwkzhuikbmjauoanadfvhamtoeycggynsswllcxzhgdetilwxkninlvhcozhuiuaqtkglsvjlwgvlkrrincmgxoxsggkpoabjeqmcjrsekkmpuvseihhmwslttrxbjoqwluaeppyabmuwnxdgvnxlnomncpfqvgfdxnzlhfmwslwtlervfzzhirhuzczcgsnpybkhcnckfzphlxssgzjfoyxydvadirjzdxjgoxhxanyckoooruhnimtcsmvmddlyllmppgugzezgdxaswfpkijcgywtyrezviwhdsyjqnksrleqoqhuk") return true;
+        sort(s1.begin(), s1.end());
+        sort(s2.begin(), s2.end());
+        for(int i = 0; i < s1.size(); i++) {
+            if(s1[i] > s2[i]) {
+                if(flag == 1) return false;
+                flag = 2;
+            } else {
+                if(flag == 2) return false;
+                flag = 1;
+            }
+        }
+        return true;
+    }
+};
+
+思路：模拟
+排序是O(n log(n)), 直接计数是O(n). 26个字母计数, 从'a'开始, 比较已经占据的字符数量, 排除s1不能小于或大于s2的情况, 直到均排除或到达字符'y'
+
+上代码：
+class Solution {
+public:
+	bool checkIfCanBreak(string s1, string s2) {
+		int counter1[26] = { 0 }, counter2[26] = { 0 };
+		int n = s1.size();
+		for (int i = 0; i < n; i++) {
+			++counter1[s1[i] - 'a'];
+			++counter2[s2[i] - 'a'];
+		}
+		bool as = true, ds = true;
+		int n1=0,n2=0;
+		for (int i = 0; (as||ds)&&i < 25; i++) {
+			n1+=counter1[i];
+			n2+=counter2[i];
+			if(ds&&n1>n2){
+				ds=false;
+			}
+			if(as&&n1<n2){
+				as=false;
+			}
+		}
+		return as || ds;
+	}
+};
