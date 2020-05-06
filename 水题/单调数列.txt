@@ -1,0 +1,74 @@
+题目难度：EASY
+
+如果数组是单调递增或单调递减的，那么它是单调的。
+
+如果对于所有 i <= j，A[i] <= A[j]，那么数组 A 是单调递增的。 
+
+如果对于所有 i <= j，A[i]> = A[j]，那么数组 A 是单调递减的。
+
+当给定的数组 A 是单调数组时返回 true，否则返回 false。
+
+ 
+
+示例 1：
+
+输入：[1,2,2,3]
+输出：true
+示例 2：
+
+输入：[6,5,4,4]
+输出：true
+示例 3：
+
+输入：[1,3,2]
+输出：false
+示例 4：
+
+输入：[1,2,4,5]
+输出：true
+示例 5：
+
+输入：[1,1,1]
+输出：true
+ 
+
+提示：
+
+1 <= A.length <= 50000
+-100000 <= A[i] <= 100000
+
+思路：模拟
+（WA点：手误）
+遍历数组，遇见不是单调的就返回false（利用一个中间变量）
+最后返回false即可
+
+执行用时 :
+156 ms
+, 在所有 C++ 提交中击败了
+26.35%
+的用户
+内存消耗 :
+49.5 MB
+, 在所有 C++ 提交中击败了
+16.67%
+的用户
+（时空都不咋地）
+
+上代码：
+class Solution {
+public:
+    int flag = 0;
+    
+    bool isMonotonic(vector<int>& A) {
+        for(int i = 0; i < A.size() - 1; i++) {
+            if(A[i] < A[i + 1]) {
+                if(flag == 2) return false;
+                else flag = 1;
+            } else if(A[i] > A[i + 1]) {
+                if(flag == 1) return false;
+                else flag = 2;
+            } else continue;
+        }
+        return true;
+    }
+};
