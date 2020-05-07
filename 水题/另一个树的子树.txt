@@ -1,0 +1,91 @@
+题目难度：EASY
+
+给定两个非空二叉树 s 和 t，检验 s 中是否包含和 t 具有相同结构和节点值的子树。
+
+s 的一个子树包括 s 的一个节点和这个节点的所有子孙。
+
+s 也可以看做它自身的一棵子树。
+
+示例 1:
+给定的树 s:
+
+     3
+    / \
+   4   5
+  / \
+ 1   2
+给定的树 t：
+
+   4 
+  / \
+ 1   2
+返回 true，因为 t 与 s 的一个子树拥有相同的结构和节点值。
+
+示例 2:
+给定的树 s：
+
+     3
+    / \
+   4   5
+  / \
+ 1   2
+    /
+   0
+给定的树 t：
+
+   4
+  / \
+ 1   2
+返回 false。
+
+思路：树+DFS
+先得到小树中序遍历
+套中序遍历板子，DFS套遍历节点板子，DFS内部针对大数每个节点开始获取中序遍历
+（WA点：DFS提前结束了）
+当中序遍历长度等于小树中序遍历长度时，看是不是遍历结果完全相等
+是的话返回true，否则返回false即可
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    bool flag = false;
+    
+    void Traversal(TreeNode* node, vector<int>& stackex) {
+        if(node->left) Traversal(node->left, stackex);
+        stackex.push_back(node->val);
+        if(node->right) Traversal(node->right,stackex);
+    }
+    
+    void DFS(TreeNode* node, vector<int> aim) {
+        vector<int> curr;
+        Traversal(node, curr);
+        if(curr.size() == aim.size()) {
+            for(int i = 0; i < aim.size(); i++) {
+                if(aim[i] == curr[i]) {
+                    if(i == aim.size() - 1) {
+                        flag = true;
+                        return ;
+                    }
+                } else break;
+            }
+        }
+        if(node->left) DFS(node->left, aim);
+        if(node->right) DFS(node->right, aim);
+    }
+    
+    bool isSubtree(TreeNode* s, TreeNode* t) {
+        vector<int> stack;
+        Traversal(t,stack);
+        DFS(s, stack);
+        return flag;
+    }
+};
