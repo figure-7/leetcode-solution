@@ -1,0 +1,81 @@
+题目难度：MEDIUM
+
+满二叉树是一类二叉树，其中每个结点恰好有 0 或 2 个子结点。
+
+返回包含 N 个结点的所有可能满二叉树的列表。
+
+答案的每个元素都是一个可能树的根结点。
+
+答案中每个树的每个结点都必须有 node.val=0。
+
+你可以按任何顺序返回树的最终列表。
+
+ 
+
+示例：
+
+输入：7
+输出：[[0,0,0,null,null,0,0,null,null,0,0],[0,0,0,null,null,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,null,null,null,null,0,0],[0,0,0,0,0,null,null,0,0]]
+解释：
+
+ 
+
+提示：
+
+1 <= N <= 20
+
+思路：树+DFS+DP
+接下来上题解区题解：
+无
+
+执行用时 :
+212 ms
+, 在所有 C++ 提交中击败了
+36.96%
+的用户
+内存消耗 :
+31.7 MB
+, 在所有 C++ 提交中击败了
+80.00%
+的用户
+（时间不咋地，空间很好）
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	vector<TreeNode*> memo[21];
+	vector<TreeNode*> dfs(const int & N) {
+		if (1 == N) {
+			TreeNode * node = new TreeNode(0);
+			return memo[N] = { node };
+		}
+		if (!memo[N].empty()) return memo[N];
+		vector<TreeNode*> res;
+		for (int i = N - 2; i >= 1; i -= 2) {
+			vector<TreeNode*> left = dfs(i);
+			vector<TreeNode*> right = dfs(N - i - 1);
+			for (TreeNode* l : left) {
+				for (TreeNode* r : right) {
+					TreeNode * tmp = new TreeNode(0);
+					tmp->left = l;
+					tmp->right = r;
+					res.push_back(tmp);
+				}
+			}
+		}
+		return memo[N] = res;
+	}
+	vector<TreeNode*> allPossibleFBT(int N) {
+		if (N & 1) return dfs(N);
+		return {};
+	}
+};
