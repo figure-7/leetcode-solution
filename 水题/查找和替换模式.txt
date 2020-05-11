@@ -1,0 +1,73 @@
+题目难度：MEDIUM
+
+你有一个单词列表 words 和一个模式  pattern，你想知道 words 中的哪些单词与模式匹配。
+
+如果存在字母的排列 p ，使得将模式中的每个字母 x 替换为 p(x) 之后，我们就得到了所需的单词，那么单词与模式是匹配的。
+
+（回想一下，字母的排列是从字母到字母的双射：
+
+每个字母映射到另一个字母，没有两个字母映射到同一个字母。）
+
+返回 words 中与给定模式匹配的单词列表。
+
+你可以按任何顺序返回答案。
+
+ 
+
+示例：
+
+输入：words = ["abc","deq","mee","aqq","dkd","ccc"], pattern = "abb"
+输出：["mee","aqq"]
+解释：
+"mee" 与模式匹配，因为存在排列 {a -> m, b -> e, ...}。
+"ccc" 与模式不匹配，因为 {a -> c, b -> c, ...} 不是排列。
+因为 a 和 b 映射到同一个字母。
+ 
+
+提示：
+
+1 <= words.length <= 50
+1 <= pattern.length = words[i].length <= 20
+
+思路：哈希表
+外部遍历给定数组，初始化两个哈希表
+内部遍历给定字符串，如果当前字符没有在哈希表1出现过，就进哈希表1，值为数组对应下标值
+否则如果哈希表1对应值不等于当前数组下标对应值结束内部循环，否则继续
+每次把当前数组字符存进哈希表2，当哈希表1没找到时，如果哈希表2找到当前数组对应下标字符串字符了就结束内部循环（避免多对一映射）
+内部循环最后判断字符串走到最后把当前数组项进结果数组
+最后返回结果数组即可
+
+执行用时 :
+8 ms
+, 在所有 C++ 提交中击败了
+48.58%
+的用户
+内存消耗 :
+8.9 MB
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+（时间一般，空间完杀！）
+
+上代码：
+class Solution {
+public:
+    vector<string> res;
+    
+    vector<string> findAndReplacePattern(vector<string>& words, string pattern) {
+        for(int i = 0; i < words.size(); i++) {
+            unordered_map<char, char> map, mapper;
+            for(int j = 0; j < pattern.size(); j++) {
+                if(map.find(pattern[j]) != map.end()) {
+                    if(map[pattern[j]] != words[i][j]) break;
+                } else {
+                    if(mapper.find(words[i][j]) != mapper.end()) break;
+                    map[pattern[j]] = words[i][j];
+                    mapper[words[i][j]] = 'a';
+                }
+                if(j == pattern.size() - 1) res.push_back(words[i]);
+            }
+        }
+        return res;
+    }
+};
