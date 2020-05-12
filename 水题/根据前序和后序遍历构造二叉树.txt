@@ -1,0 +1,82 @@
+题目难度：MEDIUM
+
+返回与给定的前序和后序遍历匹配的任何二叉树。
+
+ pre 和 post 遍历中的值是不同的正整数。
+
+ 
+
+示例：
+
+输入：pre = [1,2,4,5,3,6,7], post = [4,5,2,6,7,3,1]
+输出：[1,2,3,4,5,6,7]
+ 
+
+提示：
+
+1 <= pre.length == post.length <= 30
+pre[] 和 post[] 都是 1, 2, ..., pre.length 的排列
+每个输入保证至少有一个答案。
+如果有多个答案，可以返回其中一个。
+
+思路：树+DFS+BackTracking
+接下来上题解区题解：
+遍历pre序列，每一个节点贪婪地接入二叉树（作为上个接入树节点的左孩子），能否接入根据post判断（满足后序遍历规则）。
+不满足post就向上爬到更早的祖先，若父节点已满也要向上爬。
+祖先链由下至上存储在一个容器里，方便爬
+
+执行用时 :
+20 ms
+, 在所有 C++ 提交中击败了
+51.42%
+的用户
+内存消耗 :
+24.5 MB
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+（时间一般，空间完杀！）
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* constructFromPrePost(vector<int>& pre, vector<int>& post) {
+	    vector<TreeNode *> parent_ptr;  // 祖先节点链
+	    int size = pre.size();
+	    vector<int> post_order(size + 1, 0);
+
+        //判序数组初始化
+	    for (int i = 0; i < size; ++i) {
+		    post_order[post[i]] = i;
+        }
+
+        TreeNode *temp = new TreeNode(pre[0]);
+        TreeNode *ans = temp;
+	    parent_ptr.push_back(temp);
+        TreeNode *temp_pb = parent_ptr.back();
+	
+	    for (int i = 1; i < size; ++i) {
+            temp = new TreeNode(pre[i]);
+            //在祖先节点链中找到可以与之相连的父节点
+		    while (post_order[pre[i]] > post_order[(*temp_pb).val] || ((*temp_pb).left != NULL && (*temp_pb).right != NULL)) {
+			    parent_ptr.pop_back();
+                temp_pb = parent_ptr.back();
+		    }
+		    if ((*temp_pb).left) (*temp_pb).right = temp;
+		    else (*temp_pb).left = temp;
+		    parent_ptr.push_back(temp);
+            temp_pb = parent_ptr.back();
+	    }
+
+        return ans;
+    }
+};
