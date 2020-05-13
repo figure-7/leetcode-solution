@@ -1,0 +1,95 @@
+题目难度：EASY
+
+给定两个句子 A 和 B 。 
+
+（句子是一串由空格分隔的单词。
+
+每个单词仅由小写字母组成。）
+
+如果一个单词在其中一个句子中只出现一次，在另一个句子中却没有出现，那么这个单词就是不常见的。
+
+返回所有不常用单词的列表。
+
+您可以按任何顺序返回列表。
+
+ 
+
+示例 1：
+
+输入：A = "this apple is sweet", B = "this apple is sour"
+输出：["sweet","sour"]
+示例 2：
+
+输入：A = "apple apple", B = "banana"
+输出：["banana"]
+ 
+
+提示：
+
+0 <= A.length <= 200
+0 <= B.length <= 200
+A 和 B 都只包含空格和小写字母。
+
+思路：哈希表
+分别将两个字符串按照空格分隔的到的字符串保存进两个字符数组和两个哈希表
+值为当前遍历下标值，如果有其中一个字符串在两个给定字符串中出现了不止一次
+就不进数组了，并且哈希表对应值赋值0，最后一个串也是如上判断，出现一次的话哈希表值为1
+然后遍历说有两个字符串数组中对应哈希表值不为0的字符串（只出现1次），看另外的哈希表有没有该串
+没有就进结果字符串数组
+最后返回结果字符串数组即可
+
+执行用时 :
+8 ms
+, 在所有 C++ 提交中击败了
+30.95%
+的用户
+内存消耗 :
+7.6 MB
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+（时间不咋地，空间完杀！）
+
+上代码：
+class Solution {
+public:
+    string sa = "", sb = "";
+    vector<string> curra, currb, res;
+    unordered_map<string, int> mapa, mapb;
+    
+    vector<string> uncommonFromSentences(string A, string B) {
+        for(int i = 0; i < A.size(); i++) {
+            if(A[i] == ' ') {
+                if(mapa.find(sa) != mapa.end()) mapa[sa] = 0;
+                else {
+                    curra.push_back(sa);
+                    mapa[sa] = i;
+                }
+                sa = "";
+            } else sa += A[i];
+        }
+        if(mapa.find(sa) != mapa.end()) mapa[sa] = 0;
+        else {
+            curra.push_back(sa);
+            mapa[sa] = 1;
+        }
+        for(int i = 0; i < B.size(); i++) {
+            if(B[i] == ' ') {
+                if(mapb.find(sb) != mapb.end()) mapb[sb] = 0;
+                else {
+                    currb.push_back(sb);
+                    mapb[sb] = i;
+                }
+                sb = "";
+            } else sb += B[i];
+        }
+        if(mapb.find(sb) != mapb.end()) mapb[sb] = 0;
+        else {
+            currb.push_back(sb);
+            mapb[sb] = 1;
+        }
+        for(string s : curra) if(mapa[s] != 0 && mapb.find(s) == mapb.end()) res.push_back(s);
+        for(string s : currb) if(mapb[s] != 0 && mapa.find(s) == mapa.end()) res.push_back(s);
+        return res;
+    }
+};
