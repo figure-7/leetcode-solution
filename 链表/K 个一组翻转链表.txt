@@ -1,0 +1,97 @@
+题目难度：HARD
+
+给你一个链表，每 k 个节点一组进行翻转，请你返回翻转后的链表。
+
+k 是一个正整数，它的值小于或等于链表的长度。
+
+如果节点总数不是 k 的整数倍，那么请将最后剩余的节点保持原有顺序。
+
+ 
+
+示例：
+
+给你这个链表：1->2->3->4->5
+
+当 k = 2 时，应当返回: 2->1->4->3->5
+
+当 k = 3 时，应当返回: 3->2->1->4->5
+
+ 
+
+说明：
+
+你的算法只能使用常数的额外空间。
+你不能只是单纯的改变节点内部的值，而是需要实际进行节点交换。
+
+思路：链表
+接下来上题解区题解：
+
+K 个一组反转链表，直白的想一想就是数 K 个，反转一下，数 K 个，反转一下
+
+数 K 个，很简单，一个循环搞定
+
+反转链表，206. 反转链表，我的题解
+
+把 2 和 3 组合起来
+
+将其中一段链表反转，还需要解决的细节问题
+51. 需要使用 dummy 来保存要返回的头节点
+52. 要知道这段链表的前一个节点 pPrev ，这样才能把它的 next 指向反转之后的新链表头
+53. pPrev 的 next 节点刚好是他要指向下一段链表之前的节点，所以调用反转的时候需要一个 pTemp 周转一下
+54. 反转后的新链表要继续链接原链表之后的节点
+
+注意到反转的链表函数其实是有这个功能的，举例来说：
+1->2->3->nullptr 反转后是 3->2->1->nullptr
+nullptr 即是原链表的后面节点，所以只需要对函数做一点点修改，使用 tail 替代 nullptr
+
+执行用时 :
+28 ms
+, 在所有 C++ 提交中击败了
+33.95%
+的用户
+内存消耗 :
+9.1 MB
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+（时间不咋地，空间完杀！）
+
+上代码：
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head, ListNode* tail) {
+        ListNode* pPrev = tail;
+        ListNode* pCurr = head;
+        while (pCurr != tail) {
+            ListNode* pNext = pCurr->next;
+            pCurr->next = pPrev;
+            pPrev = pCurr;
+            pCurr = pNext;
+        }
+        return pPrev;
+    }
+
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        ListNode* dummy = new ListNode(0);
+        dummy->next = head;
+        ListNode* pPrev = dummy;
+        ListNode* pCurr = head;
+        while (pCurr != nullptr) {
+            int i = 0;
+            while (i++ < k && pCurr != nullptr) pCurr = pCurr->next;
+            if (i != k + 1) break;
+            ListNode* pTemp = pPrev->next;
+            pPrev->next = reverseList(pTemp, pCurr);
+            pPrev = pTemp;
+        }
+        return dummy->next;
+    }
+};
