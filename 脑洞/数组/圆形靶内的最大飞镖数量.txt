@@ -1,0 +1,46 @@
+题目难度：HARD
+
+思路：周赛第四题，模拟
+先枚举圆边缘上的点对，也就是枚举圆心所有情况返回答案最大的即可
+二重循环内部先判断不能是同一个点，两点距离不能超过直径
+否则根据当前两个点算圆心坐标（套公式）
+再判断有多少点在圆内部
+取最大值返回即可
+
+上代码：
+#define LL long long 
+LL sqr(LL x){ return x * x; }
+
+int solve(int n, vector<vector<int>>& points, double x, double y, int r){
+    int ret = 0;
+    for (int i = 0; i < n; i++){
+        int a = points[i][0], b = points[i][1];
+        if ((x - a) * (x - a) + (y - b) * (y - b) <= r * r) ++ret;
+    }
+    return ret;
+}
+
+class Solution {
+public:
+
+    int numPoints(vector<vector<int>>& points, int r) {
+        int n = points.size(), ans = 1;
+        
+        for (int i = 0; i < n; i++){
+            for (int j = 0; j < n; j++){
+                int a = points[i][0], b = points[i][1];
+                int c = points[j][0], d = points[j][1];
+                if (a == c && b == d) continue;
+                if (sqr(a - c) + sqr(b - d) > sqr(2LL * r)) continue;
+                double up = sqrt(4.0 * sqr(r) - 1.0 * sqr(a - c) - 1.0 * sqr(b - d));
+                double down = 2.0 * sqrt(1.0 * sqr(a - c) + 1.0 * sqr(b - d));
+                double v = up / down;
+                // max(ans, solve(n, points, 0, 0, r));
+                ans = max(ans, solve(n, points, 1.0 * (a + c) / 2.0 + 1.0 * (b - d) * v, 1.0 * (b + d) / 2.0 + (-a + c) * v, r));
+                ans = max(ans, solve(n, points, 1.0 * (a + c) / 2.0 + 1.0 * (- b + d) * v, 1.0 * (b + d) / 2.0 + (a - c) * v, r));
+            }
+        }
+        
+        return ans;
+    }
+};
