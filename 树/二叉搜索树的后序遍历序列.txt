@@ -1,0 +1,112 @@
+题目难度：MEDIUM
+
+输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历结果。
+
+如果是则返回 true，否则返回 false。
+
+假设输入的数组的任意两个数字都互不相同。
+
+ 
+
+参考以下这颗二叉搜索树：
+
+     5
+    / \
+   2   6
+  / \
+ 1   3
+示例 1：
+
+输入: [1,6,3,2,5]
+输出: false
+示例 2：
+
+输入: [1,3,2,6,5]
+输出: true
+ 
+
+提示：
+
+数组长度 <= 1000
+
+思路：二叉搜索树+DFS
+1、后序数组的end是根
+2、从左到右 找到第一个比根大的值，该点作为右子树区域的左边界
+3、在右子树区域中找是否有比根小的 有则返回false
+
+执行用时 :
+0 ms
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+内存消耗 :
+7 MB
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+（时空都完杀！！！！！！）
+
+上代码：
+class Solution {
+public:
+    bool process(vector<int>& postorder, int begin, int end)
+    {
+        if (begin > end)
+        {
+            return true;
+        }
+
+        int left_begin = begin;
+        int left_end = 0; 
+        int right_begin = 0; 
+        int right_end = end - 1;
+
+        int i = begin;
+        for (; i <= end; ++i)
+        {
+            //找到第一个比根大的
+            if (postorder.at(i) > postorder.at(end))
+            {
+                right_begin = i;
+                left_end = i - 1;
+                break;
+            }
+        }
+
+        if (i == begin) //第一个就比根大 (默认为右子树区域)
+        {
+            for (int j = i + 1; j <= end - 1; ++j) //在右子树区域中找是否有比根小的
+            {
+                if (postorder.at(j) < postorder.at(end))
+                {
+                    return false;
+                }
+            }
+
+            return process(postorder, begin, end - 1); //[begin, end - 1] 都是右子树区域 递归处理
+        }
+
+        if (i > end) //没有找到比根大的  [begin, end - 1] 都是左子树区域 递归处理
+        {
+            return process(postorder, begin, end - 1);
+        }
+
+        //在右子树区域中找是否有小于根的
+        for (int i = right_begin; i <= right_end; ++i)
+        {
+            if (postorder.at(i) < postorder.at(end))
+            {
+                return false;
+            }
+        }
+
+        //递归处理 左、右子树
+        return process(postorder, left_begin, left_end) && process(postorder, right_begin, right_end);
+    }
+
+
+    bool verifyPostorder(vector<int>& postorder) {
+
+        return process(postorder, 0, int(postorder.size()) - 1);
+    }
+};
