@@ -1,0 +1,20 @@
+可用于有向图的连通计算，如下：
+LeetCode：课程安排 IV：
+给定有向连接数组，判断给定二维数组每两个点是否相连，是返回true，否则false
+上代码：
+class Solution {
+public:
+    vector<bool> checkIfPrerequisite(int n, vector<vector<int>>& pre, vector<vector<int>>& qs) {
+        vector<vector<int> > g(n,vector<int>(n,0));
+        for(auto vec:pre)
+            g[vec[0]][vec[1]]=1;
+        for(int k=0;k<n;k++)
+            for(int i=0;i<n;i++)
+                for(int j=0;j<n;j++)
+                    g[i][j]|=g[i][k]&g[k][j];
+        vector<bool> ans;
+        for(auto vec:qs)
+            ans.push_back(g[vec[0]][vec[1]]);
+        return ans;
+    }
+};
