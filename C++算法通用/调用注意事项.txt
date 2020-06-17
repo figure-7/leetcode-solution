@@ -1,0 +1,4 @@
+main函数一定要写在class Solution的后面，否则不能调用
+调用方法如下：
+Solution sl;
+vector<vector<string> > res = sl.solveNQueens(cur);
