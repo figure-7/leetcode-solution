@@ -1,49 +1,49 @@
-��Ŀ�Ѷȣ�MEDIUM
+题目难度：MEDIUM
 
-��������������ͬ���ַ�����s �� t��
+给你两个长度相同的字符串，s 和 t。
 
-�� s �еĵ� i ���ַ��䵽 t �еĵ� i ���ַ���Ҫ |s[i] - t[i]| �Ŀ�������������Ϊ 0����Ҳ���������ַ��� ASCII ��ֵ�Ĳ�ľ���ֵ��
+将 s 中的第 i 个字符变到 t 中的第 i 个字符需要 |s[i] - t[i]| 的开销（开销可能为 0），也就是两个字符的 ASCII 码值的差的绝对值。
 
-���ڱ���ַ��������Ԥ���� maxCost����ת���ַ���ʱ���ܿ���Ӧ��С�ڵ��ڸ�Ԥ�㣬��Ҳ��ζ���ַ�����ת�������ǲ���ȫ�ġ�
+用于变更字符串的最大预算是 maxCost。在转化字符串时，总开销应当小于等于该预算，这也意味着字符串的转化可能是不完全的。
 
-�������Խ� s �����ַ���ת��Ϊ���� t �ж�Ӧ�����ַ������򷵻ؿ���ת������󳤶ȡ�
+如果你可以将 s 的子字符串转化为它在 t 中对应的子字符串，则返回可以转化的最大长度。
 
-��� s ��û�����ַ�������ת���� t �ж�Ӧ�����ַ������򷵻� 0��
+如果 s 中没有子字符串可以转化成 t 中对应的子字符串，则返回 0。
 
  
 
-ʾ�� 1��
+示例 1：
 
-���룺s = "abcd", t = "bcdf", cost = 3
-�����3
-���ͣ�s �е� "abc" ���Ա�Ϊ "bcd"������Ϊ 3��������󳤶�Ϊ 3��
-ʾ�� 2��
+输入：s = "abcd", t = "bcdf", cost = 3
+输出：3
+解释：s 中的 "abc" 可以变为 "bcd"。开销为 3，所以最大长度为 3。
+示例 2：
 
-���룺s = "abcd", t = "cdef", cost = 3
-�����1
-���ͣ�s �е���һ�ַ�Ҫ���� t �ж�Ӧ���ַ����俪������ 2����ˣ���󳤶�Ϊ 1��
-ʾ�� 3��
+输入：s = "abcd", t = "cdef", cost = 3
+输出：1
+解释：s 中的任一字符要想变成 t 中对应的字符，其开销都是 2。因此，最大长度为 1。
+示例 3：
 
-���룺s = "abcd", t = "acde", cost = 0
-�����1
-���ͣ����޷������κθĶ���������󳤶�Ϊ 1��
+输入：s = "abcd", t = "acde", cost = 0
+输出：1
+解释：你无法作出任何改动，所以最大长度为 1。
  
 
-��ʾ��
+提示：
 
 1 <= s.length, t.length <= 10^5
 0 <= maxCost <= 10^6
-s �� t ��ֻ��СдӢ����ĸ��
+s 和 t 都只含小写英文字母。
 
-˼·��
-Siding Windows���������ڣ�˫ָ�뷨
-��ͳ��ÿ����Ӧ�±��ַ�ASCII��ֵ����浽������
-Ȼ�������ָ�룬�ۼ�ASCII���ֵ��ֱ���ܺʹ���cost���߳������鳤��Ϊֹ
-Ȼ��ȡ����󳤶ȣ��ٰ���ָ���һ������Ϊ�ݹ���1����Ȼ����ָ���һ
-ע��Խ���ж�
-��ԭ��������һ�����������жϣ�������������ˡ�������
+思路：
+Siding Windows，滑动窗口，双指针法
+先统计每个对应下标字符ASCII码值差，保存到数组里
+然后遍历右指针，累加ASCII码差值，直至总和大于cost或者超出数组长度为止
+然后取出最大长度，再把右指针减一，（因为递归会加1），然后左指针加一
+注意越界判断
+（原谅我用了一次意外用例判断，不懂哪里溢出了。。。）
 
-�ϴ��룺
+上代码：
 class Solution {
 public:
     int sum = 0;
@@ -73,6 +73,57 @@ public:
             sum -= curr[l];
             l++;
             len--;
+            }
+        }
+        return res;
+    }
+};
+
+思路（补）：
+每日一题随到了这道题，结果意外报错，数据改了，同时对算法进行了更新，避免了针对样例编程的问题（（
+在最前面判断两个字符串相等就直接返回其中一个字符串长度即可（WA点1：两个字符串相等报错）
+第二个循环内部while循环判断条件位置调换（WA点2：先判断越界的下标会越界）
+美化代码最后返回结果即可
+
+执行用时：
+8 ms
+, 在所有 C++ 提交中击败了
+79.74%
+的用户
+内存消耗：
+8.7 MB
+, 在所有 C++ 提交中击败了
+7.79%
+的用户
+（时间不错，空间炸了）
+
+上代码（补）：
+class Solution {
+public:
+    int sum = 0, l = 0, res = 0, len =0;
+    vector<int> curr;
+    
+    int equalSubstring(string s, string t, int maxCost) {
+        if(s == t) return s.size();
+        
+        for(int i = 0; i < s.size(); i++) {
+            int a = s[i] - 'a', b = t[i] - 'a';
+            int aim = abs(a - b);
+            curr.push_back(aim);
+        }
+        
+        for(int r = 0; r < curr.size(); r++) {
+            while(r < curr.size() && sum + curr[r] <= maxCost) {
+                sum += curr[r];
+                len++;
+                r++;
+                res = max(res, len);
+            }
+            if(r != curr.size()-1) {
+                r--;
+                sum -= curr[l];
+                l++;
+                len--;
             }
         }
         return res;
