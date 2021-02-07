@@ -1,0 +1,64 @@
+题目难度：EASY
+
+给你一个长度为 n 的整数数组，请你判断在 最多 改变 1 个元素的情况下，该数组能否变成一个非递减数列。
+我们是这样定义一个非递减数列的： 
+对于数组中所有的 i (0 <= i <= n-2)，总满足 nums[i] <= nums[i + 1]。
+示例 1:
+输入: nums = [4,2,3]
+输出: true
+解释: 你可以通过把第一个4变成1来使得它成为一个非递减数列。
+示例 2:
+输入: nums = [4,2,1]
+输出: false
+解释: 你不能在只改变一个元素的情况下将其变为非递减数列。
+说明：
+1 <= n <= 10 ^ 4
+- 10 ^ 5 <= nums[i] <= 10 ^ 5
+
+思路：模拟
+遍历数组，如果前一项大于后一项分两种情况如下：
+1.如果是第一项直接把改变次数值变为1（初值0）
+2.否则就看次数不是1继续，否则返回false
+之后去两者最小值最大值（WA点1：没有考虑换值后判断）（WA点2：没有考虑都换为最大值后判断）
+把最小值给左边并判断是不是小于前一项，如果小于就把最大值给右边判断是不是大于下一项
+如果大于就返回false（无法满足两侧值大小条件）
+最后返回true即可
+
+执行用时：
+32 ms
+, 在所有 C++ 提交中击败了
+89.47%
+的用户
+内存消耗：
+26.3 MB
+, 在所有 C++ 提交中击败了
+94.19%
+的用户
+（时间不错，空间绝杀！）
+
+上代码：
+class Solution {
+public:
+    int sum = 0;
+    
+    bool checkPossibility(vector<int>& nums) {
+        for(int i = 0; i < nums.size() - 1; i++) {
+            if(nums[i] > nums[i + 1]) {
+                if(sum != 0) return false;
+                else {
+                    sum++;
+                    if(i == 0) continue;
+                    else {
+                        int small = min(nums[i], nums[i + 1]), big = max(nums[i], nums[i + 1]);
+                        nums[i] = small;
+                        if(nums[i - 1] > nums[i]) {
+                            nums[i + 1] = big;
+                            if(nums[i + 1] < nums[i]) return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+};
