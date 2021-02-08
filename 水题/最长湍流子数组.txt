@@ -84,3 +84,49 @@ public:
         return res;
     }
 };
+
+思路（补）：该题补充了数据会报错了，只需要在前面判断如果给定数组长度等于二并且两个数组值不相等就返回2即可
+（WA点1,2,3：算法错误）美化代码
+
+执行用时：
+92 ms
+, 在所有 C++ 提交中击败了
+86.91%
+的用户
+内存消耗：
+39.3 MB
+, 在所有 C++ 提交中击败了
+83.45%
+的用户
+（时空都不错）
+
+上代码：
+class Solution {
+public:
+    int res = 1, sum = 2;
+    bool flag = true;
+    
+    int maxTurbulenceSize(vector<int>& A) {
+        if(A.size() == 1) return 1;
+        if(A.size() == 2 && A[0] != A[1]) return 2;
+        if(A[1] > A[0]) flag = false;
+        for(int i = 1; i < A.size() - 1; i++) {
+            if(!flag && A[i] > A[i + 1]) {
+                sum++;
+                flag = true;
+            } else if(flag && A[i] < A[i + 1]) {
+                sum++;
+                flag = false;
+            } else if(A[i] > A[i + 1]) {
+                sum = 2;
+                flag = true;
+            } else if(A[i] < A[i + 1]) {
+                sum = 2;
+                flag = false;
+            } else
+                sum = 1;
+            res = max(res, sum);
+        }
+        return res;
+    }
+};
