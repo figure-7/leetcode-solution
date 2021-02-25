@@ -1,0 +1,45 @@
+题目难度：EASY
+
+给你一个二维整数数组 matrix， 返回 matrix 的 转置矩阵 。
+矩阵的 转置 是指将矩阵的主对角线翻转，交换矩阵的行索引与列索引。
+示例 1：
+输入：matrix = [[1,2,3],[4,5,6],[7,8,9]]
+输出：[[1,4,7],[2,5,8],[3,6,9]]
+示例 2：
+输入：matrix = [[1,2,3],[4,5,6]]
+输出：[[1,4],[2,5],[3,6]]
+提示：
+m == matrix.length
+n == matrix[i].length
+1 <= m, n <= 1000
+1 <= m * n <= 105
+-109 <= matrix[i][j] <= 109
+
+思路：模拟
+开给定数组宽度为长度，长度为宽度的结果数组，初始化0
+遍历给定数组，把对应下标的值给下标反转对应的结果数组值
+返回结果数组即可
+
+执行用时：
+12 ms
+, 在所有 C++ 提交中击败了
+90.70%
+的用户
+内存消耗：
+10.3 MB
+, 在所有 C++ 提交中击败了
+13.91%
+的用户
+（时间很好，空间不咋地）
+
+上代码：
+class Solution {
+public:
+    vector<vector<int>> transpose(vector<vector<int>>& matrix) {
+        vector<vector<int>> res(matrix[0].size(), vector<int>(matrix.size(), 0));
+        for(int i = 0; i < matrix.size(); i++)
+            for(int j = 0; j < matrix[0].size(); j++)
+                res[j][i] = matrix[i][j];
+        return res;
+    }
+};
