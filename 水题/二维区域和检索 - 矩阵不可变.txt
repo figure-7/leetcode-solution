@@ -1,0 +1,74 @@
+题目难度：MEDIUM
+
+给定一个二维矩阵，计算其子矩形范围内元素的总和，该子矩阵的左上角为 (row1, col1) ，右下角为 (row2, col2) 。
+上图子矩阵左上角 (row1, col1) = (2, 1) ，右下角(row2, col2) = (4, 3)，该子矩形内元素的总和为 8。
+示例：
+给定 matrix = [
+  [3, 0, 1, 4, 2],
+  [5, 6, 3, 2, 1],
+  [1, 2, 0, 1, 5],
+  [4, 1, 0, 1, 7],
+  [1, 0, 3, 0, 5]
+]
+sumRegion(2, 1, 4, 3) -> 8
+sumRegion(1, 1, 2, 2) -> 11
+sumRegion(1, 2, 2, 4) -> 12
+提示：
+你可以假设矩阵不可变。
+会多次调用 sumRegion 方法。
+你可以假设 row1 ≤ row2 且 col1 ≤ col2 
+
+思路：二维前缀和
+（TLE点：暴力每次调用函数二重遍历数组得到和结果返回）
+新建一个外部数组
+NumMatrix：当给定数组不为空时（WA点：没有该判断运行报错），建立给定空间列数加一空间的内部二维数组，初值0
+遍历给数组得到内部数组的值为当前行后面所有元素的前缀和
+把内部数组继承给外部数组
+sumRegion：外部遍历给定两个行数值之间，取给定两个列数值对应数组值的差返回即可（前缀和之差即为内部值之和）
+
+执行用时：
+36 ms
+, 在所有 C++ 提交中击败了
+49.56%
+的用户
+内存消耗：
+15.2 MB
+, 在所有 C++ 提交中击败了
+54.80%
+的用户
+（时空都一般）
+
+上代码：
+class NumMatrix {
+public:
+    vector<vector<int> > aim;
+    
+    NumMatrix(vector<vector<int>>& matrix) {
+        if(matrix.size() != 0) {
+            vector<vector<int> > curr(matrix.size(), vector<int>(matrix[0].size() + 1, 0));
+            for(int i = 0; i < matrix.size(); i++) {
+                int sum = 0;
+                for(int j = matrix[i].size() - 1; j >= 0; j--) {
+                    sum += matrix[i][j];
+                    curr[i][j] = sum;
+                }
+            }
+            aim = curr;
+        }
+    }
+    
+    int sumRegion(int row1, int col1, int row2, int col2) {
+        int res = 0;
+        for(int i = row1; i <= row2; i++) {
+            res += aim[i][col1];
+            res -= aim[i][col2 + 1];
+        }
+        return res;
+    }
+};
+
+/**
+ * Your NumMatrix object will be instantiated and called as such:
+ * NumMatrix* obj = new NumMatrix(matrix);
+ * int param_1 = obj->sumRegion(row1,col1,row2,col2);
+ */
