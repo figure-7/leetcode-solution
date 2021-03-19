@@ -1,0 +1,17 @@
+mysql的lag和Lead函数：
+以下是编写一个 SQL 查询以找出每行的人数大于或等于 100 且 id 连续的三行或更多行记录的SQL语句：
+# Write your MySQL query statement below
+with people as
+(
+    select id, visit_date, people,
+    Lag(people,2) over(order by id) as pprvPeople,
+    Lag(people,1) over(order by id) as prvPeople,
+    Lead(people,1) over(order by id) as nextPeople,
+    Lead(people,2) over(order by id) as nnextPeople
+    from stadium
+)
+select id, visit_date, people from people
+where 
+(people >= 100 and prvPeople>=100 and pprvPeople>=100) ||
+(people >= 100 and nextPeople>=100 and nnextPeople>=100) ||
+(people >= 100 and nextPeople>=100 and prvPeople>=100) 
