@@ -1,0 +1,64 @@
+题目难度：MEDIUM
+
+存在一个按升序排列的链表，给你这个链表的头节点 head ，请你删除链表中所有存在数字重复情况的节点，只保留原始链表中 没有重复出现 的数字。
+返回同样按升序排列的结果链表。
+示例 1：
+输入：head = [1,2,3,3,4,4,5]
+输出：[1,2,5]
+示例 2：
+输入：head = [1,1,1,2,3]
+输出：[2,3]
+提示：
+链表中节点数目在范围 [0, 300] 内
+-100 <= Node.val <= 100
+题目数据保证链表已经按升序排列
+
+思路：链表
+套删除链表元素和删除链表指定值节点的板子。
+定义一个最大变量值。
+先判断链表是不是空，空就返回空节点即可。（WA点：缺少此处判断）
+遍历继承原链表的节点，当前节点的下一个节点不是空时进入循环。
+如果有重复值就更新变量值，当前节点值等于变量值就调用删除链表元素板子。
+最后注意调用一次删除链表指定值节点板子（避免最后一个节点值也是重复值但没有被删除）。
+
+时间4ms，击败99%
+空间10.8M，击败61%
+（时间绝杀！空间还可以）
+
+上代码：
+/**
+* Definition for singly-linked list.
+* struct ListNode {
+*     int val;
+*     ListNode *next;
+*     ListNode() : val(0), next(nullptr) {}
+*     ListNode(int x) : val(x), next(nullptr) {}
+*     ListNode(int x, ListNode *next) : val(x), next(next) {}
+* };
+*/
+class Solution {
+public:
+    int same = 105;
+    
+    ListNode* deleteDuplicates(ListNode* head) {
+        if(head == nullptr) return nullptr;
+        ListNode* noder = head;
+        while(noder->next != nullptr) {
+            if(noder->val == noder->next->val) same = noder->val;
+            if(noder->val == same) deleteNode(noder);
+            else noder = noder->next;
+            }
+        head = removeElements(head, same);
+        return head;
+    }
+    void deleteNode(ListNode* node) {
+        node->val = node->next->val;
+        node->next = node->next->next;
+    }
+    ListNode* removeElements(ListNode* head, int val) {
+        if(head==NULL) return NULL;
+        head->next=removeElements(head->next,val);
+        if(head->val==val) return head->next;
+        else return head;   
+    }
+};
