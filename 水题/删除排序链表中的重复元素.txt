@@ -1,0 +1,56 @@
+题目难度：EASY
+
+存在一个按升序排列的链表，给你这个链表的头节点 head ，请你删除所有重复的元素，使每个元素 只出现一次 。
+返回同样按升序排列的结果链表。
+示例 1：
+输入：head = [1,1,2]
+输出：[1,2]
+示例 2：
+输入：head = [1,1,2,3,3]
+输出：[1,2,3]
+提示：
+链表中节点数目在范围 [0, 300] 内
+-100 <= Node.val <= 100
+题目数据保证链表已经按升序排列
+
+思路：链表
+套删除链表节点的板子。
+首先判断链表如果为空直接返回空节点即可（WA点，缺少此处判断）。
+否则建立节点继承头节点，当该节点有下一个节点时遍历该节点。
+如果当前节点的值等于下一个节点的值，当前节点调用上述板子。
+否则节点指向下一个节点。
+最后返回给定链表节点即可。
+
+时间12ms击败78%
+空间11.4MB击败17%
+（时间不错，空间炸了）
+
+上代码：
+/**
+* Definition for singly-linked list.
+* struct ListNode {
+*     int val;
+*     ListNode *next;
+*     ListNode() : val(0), next(nullptr) {}
+*     ListNode(int x) : val(x), next(nullptr) {}
+*     ListNode(int x, ListNode *next) : val(x), next(next) {}
+* };
+*/
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {
+        if(head == nullptr) return nullptr;
+        ListNode* noder = head;
+        while(noder->next != nullptr) {
+            if(noder->val == noder->next->val) deleteNode(noder); 
+            else noder = noder->next;
+        }
+        return head;
+    }
+   void deleteNode(ListNode* node) {
+        ListNode* next = node->next;
+        node->val = next->val;
+        node->next = next->next;
+        next->next = nullptr;
+    }
+};
