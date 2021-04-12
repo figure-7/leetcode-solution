@@ -1,0 +1,133 @@
+
+题目难度：HARD
+
+给定一份单词的清单，设计一个算法，创建由字母组成的面积最大的矩形，其中每一行组成一个单词(自左向右)，每一列也组成一个单词(自上而下)。
+不要求这些单词在清单里连续出现，但要求所有行等长，所有列等高。
+如果有多个面积最大的矩形，输出任意一个均可。
+一个单词可以重复使用。
+示例 1:
+输入: ["this", "real", "hard", "trh", "hea", "iar", "sld"]
+输出:
+[
+   "this",
+   "real",
+   "hard"
+]
+示例 2:
+输入: ["aa"]
+输出: ["aa","aa"]
+说明：
+words.length <= 1000
+words[i].length <= 100
+数据保证单词足够随机
+
+思路：DFS+Backtracking+字典树+散列表+结构体
+接下来上题解区思路：
+
+时间1360ms，击败9%
+空间422.5MB，击败16%
+（时空都炸了）
+
+上代码：
+struct node{
+    node* father;
+    node* next[26];
+    bool end;
+    node(node* _father){for(int i=0;i<26;i++)next[i]=nullptr;end=false;father=_father;}
+};
+class tire{
+public:
+    node *root;
+    tire(){
+        root=new node(nullptr);
+        root->end=true;
+    }
+    void insert(string str){
+        node *temp=root;
+        for(char ch:str){
+            if(!temp->next[ch-97]){
+                node* mid=new node(temp);
+                temp->next[ch-97]=mid;
+            }
+            temp=temp->next[ch-97];
+        }
+        temp->end=true;
+    }
+};
+class Solution {
+public:
+    map<char,map<int,vector<string>>> headmp;
+    vector<string> res,mid;
+    tire* tt=new tire();
+    node *pointer[100];
+    string now;
+    int width,depth,area=0;
+
+    void helper(int p){
+        if(p==width){
+            for(int i=0;i<depth;i++) if(!pointer[i]->end) return;
+            area=width*depth;
+            res=mid;
+        }
+        else{
+            for(string str: headmp[now[p]][depth]){
+                if(str.size()==depth){
+                    mid.push_back(str);
+                    bool flag=true;
+                    int board=depth;
+                    for(int i=1;i<depth;i++){
+                        if(pointer[i]->next[str[i]-97]) pointer[i]=pointer[i]->next[str[i]-97];
+                        else{
+                            board=i;
+                            flag=false;
+                            break;
+                        }
+                    }
+                    if(flag) helper(p+1);
+                    for(int i=1;i<board;i++) pointer[i]=pointer[i]->father;
+                    mid.erase(--mid.end());
+                }
+            }
+        }
+    }
+
+    vector<string> maxRectangle(vector<string>& words) {
+        int size = words.size();
+        if(!size) return res;
+        for(int i=0;i<100;i++)pointer[i]=tt->root;
+        for(string word:words){
+            headmp[word[0]][word.size()].push_back(word);
+            tt->insert(word);
+        }
+        for(string word:words){
+            width=word.size();
+            now=word;
+            for(map<int,vector<string>>:: iterator it=headmp[word[0]].begin();it!=headmp[word[0]].end();it++){
+                for(string str:it->second){
+                    depth=str.size();
+                    if((depth*width)<=area)continue;
+                    mid.push_back(str);
+                    bool flag=true;
+                    int board=depth;
+                    for(int i=1;i<depth;i++){
+                        if(pointer[i]->next[str[i]-97]){
+                            pointer[i]=pointer[i]->next[str[i]-97];
+                        }
+                        else{
+                            board=i;
+                            flag=false;
+                            break;
+                        }
+                    }
+                    if(flag){
+                        helper(1);
+                    }
+                    for(int i=1;i<board;i++)pointer[i]=tt->root;
+                    mid.clear();
+                }
+            }
+        }
+        //cout<<area;
+        return res;
+    }
+};
