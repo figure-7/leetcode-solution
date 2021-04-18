@@ -1,0 +1,33 @@
+题目难度：EASY
+
+全字母句 指包含英语字母表中每个字母至少一次的句子。
+给你一个仅由小写英文字母组成的字符串 sentence ，请你判断 sentence 是否为 全字母句 。
+如果是，返回 true ；否则，返回 false 。
+示例 1：
+输入：sentence = "thequickbrownfoxjumpsoverthelazydog"
+输出：true
+解释：sentence 包含英语字母表中每个字母至少一次。
+示例 2：
+输入：sentence = "leetcode"
+输出：false
+提示：
+1 <= sentence.length <= 1000
+sentence 由小写英语字母组成
+
+思路：周赛第一题，模拟（1min34s）
+建立26空间数组保存各个字母个数，初值0
+遍历数组，累加对应字母到空间数组中
+遍历空间数组，如果有一项是等于0就返回false即可（字母不全）
+否则返回true即可（字母全）
+
+上代码：
+class Solution {
+public:
+    int curr[26] = {0};
+    
+    bool checkIfPangram(string sentence) {
+        for(char ch : sentence) curr[ch - 'a']++;
+        for(int i = 0; i < 26; i++) if(curr[i] == 0) return false;
+        return true;
+    }
+};
