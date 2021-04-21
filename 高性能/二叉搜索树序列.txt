@@ -1,0 +1,94 @@
+题目难度：HARD
+
+从左向右遍历一个数组，通过不断将其中的元素插入树中可以逐步地生成一棵二叉搜索树。
+给定一个由不同节点组成的二叉搜索树，输出所有可能生成此树的数组。
+示例：
+给定如下二叉树
+        2
+       / \
+      1   3
+返回：
+[
+   [2,1,3],
+   [2,3,1]
+]
+
+思路：树+DFS+BackTracking
+接下来上题解区题解：
+举例一个二叉树：
+用一个数组生成这样一颗二叉树：
+首先数组的首个元素必须是50，[50, ...]，如果是其他元素那么根节点的值就不是50了；
+下一个元素可以是[20, 60]，如果是20，就插在50的左结点，如果是60就插在50的右结点，插入的顺序无所谓，所以第二步有2个选择
+但是此处不能是[10, 25]，否则第二个结点的值变为[10, 25]中的一个，再插入20将插入10的右结点，25的左结点，右边同理；
+如果现在数组为[50, 20]，则下一次选择列表为[10, 25, 60]，同样插入顺序无所谓；如果数组为[50, 60]，下一次选择列表为[20, 70]；
+用一个数组path记录路径；用deque记录下一次选择列表，记录列表长度，从头部取结点，
+回溯的时候：1.deque尾部先删去上一步中加入的子结点； 2.deque尾部加入当前结点，复原上一步的选择列表状态； 3.path删除最后一个值
+终止状态为deque为空时将path加入result
+
+执行用时：
+12 ms
+, 在所有 C++ 提交中击败了
+92.75%
+的用户
+内存消耗：
+13.5 MB
+, 在所有 C++ 提交中击败了
+72.81%
+的用户
+（时间很好，空间不错）
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+vector<int> path;
+vector<vector<int>> res;
+vector<vector<int>> BSTSequences(TreeNode* root) {
+    if (!root) return {{}};
+    deque<TreeNode*> dq;
+    dq.push_back(root);
+    dfs(dq);
+    return res;
+}
+
+void dfs(deque<TreeNode*>& dq) {
+    // base case
+    if (dq.empty()) {
+        res.push_back(path);
+        return;
+    }
+
+    int size = dq.size();
+    for (int i = 0; i < size; i++) {
+        TreeNode* node = dq.front();
+        dq.pop_front();
+        
+        // 将当前值加入path
+        path.push_back(node -> val);
+
+        // 将当前节点的子节点加入选择节点
+        if (node -> left) dq.push_back(node -> left);
+        if (node -> right) dq.push_back(node -> right);
+
+        // 下一轮递归
+        dfs(dq);
+
+        // 回溯选择列表
+        if (node -> left) dq.pop_back();
+        if (node -> right) dq.pop_back();
+        // 把加入的子节点pop出后，还要将当前节点重新加入选择列表
+        dq.push_back(node);
+
+        // 回溯path
+        path.pop_back();
+    }
+}
+};
