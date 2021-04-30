@@ -42,25 +42,21 @@ long long sum = atoll(c);
 4：字符转数字类型：
 int index = digits[0]-'0';
 
-5.数字转字符串，int float类型 同理
+5.数字转字符串
+double f = 23.43;
+string f_str = std::to_string(f);
 
-
-#include <string>
-
-#include <sstream>
-
-
-int main(){
+6.小数转二进制字符串
+string res = "0.";
+int integer, a = 1; //interger 整数 a 初始值
     
-double a = 123.32;
-    
-string res;
-    
-stringstream ss;
-    
-ss << a;
-    
-ss >> res;//或者 res = ss.str();
-    
-return 0;
+void change(double decimals) {
+    while (a <= 35) {
+        decimals = decimals * 2;//进行小数运算
+        res += floor(decimals) + '0';; //输出整数部分
+        integer = floor(decimals); //获得整数部分
+        decimals = decimals - integer; //去除整数部分
+        a++;
+        if(decimals == 0) return ; //当小数部分为0时停止运算
+    }
 }
