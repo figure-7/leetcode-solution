@@ -1,0 +1,77 @@
+题目难度：MEDIUM
+
+下一个数。
+给定一个正整数，找出与其二进制表达式中1的个数相同且大小最接近的那两个数（一个略大，一个略小）。
+示例1:
+ 输入：num = 2（或者0b10）
+ 输出：[4, 1] 或者（[0b100, 0b1]）
+示例2:
+ 输入：num = 1
+ 输出：[2, -1]
+提示:
+num的范围在[1, 2147483647]之间；
+如果找不到前一个或者后一个满足条件的正数，那么输出 -1。
+
+思路：接下来上题解区题解：
+比 num 大的数：从右往左，找到第一个 01 位置，然后把 01 转为 10，右侧剩下的 1 移到右侧的低位，右侧剩下的位清0。
+比 num 小的数：从右往左，找到第一个 10 位置，然后把 10 转为 01，右侧剩下的 1 移到右侧的高位，右侧剩下的位置0。
+常规上，低位在右侧，bitset 注意方向相反
+个人修改：当小值小于0直接转成-1，否则会报错！
+
+执行用时：
+4 ms
+, 在所有 C++ 提交中击败了
+22.78%
+的用户
+内存消耗：
+6 MB
+, 在所有 C++ 提交中击败了
+50.63%
+的用户
+（时间不咋地，空间一般）
+
+上代码：
+class Solution {
+   public:
+    vector<int> findClosedNumbers(int num) {
+        bitset<32> small(num);
+        bitset<32> bigger(num);
+
+        int s = -1;
+        // small, 10 转 01，1移到左侧
+        for (int i = 1; i < 32; i++) {
+            if (small[i] == 1 && small[i - 1] == 0) {
+                small.flip(i);
+                small.flip(i - 1);
+                for (int left = 0, right = i - 2; left < right;) {
+                    while (left < right && small[left] == 0) left++;
+                    while (left < right && small[right] == 1) right--;
+                    small.flip(left);
+                    small.flip(right);
+                }
+                s = (int)small.to_ulong();
+                break;
+            }
+        }
+
+        // bigger, 01转10，1移到最右侧
+        int b = -1;
+        for (int i = 1; i < 32; i++) {
+            if (bigger[i] == 0 && bigger[i - 1] == 1) {
+                bigger.flip(i);
+                bigger.flip(i - 1);
+
+                for (int left = 0, right = i - 2; left < right;) {
+                    while (left < right && bigger[left] == 1) left++;
+                    while (left < right && bigger[right] == 0) right--;
+                    bigger.flip(left);
+                    bigger.flip(right);
+                }
+                b = (int)bigger.to_ulong();
+                break;
+            }
+        }
+
+        return {b, s};
+    }
+};
