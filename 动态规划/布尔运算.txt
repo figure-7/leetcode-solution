@@ -1,0 +1,73 @@
+题目难度：MEDIUM
+
+给定一个布尔表达式和一个期望的布尔结果 result，布尔表达式由 0 (false)、1 (true)、& (AND)、 | (OR) 和 ^ (XOR) 符号组成。
+实现一个函数，算出有几种可使该表达式得出 result 值的括号方法。
+示例 1:
+输入: s = "1^0|0|1", result = 0
+输出: 2
+解释: 两种可能的括号方法是
+1^(0|(0|1))
+1^((0|0)|1)
+示例 2:
+输入: s = "0&0&0&1^1|0", result = 1
+输出: 10
+提示：
+运算符的数量不超过 19 个
+
+思路：区间DP
+接下来上题解区题解：
+dp[i][j][0]代表第i个字符到第j个字符，result=0的可能性个数
+dp[i][j][1]代表第i个字符到第j个字符，result=1的可能性个数
+然后枚举中间断点就行啦
+
+执行用时：
+12 ms
+, 在所有 C++ 提交中击败了
+63.75%
+的用户
+内存消耗：
+9.3 MB
+, 在所有 C++ 提交中击败了
+27.91%
+的用户
+（时间还可以，空间不咋地）
+
+上代码：
+class Solution {
+public:
+    int countEval(string s, int result) {
+        int n = s.length();
+        vector<vector<vector<int>>> dp(n, vector<vector<int>>(n, vector<int>(2, 0)));
+
+        for (int i=0; i<n; i+=2){
+            int tmp = 0;
+            if (s[i] == '1') tmp = 1;
+            dp[i][i][0] = 1-tmp;
+            dp[i][i][1] = tmp;
+        }
+
+        for (int step=0; step<n; step+=2){
+            for (int i=0; i+step<n; i+=2){
+                for (int j=i+1; j<i+step; j+=2){
+                    int left0 = dp[i][j-1][0], left1 = dp[i][j-1][1];
+                    int right0 = dp[j+1][i+step][0], right1 = dp[j+1][i+step][1];
+                    // cout<<i<<" "<<i+step<<" "<<left0<<" "<<left1<<" "<<right0<<" "<<right1;
+                    if (s[j]=='&'){
+                        dp[i][i+step][0] += left0*(right0+right1)+left1*right0;
+                        dp[i][i+step][1] += left1*right1;
+                    }
+                    else if (s[j]=='|'){
+                        dp[i][i+step][0] += left0*right0;
+                        dp[i][i+step][1] += left0*right1 + left1*(right0+right1);
+                    }
+                    else{//s[j]=='^'
+                        dp[i][i+step][0] += left0*right0 + left1*right1;
+                        dp[i][i+step][1] += left0*right1 + left1*right0;
+                    }
+                    // cout<<" dp[i][i+step][0]:"<<dp[i][i+step][0]<<" dp[i][i+step][1]:"<<dp[i][i+step][1]<<endl;
+                }
+            }
+        }
+        return dp[0][n-1][result];
+    }
+};
