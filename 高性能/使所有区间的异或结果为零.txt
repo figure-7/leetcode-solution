@@ -1,0 +1,226 @@
+题目难度：HARD
+
+给你一个整数数组 nums​​​ 和一个整数 k​​​​​ 。
+区间 [left, right]（left <= right）的 异或结果 是对下标位于 left 和 right（包括 left 和 right ）之间所有元素进行 XOR 运算的结果：
+nums[left] XOR nums[left+1] XOR ... XOR nums[right] 。
+返回数组中 要更改的最小元素数 ，以使所有长度为 k 的区间异或结果等于零。
+示例 1：
+输入：nums = [1,2,0,3,0], k = 1
+输出：3
+解释：将数组 [1,2,0,3,0] 修改为 [0,0,0,0,0]
+示例 2：
+输入：nums = [3,4,5,2,1,7,3,4,7], k = 3
+输出：3
+解释：将数组 [3,4,5,2,1,7,3,4,7] 修改为 [3,4,7,3,4,7,3,4,7]
+示例 3：
+输入：nums = [1,2,4,1,2,5,1,2,6], k = 3
+输出：3
+解释：将数组[1,2,4,1,2,5,1,2,6] 修改为 [1,2,3,1,2,3,1,2,3]
+提示：
+1 <= k <= nums.length <= 2000
+​​​​​​0 <= nums[i] < 210
+
+思路：数论+DP
+设数组 \textit{nums}nums 的长度为 nn。
+首先我们需要分析出数组 \textit{nums}nums 在修改之后应当具有哪些性质。
+由于任意长度为 kk 的区间异或结果等于 00，那么对于任意的 ii，有：
+\textit{nums}[i] \oplus \textit{nums}[i+1] \oplus \cdots \oplus \textit{nums}[i+k-1] = 0 \tag{1}
+nums[i]⊕nums[i+1]⊕⋯⊕nums[i+k−1]=0(1)
+以及：
+\textit{nums}[i+1] \oplus \textit{nums}[i+2] \oplus \cdots \oplus \textit{nums}[i+k] = 0 \tag{2}
+nums[i+1]⊕nums[i+2]⊕⋯⊕nums[i+k]=0(2)
+其中 \oplus⊕ 表示异或运算。
+根据异或运算的性质 a \oplus b \oplus b = aa⊕b⊕b=a，将 (1)(2)(1)(2) 两式联立，即可得到：
+\textit{nums}[i] \oplus \textit{nums}[i+k] = 0
+nums[i]⊕nums[i+k]=0
+其等价于 \textit{nums}[i] = \textit{nums}[i+k]nums[i]=nums[i+k]。
+因此我们可以得出一个重要的结论：
+数组 \textit{nums}nums 在修改之后是一个以 kk 为周期的周期性数组，即 \forall i \in [0, n-k), \textit{nums}[i] = \textit{nums}[i+k]∀i∈[0,n−k),nums[i]=nums[i+k]。
+因此，我们可以将数组 \textit{nums}nums 按照下标对 kk 取模的结果 0, 1, \cdots, k-10,1,⋯,k−1 分成 kk 个组，每个组内的元素必须要相等，并且这 kk 个组对应的元素的异或和为 00，即：
+\textit{nums}[0] \oplus \textit{nums}[1] \oplus \cdots \oplus \textit{nums}[k-1] = 0
+nums[0]⊕nums[1]⊕⋯⊕nums[k−1]=0
+只要满足上述的要求，修改后的数组的所有长度为 kk 的区间异或结果一定等于 00。
+对于第 ii 个组，我们可以使用哈希映射来存储该组内的元素以及每个元素出现的次数，这样一来，我们就可以尝试使用动态规划来解决本题了。
+设 f(i, \textit{mask})f(i,mask) 表示我们已经处理了第 0, 1, \cdots, i0,1,⋯,i 个组，并且这些组对应元素的异或和：
+\textit{nums}[0] \oplus \textit{nums}[1] \oplus \cdots \oplus \textit{nums}[i]
+nums[0]⊕nums[1]⊕⋯⊕nums[i]
+为 \textit{mask}mask 的前提下，这些组总计最少需要修改的元素个数。
+在进行状态转移时，我们可以枚举第 ii 组被修改成了哪个数。
+假设其被修改成了 xx，那么第 0, 1, \cdots, i-10,1,⋯,i−1 个组对应的元素的异或和即为 \textit{mask} \oplus xmask⊕x，因此我们可以得到状态转移方程：
+f(i, \textit{mask}) = \min_x \big\{ f(i-1, \textit{mask} \oplus x) + \text{size}(i) - \text{count}(i, x) \big\}
+f(i,mask)= 
+x
+min	
+ {f(i−1,mask⊕x)+size(i)−count(i,x)}
+其中 \text{size}(i)size(i) 表示第 ii 个组里的元素个数，\text{count}(i, x)count(i,x) 表示第 ii 个组里元素 xx 的次数，它们的值都可以通过哈希映射得到。
+上述状态转移方程的意义即为：如果我们选择将第 ii 组全部修改为 xx，那么有 \text{count}(i, x)count(i,x) 个数是无需修改的，这样就需要修改 \text{size}(i) - \text{count}(i, x)size(i)−count(i,x) 次。
+动态规划的时间复杂度是多少呢？
+我们发现这并不好估计，这是因为 xx 可以很小，也可以很大，它并没有一个固定的范围。
+然而我们可以发现，题目中规定了 \textit{nums}[i] < 2^{10}nums[i]<2 
+10
+ ，也就是 \textit{nums}[i]nums[i] 的二进制表示的位数不超过 1010。
+因此我们可以断定，xx 的上限就是 2^{10}2 
+10
+ 。
+如果 x \geq 2^{10}x≥2 
+10
+ ，那么 xx 的二进制表示的最高位 11 是在数组 \textit{nums}nums 的其它元素中没有出现过的，因此根据异或的性质，要想将最终的异或结果变为 00，我们需要将另一个组的所有元素改为 yy，且 yy 有与 xx 相同的高位 11。
+这样一来，我们不如将 xx 和 yy 的高位 11 移除，让它们都在 [0, 2^{10})[0,2 
+10
+ ) 的范围内，这样更容易增大 \text{count}(i, x)count(i,x)，减少最终的修改次数。
+当我们确定了 xx 的上限，就可以计算出动态规划的时间复杂度了。
+状态的数量有 k \times 2^{10}k×2 
+10
+  个，对于每一个状态，我们需要枚举 xx 来进行状态转移，而 xx 的数量同样有 2^{10}2 
+10
+  个，因此时间复杂度为 O(2^{20} k) = O(2^{20} n)O(2 
+20
+ k)=O(2 
+20
+ n)，数量级约为 2 \times 10^92×10 
+9
+ ，超出了时间限制，因此我们必须要进行优化。
+优化
+对于未优化的状态转移方程：
+f(i, \textit{mask}) = \min_x \big\{ f(i-1, \textit{mask} \oplus x) + \text{size}(i) - \text{count}(i, x) \big\}
+f(i,mask)= 
+x
+min	
+ {f(i−1,mask⊕x)+size(i)−count(i,x)}
+首先 \text{size}(i)size(i) 是与 xx 无关的常量，我们可以将其移出最小值的限制，即：
+f(i, \textit{mask}) = \text{size}(i) + \min_x \big\{ f(i-1, \textit{mask} \oplus x) - \text{count}(i, x) \big\}
+f(i,mask)=size(i)+ 
+x
+min
+ {f(i−1,mask⊕x)−count(i,x)}
+由于我们需要求的是「最小值」，因此在状态转移方程中添加若干大于等于「最小值」的项，对最终的答案不会产生影响。
+考虑 \text{count}(i, x)count(i,x) 这一项，如果 xx 没有在哈希表中出现，那么这一项的值为 00，否则这一项的值大于 00。
+即：
+如果 xx 没有在哈希表中出现，那么转移的状态为：
+f(i-1, \textit{mask} \oplus x)
+f(i−1,mask⊕x)
+如果 xx 在哈希表中出现，那么转移的状态为：
+f(i-1, \textit{mask} \oplus x) - \text{count}(i, x)
+f(i−1,mask⊕x)−count(i,x)
+它严格小于 f(i-1, \textit{mask} \oplus x)f(i−1,mask⊕x)。
+如果我们在状态转移方程中添加 f(i-1, \textit{mask} \oplus x)f(i−1,mask⊕x)，最终的答案不会变化。
+因此我们可以将状态转移方程变化为：
+f(i, \textit{mask}) = \text{size}(i) + \min\{ t_1, t_2 \}
+f(i,mask)=size(i)+min{t 
+1
+ ,t 
+2	
+ }
+其中 t_1t 
+1	
+  对应 xx 在哈希表中出现的状态，即：
+t_1 = \min_{x \in \text{HashTable}(i)} \big\{ f(i-1, \textit{mask} \oplus x) - \text{count}(i, x) \big\}
+t 
+1	
+ = 
+x∈HashTable(i)
+min	
+ {f(i−1,mask⊕x)−count(i,x)}
+t_2t 
+2	
+  对应 xx 不在哈希表中出现的状态，以及 xx 在哈希表中出现并且我们额外添加的状态，即：
+t_2 = \min_x f(i - 1, \textit{mask} \oplus x)
+t 
+2	
+ = 
+x
+min	
+ f(i−1,mask⊕x)
+由于 \textit{mask}mask 的取值范围是 [0, 2^{10})[0,2 
+10
+ )，xx 的取值范围也是 [0, 2^{10})[0,2 
+10
+ )，因此 \textit{mask} \oplus xmask⊕x 的取值范围就是 [0, 2^{10})[0,2 
+10
+ )，与 xx 无关。也就是说：
+t_2t 
+2	
+  就是所有状态 f(i-1, ..)f(i−1,..) 中的最小值。
+那么优化后的动态规划的时间复杂度是多少呢？
+对于第 ii 组，我们需要计算出第 i-1i−1 组对应的状态 f(i-1, ..)f(i−1,..) 中的最小值，时间复杂度为 O(2^{10})O(2 
+10
+ )，即为 t_2t 
+2	
+  部分的状态转移。而对于 t_1t 
+1	
+  部分，状态转移的次数等于第 ii 组哈希映射的大小，小于等于 \text{size}(i)size(i)。
+因此总的时间复杂度为：
+O\left( \sum_{i=0}^{k-1} \big( 2^{10} + \text{size}(i) \big) \right) = O(2^{10}k + n)
+O( 
+i=0
+∑
+k−1	
+ (2 
+10
+ +size(i)))=O(2 
+10
+ k+n)
+最终的答案即为 f(k-1, 0)f(k−1,0)。
+细节
+由于 f(i, ..)f(i,..) 只会从 f(i-1, ..)f(i−1,..) 转移而来，因此我们可以使用两个长度为 2^{10}2 
+10
+  的一维数组代替二维数组，交替地进行状态转移，减少空间复杂度。
+此外，当 i=0i=0 时，f(-1, ..)f(−1,..) 都是需要特殊考虑的边界条件。
+由于 f(-1, ..)f(−1,..) 表示没有考虑任何组时的异或和，因此该异或和一定为 00，即 f(-1, 0) = 0f(−1,0)=0。
+其它的状态都是不合法的状态，我们可以将它们赋予一个极大值 \infty∞。
+
+执行用时：
+464 ms
+, 在所有 C++ 提交中击败了
+58.72%
+的用户
+内存消耗：
+46.6 MB
+, 在所有 C++ 提交中击败了
+27.68%
+的用户
+（时间一般，空间不咋地）
+
+上代码：
+class Solution {
+private:
+    // x 的范围为 [0, 2^10)
+    static constexpr int MAXX = 1 << 10;
+    // 极大值，为了防止整数溢出选择 INT_MAX / 2
+    static constexpr int INFTY = INT_MAX / 2;
+    
+public:
+    int minChanges(vector<int>& nums, int k) {
+        int n = nums.size();
+        vector<int> f(MAXX, INFTY);
+        // 边界条件 f(-1,0)=0
+        f[0] = 0;
+        
+        for (int i = 0; i < k; ++i) {
+            // 第 i 个组的哈希映射
+            unordered_map<int, int> cnt;
+            int size = 0;
+            for (int j = i; j < n; j += k) {
+                ++cnt[nums[j]];
+                ++size;
+            }
+
+            // 求出 t2
+            int t2min = *min_element(f.begin(), f.end());
+
+            vector<int> g(MAXX, t2min);
+            for (int mask = 0; mask < MAXX; ++mask) {
+                // t1 则需要枚举 x 才能求出
+                for (auto [x, countx]: cnt) {
+                    g[mask] = min(g[mask], f[mask ^ x] - countx);
+                }
+            }
+            
+            // 别忘了加上 size
+            for_each(g.begin(), g.end(), [&](int& val) {val += size;});
+            f = move(g);
+        }
+
+        return f[0];
+    }
+};
