@@ -1,2 +1,0 @@
-priority_queue<int> h;
-里面数据从小到大自动堆排很方便，告别sort
