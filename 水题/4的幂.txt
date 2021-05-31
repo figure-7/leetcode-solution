@@ -1,0 +1,55 @@
+题目难度：EASY
+
+给定一个整数，写一个函数来判断它是否是 4 的幂次方。
+如果是，返回 true ；
+否则，返回 false 。
+整数 n 是 4 的幂次方需满足：
+存在整数 x 使得 n == 4x
+示例 1：
+输入：n = 16
+输出：true
+示例 2：
+输入：n = 5
+输出：false
+示例 3：
+输入：n = 1
+输出：true
+提示：
+-231 <= n <= 231 - 1
+
+思路：模拟
+（WA点1,2,3,：算法错误）
+首先判断当给定值小于等于0返回false即可
+如果给定值等于1返回true即可
+循环从4开始4的幂（WA点4：没用大数表示导致越界）
+如果给定值等于当前4的幂就返回true即可
+否则如果小于就退出循环（注定不是4的幂）
+最后返回false即可
+
+执行用时：
+0 ms
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+内存消耗：
+5.8 MB
+, 在所有 C++ 提交中击败了
+31.62%
+的用户
+（时间完杀！！！空间不咋地）
+
+上代码：
+class Solution {
+public:
+    long long cur = 4;
+    
+    bool isPowerOfFour(int n) {
+        if(n <= 0) return false;
+        if(n == 1) return true;
+        while(cur <= n) {
+            if(cur == n) return true;
+            cur *= 4;
+        }
+        return false;
+    }
+};
