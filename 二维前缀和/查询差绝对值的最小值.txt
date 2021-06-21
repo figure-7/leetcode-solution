@@ -1,0 +1,133 @@
+题目难度：HARD
+
+一个数组 a 的 差绝对值的最小值 定义为：0 <= i < j < a.length 且 a[i] != a[j] 的 |a[i] - a[j]| 的 最小值。
+如果 a 中所有元素都 相同 ，那么差绝对值的最小值为 -1 。
+比方说，数组 [5,2,3,7,2] 差绝对值的最小值是 |2 - 3| = 1 。
+注意答案不为 0 ，因为 a[i] 和 a[j] 必须不相等。
+给你一个整数数组 nums 和查询数组 queries ，其中 queries[i] = [li, ri] 。
+对于每个查询 i ，计算 子数组 nums[li...ri] 中 差绝对值的最小值 ，子数组 nums[li...ri] 包含 nums 数组（下标从 0 开始）中下标在 li 和 ri 之间的所有元素（包含 li 和 ri 在内）。
+请你返回 ans 数组，其中 ans[i] 是第 i 个查询的答案。
+子数组 是一个数组中连续的一段元素。
+|x| 的值定义为：
+如果 x >= 0 ，那么值为 x 。
+如果 x < 0 ，那么值为 -x 。
+示例 1：
+输入：nums = [1,3,4,8], queries = [[0,1],[1,2],[2,3],[0,3]]
+输出：[2,1,4,1]
+解释：查询结果如下：
+- queries[0] = [0,1]：
+子数组是 [1,3] ，差绝对值的最小值为 |1-3| = 2 。
+- queries[1] = [1,2]：
+子数组是 [3,4] ，差绝对值的最小值为 |3-4| = 1 。
+- queries[2] = [2,3]：
+子数组是 [4,8] ，差绝对值的最小值为 |4-8| = 4 。
+- queries[3] = [0,3]：
+子数组是 [1,3,4,8] ，差的绝对值的最小值为 |3-4| = 1 。
+示例 2：
+输入：nums = [4,5,2,2,7,10], queries = [[2,3],[0,2],[0,5],[3,5]]
+输出：[-1,1,1,3]
+解释：查询结果如下：
+- queries[0] = [2,3]：
+子数组是 [2,2] ，差绝对值的最小值为 -1 ，因为所有元素相等。
+- queries[1] = [0,2]：
+子数组是 [4,5,2] ，差绝对值的最小值为 |4-5| = 1 。
+- queries[2] = [0,5]：
+子数组是 [4,5,2,2,7,10] ，差绝对值的最小值为 |4-5| = 1 。
+- queries[3] = [3,5]：
+子数组是 [2,7,10] ，差绝对值的最小值为 |7-10| = 3 。
+提示：
+2 <= nums.length <= 105
+1 <= nums[i] <= 100
+1 <= queries.length <= 2 * 104
+0 <= li < ri < nums.length
+
+思路：周赛第四题，前缀和
+接下来上官方题解：
+提示 11
+在本题中，数组 \textit{nums}nums 的元素范围在 [1, 100][1,100] 中，这使得对于每一组询问 \textit{queries}_i = (l_i, r_i)queries 
+i	
+ =(l 
+i	
+ ,r 
+i
+ )，我们可以枚举 [1, 100][1,100] 中的每一个整数是否出现，并以此计算「差绝对值的最小值」。
+提示 22
+对于任意的数组 aa，如果 aa 已经有序，那么我们只需要对 aa 进行一次遍历，得到 aa 中相邻两元素的差值中的最小值（不能为 00），即为「差绝对值的最小值」。
+如果 aa 中所有元素均相等，那么「差绝对值的最小值」为 -1−1。
+思路与算法
+我们可以使用前缀和数组 \textit{pre}[i][c]pre[i][c] 表示数组 \textit{nums}nums 的前缀 a[0..i-1]a[0..i−1] 中包含元素 cc 的个数。
+对于询问 \textit{queries}_i = (l_i, r_i)queries 
+i	
+ =(l 
+i	
+ ,r 
+i	
+ )，如果\textit{nums}[l_i .. r_i]nums[l 
+i	
+ ..r 
+i	
+ ] 中包含元素 cc，那么 \textit{pre}[r_i+1][c] - \textit{pre}[l_i][c]pre[r 
+i	
+ +1][c]−pre[l 
+i	
+ ][c] 的值大于 00，否则其等于 00。
+这样一来，根据提示 11，我们只需要从小到大在 [1, 100][1,100] 中枚举元素 cc，并通过 \textit{pre}[r_i+1][c] - \textit{pre}[l_i][c] > 0pre[r 
+i	
+ +1][c]−pre[l 
+i
+ ][c]>0 判断元素 cc 是否在 \textit{nums}[l_i .. r_i]nums[l 
+i	
+ ..r 
+i
+ ] 中出现过。
+这样做就相当于我们对 \textit{nums}[l_i .. r_i]nums[l 
+i
+ ..r 
+i
+ ] 中的元素无重复地从小到大进行了一次遍历。
+根据提示 22，我们只需要求出相邻两个在 \textit{nums}[l_i .. r_i]nums[l 
+i	
+ ..r 
+i	
+ ] 中出现过的元素的差值中的最小值，即为「差绝对值的最小值」。
+
+上代码：
+class Solution {
+private:
+    // 元素 c 的最大值
+    static constexpr int C = 100;
+
+public:
+    vector<int> minDifference(vector<int>& nums, vector<vector<int>>& queries) {
+        int n = nums.size();
+        // 前缀和
+        vector<array<int, C + 1>> pre(n + 1);
+        fill(pre[0].begin(), pre[0].end(), 0);
+        for (int i = 0; i < nums.size(); ++i) {
+            copy_n(pre[i].begin(), C + 1, pre[i + 1].begin());
+            ++pre[i + 1][nums[i]];
+        }
+
+        int q = queries.size();
+        vector<int> ans;
+        for (int i = 0; i < q; ++i) {
+            int left = queries[i][0], right = queries[i][1];
+            // last 记录上一个出现的元素
+            // best 记录相邻两个元素差值的最小值
+            int last = 0, best = INT_MAX;
+            for (int j = 1; j <= C; ++j) {
+                if (pre[left][j] != pre[right + 1][j]) {
+                    if (last) {
+                        best = min(best, j - last);
+                    }
+                    last = j;
+                }
+            }
+            if (best == INT_MAX) {
+                best = -1;
+            }
+            ans.push_back(best);
+        }
+        return ans;
+    }
+};
