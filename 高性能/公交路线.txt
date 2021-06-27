@@ -1,0 +1,97 @@
+题目难度：HARD
+
+给你一个数组 routes ，表示一系列公交线路，其中每个 routes[i] 表示一条公交线路，第 i 辆公交车将会在上面循环行驶。
+例如，路线 routes[0] = [1, 5, 7] 表示第 0 辆公交车会一直按序列 1 -> 5 -> 7 -> 1 -> 5 -> 7 -> 1 -> ... 这样的车站路线行驶。
+现在从 source 车站出发（初始时不在公交车上），要前往 target 车站。 期间仅可乘坐公交车。
+求出 最少乘坐的公交车数量 。如果不可能到达终点车站，返回 -1 。
+示例 1：
+输入：routes = [[1,2,7],[3,6,7]], source = 1, target = 6
+输出：2
+解释：最优策略是先乘坐第一辆公交车到达车站 7 , 然后换乘第二辆公交车到车站 6 。 
+示例 2：
+输入：routes = [[7,12],[4,5,15],[6],[15,19],[9,12,13]], source = 15, target = 12
+输出：-1
+提示：
+1 <= routes.length <= 500.
+1 <= routes[i].length <= 105
+routes[i] 中的所有值 互不相同
+sum(routes[i].length) <= 105
+0 <= routes[i][j] < 106
+0 <= source, target < 106
+
+思路：图+BFS
+接下来上官方题解：
+由于求解的目标是最少乘坐的公交车数量，对于同一辆公交车，乘客可以在其路线中的任意车站间无代价地移动，于是我们可以把公交路线当作点。如果两条公交路线有相同车站，则可以在这两条路线间换乘公交车，那么这两条公交路线之间可视作有一条长度为 11 的边。
+这样建出的图包含的点数即为公交路线的数量，记作 nn。
+完成了建图后，我们需要先明确新的图的起点和终点，然后使用广度优先搜索，计算出的起点和终点的最短路径，从而得到最少换乘次数。
+注意到原本的起点车站和终点车站可能同时位于多条公交路线上，因此在新图上可能有多个起点和终点。
+对于这种情况，我们初始可以同时入队多个点，并在广度优先搜索结束后检查到各个终点的最短路径，取其最小值才是最少换乘次数。
+实际建图时，我们有以下两种方案：
+方案一：我们直接枚举左右两端点，检查两点对应的两公交路线是否有公共车站。
+利用哈希表，我们可以将单次比较的时间复杂度优化到均摊 O(n)O(n)。
+方案二：我们遍历所有公交路线，记录每一个车站属于哪些公交路线。
+然后我们遍历每一个车站，如果有多条公交路线经过该点，则在这些公交路线之间连边。
+本题中我们采用方案二，据此还可以直接得到起点和终点在新图中对应的点。
+实际代码中，我们使用哈希映射来实时维护「车站所属公交路线列表」。
+假设当前枚举到公交路线 ii 中的车站 \textit{site}site，此时哈希映射中已记录若干条公交路线经过车站 \textit{site}site，我们只需要让点 ii 与这些点公交路线对应的点相连即可。
+完成了连线后，我们再将公交路线 ii 加入到「车站 \textit{site}site 所属公交路线列表」中。
+特别地，起点和终点相同时，我们可以直接返回 00。
+
+执行用时：
+196 ms
+, 在所有 C++ 提交中击败了
+84.90%
+的用户
+内存消耗：
+50.6 MB
+, 在所有 C++ 提交中击败了
+57.64%
+的用户
+（时间不错，空间一般）
+
+上代码：
+class Solution {
+public:
+    int numBusesToDestination(vector<vector<int>>& routes, int source, int target) {
+        if (source == target) {
+            return 0;
+        }
+
+        int n = routes.size();
+        vector<vector<int>> edge(n, vector<int>(n));
+        unordered_map<int, vector<int>> rec;
+        for (int i = 0; i < n; i++) {
+            for (auto& site : routes[i]) {
+                for (auto& j : rec[site]) {
+                    edge[i][j] = edge[j][i] = true;
+                }
+                rec[site].push_back(i);
+            }
+        }
+
+        vector<int> dis(n, -1);
+        queue<int> que;
+        for (auto& site : rec[source]) {
+            dis[site] = 1;
+            que.push(site);
+        }
+        while (!que.empty()) {
+            int x = que.front();
+            que.pop();
+            for (int y = 0; y < n; y++) {
+                if (edge[x][y] && dis[y] == -1) {
+                    dis[y] = dis[x] + 1;
+                    que.push(y);
+                }
+            }
+        }
+
+        int ret = INT_MAX;
+        for (auto& site : rec[target]) {
+            if (dis[site] != -1) {
+                ret = min(ret, dis[site]);
+            }
+        }
+        return ret == INT_MAX ? -1 : ret;
+    }
+};
