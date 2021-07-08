@@ -1,0 +1,6 @@
+使用find函数：
+while ((index = big.find(x, index)) != string::npos) {
+    tmp.emplace_back(index);
+    index++;
+}
+上面代码的意思是：在字符串big中找到所有子字符串x出现的第一个字符位置下标
