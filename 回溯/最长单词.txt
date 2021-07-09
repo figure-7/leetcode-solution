@@ -1,0 +1,73 @@
+题目难度：MEDIUM
+
+给定一组单词words，编写一个程序，找出其中的最长单词，且该单词由这组单词中的其他单词组合而成。
+若有多个长度相同的结果，返回其中字典序最小的一项，若没有符合要求的单词则返回空字符串。
+示例：
+输入： ["cat","banana","dog","nana","walk","walker","dogwalker"]
+输出： "dogwalker"
+解释： "dogwalker"可由"dog"和"walker"组成。
+提示：
+0 <= len(words) <= 200
+1 <= len(words[i]) <= 100
+
+思路：DFS+BackTracking
+接下来上题解区题解：
+对输入单词排序。
+排序标准：
+单词长的排在前面；
+长度相等时，字典序小的排在前面。
+那么，第一个满足题目要求的单词就是解。
+输入单词导入集合S，用于去重。
+用回溯算法判断单词w是否由其它单词组成。
+
+执行用时：
+8 ms
+, 在所有 C++ 提交中击败了
+95.47%
+的用户
+内存消耗：
+10.2 MB
+, 在所有 C++ 提交中击败了
+83.95%
+的用户
+（时间绝杀，空间很好）
+
+上代码：
+struct cmp{
+    bool operator()(const string& A,const string& B)const{
+        return A.size() >  B.size() || A.size() == B.size() && A < B;
+    }
+};
+class Solution {
+public:
+    string longestWord(vector<string>& words) {
+        unordered_set<string> S(words.begin(),words.end());
+        sort(words.begin(),words.end(),cmp());
+
+        for(auto x : words){
+            if(dfs(x,0,S)){
+                return x;
+            }
+        }
+        return "";
+    }
+
+    bool dfs(const string& w,int i,const unordered_set<string>& S){
+        if(i >= w.size()){
+            return true;
+        }
+        for(int j=i;j<w.size();++j){
+            if(j - i + 1 == w.size()){
+                continue;
+            }
+            string sub = w.substr(i,j-i+1);
+            if(S.count(sub)){
+                bool ret = dfs(w,j+1,S);
+                if(ret){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+};
