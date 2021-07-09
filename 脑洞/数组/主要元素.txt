@@ -1,0 +1,73 @@
+题目难度：EASY
+
+数组中占比超过一半的元素称之为主要元素。
+给你一个 整数 数组，找出其中的主要元素。
+若没有，返回 -1 。
+请设计时间复杂度为 O(N) 、空间复杂度为 O(1) 的解决方案。
+示例 1：
+输入：[1,2,5,9,5,9,5,5,5]
+输出：5
+示例 2：
+输入：[3,2]
+输出：-1
+示例 3：
+输入：[2,2,1,1,1,2,2]
+输出：2
+
+思路：模拟
+接下来上官方题解：
+由于题目要求时间复杂度 O(n)O(n) 和空间复杂度 O(1)O(1)，因此符合要求的解法只有 \text{Boyer-Moore}Boyer-Moore 投票算法。
+\text{Boyer-Moore}Boyer-Moore 投票算法的基本思想是：
+在每一轮投票过程中，从数组中删除两个不同的元素，直到投票过程无法继续，此时数组为空或者数组中剩下的元素都相等。
+如果数组为空，则数组中不存在主要元素；
+如果数组中剩下的元素都相等，则数组中剩下的元素可能为主要元素。
+\text{Boyer-Moore}Boyer-Moore 投票算法的步骤如下：
+维护一个候选主要元素 \textit{candidate}candidate 和候选主要元素的出现次数 \textit{count}count，初始时 \textit{candidate}candidate 为任意值，\textit{count}=0count=0；
+遍历数组 \textit{nums}nums 中的所有元素，遍历到元素 xx 时，进行如下操作：
+如果 \textit{count}=0count=0，则将 xx 的值赋给 \textit{candidate}candidate，否则不更新 \textit{candidate}candidate 的值；
+如果 x=\textit{candidate}x=candidate，则将 \textit{count}count 加 11，否则将 \textit{count}count 减 11。
+遍历结束之后，如果数组 \textit{nums}nums 中存在主要元素，则 \textit{candidate}candidate 即为主要元素，否则 \textit{candidate}candidate 可能为数组中的任意一个元素。
+由于不一定存在主要元素，因此需要第二次遍历数组，验证 \textit{candidate}candidate 是否为主要元素。
+第二次遍历时，统计 \textit{candidate}candidate 在数组中的出现次数，如果出现次数大于数组长度的一半，则 \textit{candidate}candidate 是主要元素，返回 \textit{candidate}candidate，否则数组中不存在主要元素，返回 -1−1。
+为什么当数组中存在主要元素时，\text{Boyer-Moore}Boyer-Moore 投票算法可以确保得到主要元素？
+在 \text{Boyer-Moore}Boyer-Moore 投票算法中，遇到相同的数则将 \textit{count}count 加 11，遇到不同的数则将 \textit{count}count 减 11。
+根据主要元素的定义，主要元素的出现次数大于其他元素的出现次数之和，因此在遍历过程中，主要元素和其他元素两两抵消，最后一定剩下至少一个主要元素，此时 \textit{candidate}candidate 为主要元素，且 \textit{count} \ge 1count≥1。
+
+执行用时：
+16 ms
+, 在所有 C++ 提交中击败了
+90.87%
+的用户
+内存消耗：
+18.3 MB
+, 在所有 C++ 提交中击败了
+47.85%
+的用户
+（时间很好，空间一般）
+
+上代码：
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        int candidate = -1;
+        int count = 0;
+        for (int& num : nums) {
+            if (count == 0) {
+                candidate = num;
+            }
+            if (num == candidate) {
+                count++;
+            } else {
+                count--;
+            }
+        }
+        count = 0;
+        int length = nums.size();
+        for (int& num : nums) {
+            if (num == candidate) {
+                count++;
+            }
+        }
+        return count * 2 > length ? candidate : -1;
+    }
+};
