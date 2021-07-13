@@ -1,0 +1,138 @@
+题目难度：MEDIUM
+
+每年，政府都会公布一万个最常见的婴儿名字和它们出现的频率，也就是同名婴儿的数量。
+有些名字有多种拼法，例如，John 和 Jon 本质上是相同的名字，但被当成了两个名字公布出来。
+给定两个列表，一个是名字及对应的频率，另一个是本质相同的名字对。设计一个算法打印出每个真实名字的实际频率。
+注意，如果 John 和 Jon 是相同的，并且 Jon 和 Johnny 相同，则 John 与 Johnny 也相同，即它们有传递和对称性。
+在结果列表中，选择 字典序最小 的名字作为真实名字。
+示例：
+输入：names = ["John(15)","Jon(12)","Chris(13)","Kris(4)","Christopher(19)"], synonyms = ["(Jon,John)","(John,Johnny)","(Chris,Kris)","(Chris,Christopher)"]
+输出：["John(27)","Chris(36)"]
+提示：
+names.length <= 100000
+
+思路：并查集
+（这题不知道为什么我的代码不行...）
+接下来上题解区题解：
+并查集解法
+并查集的根节点就是最小字典序的名字
+要考虑某些名字不一定在names里，但是在synonyms里，所以也要算在并查集里
+例如aa数量为5，a数量为0， 但是a<aa,所以最后是输出 a=5 （0+5）
+具体参见代码和注释吧
+
+执行用时：
+288 ms
+, 在所有 C++ 提交中击败了
+74.61%
+的用户
+内存消耗：
+98.8 MB
+, 在所有 C++ 提交中击败了
+26.32%
+的用户
+（时间不错，空间炸了）
+
+上代码：
+class UnionSet
+{
+private:
+    unordered_map<string, string> parents;
+    unordered_map<string, int> sizes;
+public:
+    void Put(string&& str, int size)
+    {
+        parents[str] = str;
+        sizes[str] = size;
+    }
+
+    void Put(string& str, int size)
+    {
+        parents[str] = str;
+        sizes[str] = size;
+    }
+
+    void Merge(string str1, string str2)
+    {
+        str1 = Find(str1);
+        str2 = Find(str2);
+        // cout << "merge " << str1 << " " << str2 << endl;
+        if (str1 < str2)
+        {
+            parents[str2] = str1;
+            sizes[str1] = sizes[str2] + sizes[str1];
+        }
+        else if (str2 < str1)
+        {
+            parents[str1] = str2;
+            sizes[str2] = sizes[str2] + sizes[str1];
+        }
+    }
+
+    string Find(string& a)
+    {
+        if (parents[a] == a)
+        {
+            return a;
+        }
+        return Find(parents[a]);
+    }
+
+    int Size(string& str)
+    {
+        return sizes[str];
+    }
+
+    bool IsExist(string& str)
+    {
+        return parents.find(str) != parents.end();
+    }
+};
+
+class Solution {
+public:
+    vector<string> trulyMostPopular(vector<string>& names, vector<string>& synonyms) {
+        UnionSet us;
+        // 存储目前的名字
+        vector<string> allNames;
+        // 首次遍历names把数量插入到UnionSet里
+        for (string& name : names)
+        {
+            auto start = name.find("(");
+            auto end = name.find(")");
+            // cout << name.substr(0, start) << " " << stoi(name.substr(start+1, end-start-1)) << endl;
+            us.Put(name.substr(0, start), stoi(name.substr(start+1, end-start-1)));
+            allNames.push_back(name.substr(0, start));
+        }
+
+        // 遍历synnoyms来生成并查集
+        for (string synonym : synonyms)
+        {
+            // 考虑在names里不存在name，也插入默认的size=0
+            auto index1 = synonym.find(",");
+            string name1 = synonym.substr(1, index1-1);
+            string name2 = synonym.substr(index1+1,  synonym.find(")")- index1-1);
+            // cout << name1 << " " << name2 << endl;
+            if (!us.IsExist(name1))
+            {
+                us.Put(name1, 0);
+            }
+            if (!us.IsExist(name2))
+            {
+                us.Put(name2, 0);
+            }
+            us.Merge(name1, name2);
+        }
+        
+        // 再次遍历只找自己的父节点是自己的name（即就是输出真实的字典序最小）
+        vector<string> res;
+        for (string& name : allNames)
+        {
+            // 只输出根节点是自己的
+            if (us.Find(name) == name)
+            {
+                res.push_back(name + "(" + to_string(us.Size(name)) + ")");
+            }
+        }
+        return res;
+    }
+};
