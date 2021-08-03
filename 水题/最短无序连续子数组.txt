@@ -1,0 +1,56 @@
+题目难度：MEDIUM
+
+给你一个整数数组 nums ，你需要找出一个 连续子数组 ，如果对这个子数组进行升序排序，那么整个数组都会变为升序排序。
+请你找出符合题意的 最短 子数组，并输出它的长度。
+示例 1：
+输入：nums = [2,6,4,8,10,9,15]
+输出：5
+解释：你只需要对 [6, 4, 8, 10, 9] 进行升序排序，那么整个表都会变为升序排序。
+示例 2：
+输入：nums = [1,2,3,4]
+输出：0
+示例 3：
+输入：nums = [1]
+输出：0
+提示：
+1 <= nums.length <= 104
+-105 <= nums[i] <= 105
+进阶：你可以设计一个时间复杂度为 O(n) 的解决方案吗？
+
+思路：队列
+由于要保证时间O(N)，采用优先队列
+遍历给定数组存进优先队列
+遍历优先队列的所有元素给另外的数组
+将两个数组的值正向反向遍历，分别取得第一个不同值的下标
+最后返回三目运算符如果两个下标值不同返回差值加一即可
+否则返回0即可
+
+上代码：
+class Solution {
+public:
+    int begin = 0, end = 0;
+    vector<int> curr;
+    priority_queue<int, vector<int>, greater<int> > q;
+    
+    int findUnsortedSubarray(vector<int>& nums) {
+        for(int cur : nums) q.push(cur);
+        while(!q.empty()) {
+            int cur = q.top();
+            q.pop();
+            curr.push_back(cur);
+        }
+        for(int i = 0; i < nums.size(); i++) {
+            if(nums[i] != curr[i]) {
+                begin = i;
+                break;
+            }
+        }
+        for(int i = nums.size() - 1; i >= 0; i--) {
+            if(nums[i] != curr[i]) {
+                end = i;
+                break;
+            }
+        }
+        return end > begin ? end - begin + 1 : 0;
+    }
+};;
