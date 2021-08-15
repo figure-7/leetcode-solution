@@ -1,0 +1,63 @@
+题目难度：MEDIUM
+
+给你一个大小为 m x n 的网格和一个球。
+球的起始坐标为 [startRow, startColumn] 。
+你可以将球移到在四个方向上相邻的单元格内（可以穿过网格边界到达网格之外）。
+你 最多 可以移动 maxMove 次球。
+给你五个整数 m、n、maxMove、startRow 以及 startColumn ，找出并返回可以将球移出边界的路径数量。
+因为答案可能非常大，返回对 109 + 7 取余 后的结果。
+示例 1：
+输入：m = 2, n = 2, maxMove = 2, startRow = 0, startColumn = 0
+输出：6
+示例 2：
+输入：m = 1, n = 3, maxMove = 3, startRow = 0, startColumn = 1
+输出：12
+提示：
+1 <= m, n <= 50
+0 <= maxMove <= 50
+0 <= startRow < m
+0 <= startColumn < n
+
+思路：DP+BFS
+接下来上官方题解：
+可以使用动态规划计算出界的路径数。
+动态规划的状态由移动次数、行和列决定，定义 \textit{dp}[i][j][k]dp[i][j][k] 表示球移动 ii 次之后位于坐标 (j, k)(j,k) 的路径数量。
+当 i=0i=0 时，球一定位于起始坐标 (\textit{startRow}, \textit{startColumn})(startRow,startColumn)，因此动态规划的边界情况是：\textit{dp}[0][\textit{startRow}][\textit{startColumn}]=1dp[0][startRow][startColumn]=1，当 (j, k) \ne (\textit{startRow}, \textit{startColumn})(j,k) 
+ =(startRow,startColumn) 时有 \textit{dp}[0][j][k]=0dp[0][j][k]=0。
+如果球移动了 ii 次之后位于坐标 (j, k)(j,k)，且 i < \textit{maxMove}i<maxMove，0 \le j < m0≤j<m，0 \le k < n0≤k<n，则移动第 i+1i+1 次之后，球一定位于和坐标 (j, k)(j,k) 相邻的一个坐标，记为 (j', k')(j 
+′
+ ,k 
+′
+ )。
+当 0 \le j' < m0≤j 
+′
+ <m 且 0 \le k' < n0≤k 
+′
+ <n 时，球在移动 i+1i+1 次之后没有出界，将 \textit{dp}[i][j][k]dp[i][j][k] 的值加到 \textit{dp}[i+1][j'][k']dp[i+1][j 
+′
+ ][k 
+′
+ ]；
+否则，球在第 i+1i+1 次移动之后出界，将 \textit{dp}[i][j][k]dp[i][j][k] 的值加到出界的路径数。
+由于最多可以移动的次数是 \textit{maxMove}maxMove，因此遍历 0 \le i < \textit{maxMove}0≤i<maxMove，根据 \textit{dp}[i][][]dp[i][][] 计算 \textit{dp}[i+1][][]dp[i+1][][] 的值以及出界的路径数，即可得到最多移动 \textit{maxMove}maxMove 次的情况下的出界的路径数。
+根据上述思路，可以得到时间复杂度和空间复杂度都是 O(\textit{maxMove} \times m \times n)O(maxMove×m×n) 的实现。
+
+上代码：
+class Solution:
+    def findPaths(self, m: int, n: int, maxMove: int, startRow: int, startColumn: int) -> int:
+        MOD = 10**9 + 7
+
+        outCounts = 0
+        dp = [[[0] * n for _ in range(m)] for _ in range(maxMove + 1)]
+        dp[0][startRow][startColumn] = 1
+        for i in range(maxMove):
+            for j in range(m):
+                for k in range(n):
+                    if dp[i][j][k] > 0:
+                        for j1, k1 in [(j - 1, k), (j + 1, k), (j, k - 1), (j, k + 1)]:
+                            if 0 <= j1 < m and 0 <= k1 < n:
+                                dp[i + 1][j1][k1] = (dp[i + 1][j1][k1] + dp[i][j][k]) % MOD
+                            else:
+                                outCounts = (outCounts + dp[i][j][k]) % MOD
+        
+        return outCounts
