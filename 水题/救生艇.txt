@@ -1,0 +1,72 @@
+题目难度：MEDIUM
+
+第 i 个人的体重为 people[i]，每艘船可以承载的最大重量为 limit。
+每艘船最多可同时载两人，但条件是这些人的重量之和最多为 limit。
+返回载到每一个人所需的最小船数。
+(保证每个人都能被船载)。
+示例 1：
+输入：people = [1,2], limit = 3
+输出：1
+解释：1 艘船载 (1, 2)
+示例 2：
+输入：people = [3,2,2,1], limit = 3
+输出：3
+解释：3 艘船分别载 (1, 2), (2) 和 (3)
+示例 3：
+输入：people = [3,5,3,4], limit = 5
+输出：4
+解释：4 艘船分别载 (3), (3), (4), (5)
+提示：
+1 <= people.length <= 50000
+1 <= people[i] <= limit <= 30000
+
+思路：贪心
+先排序数组，同时将数值保存进哈希表，值为数值出现个数
+倒序遍历数组（后面遍历查哈希表省时间）
+如果当前数组值对应哈希表值小于0（当前这个人已经上船），就继续遍历
+否则结果值（初值0）加一，当前数组值对应哈希表值减一
+之后计算给定值减去当前数组值（剩下的空间）
+遍历计算值到1循环，如果当前值对应哈希表的值大于0（WA点1：缺少哈希表值的判断）就把哈希表值减一（上船的第二个人）
+同时结束循环（WA点2：审题错误，船上最多俩人）
+否则当前循环值减一后继续遍历
+最后返回结果值即可
+
+执行用时：
+464 ms
+, 在所有 C++ 提交中击败了
+5.05%
+的用户
+内存消耗：
+46.8 MB
+, 在所有 C++ 提交中击败了
+5.33%
+的用户
+（时空都炸了）
+
+上代码：
+class Solution {
+public:
+    unordered_map<int, int> map;
+    int res = 0;
+    
+    int numRescueBoats(vector<int>& people, int limit) {
+        for(int cur : people) {
+            if(!map.count(cur)) map[cur] = 1;
+            else map[cur]++;
+        }
+        sort(people.begin(), people.end());
+        for(int i = people.size() - 1; i >= 0; i--) {
+            if(map[people[i]] <= 0) continue;
+            res++;
+            map[people[i]]--;
+            int cur = limit - people[i];
+            while(cur > 0) {
+                if(map.count(cur) && map[cur] > 0) {
+                    map[cur]--;
+                    break;
+                } else cur--;
+            }
+        }
+        return res;
+    }
+};
