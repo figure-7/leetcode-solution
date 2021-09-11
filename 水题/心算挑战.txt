@@ -1,0 +1,73 @@
+题目难度：EASY
+
+「力扣挑战赛」心算项目的挑战比赛中，要求选手从 N 张卡牌中选出 cnt 张卡牌，若这 cnt 张卡牌数字总和为偶数，则选手成绩「有效」且得分为 cnt 张卡牌数字总和。
+给定数组 cards 和 cnt，其中 cards[i] 表示第 i 张卡牌上的数字。 
+请帮参赛选手计算最大的有效得分。
+若不存在获取有效得分的卡牌方案，则返回 0。
+示例 1：
+输入：cards = [1,2,8,9], cnt = 3
+输出：18
+解释：选择数字为 1、8、9 的这三张卡牌，此时可获得最大的有效得分 1+8+9=18。
+示例 2：
+输入：cards = [3,3,1], cnt = 1
+输出：0
+解释：不存在获取有效得分的卡牌方案。
+提示：
+1 <= cnt <= cards.length <= 10^5
+1 <= cards[i] <= 1000
+
+思路：力扣杯全国秋季编程大赛第二题（1h12min41s），优先队列
+（这题巨麻烦，大模拟，我就不具体写了，写个大概思路）
+先使用优先队列存储数组值
+再累加给定值个数的队列值进行累加和计算，并且记录当前和里偶数和奇数最小的值（方便后续和里奇数为奇数个时值的调换）
+当和里的奇数为偶数个时，直接返回和即可
+当和里的奇数为奇数个时（不符合和为偶数的条件），分几种情况：
+1：和里有奇数去除该奇数并且加上没在和里的最大的偶数
+2：和里有偶数去除该偶数并且加上没在和里的最大的奇数
+并且要数以上面运算只能进行一次，分别进行一次后比较两个结果的最大值，取最大值给结果
+此外还要考虑数组中全是奇数并且给定值为奇数，那么必然要返回0（和必为奇数）
+
+上代码：
+class Solution {
+public:
+    priority_queue<int> h;
+    int res = 0, ji = 0, ou = 0, sumji = 0, a = 0, b = 0;
+    
+    int maxmiumScore(vector<int>& cards, int cnt) {
+        for(int cur : cards) h.push(cur);
+        while(cnt > 0) {
+            int cur = h.top();
+            if(cur % 2 != 0) {
+                ji = cur;
+                sumji++;
+                res += cur;
+            } else {
+                ou = cur;
+                res += cur;
+            }
+            h.pop();
+            cnt--;
+        }
+        if(sumji % 2 != 0) {
+            if(h.empty()) return 0;
+            while(!h.empty()) {
+                int cur = h.top();
+                if(a == 0 && cur % 2 != 0) {
+                    if(ou != 0) {
+                        a = res;
+                        a -= ou;
+                        a += cur;
+                    }
+                    if(b != 0 && a > b) return a;
+                } else if(b == 0 && cur % 2 == 0) {
+                    b = res;
+                    b -= ji;
+                    b += cur; 
+                    if(a != 0 && b > a) return b;
+                } else a = a;
+                h.pop();
+            }
+        } else return res;
+        return a > b ? a : b;
+    }
+};
