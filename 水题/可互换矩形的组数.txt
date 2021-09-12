@@ -1,0 +1,69 @@
+题目难度：MEDIUM
+
+用一个下标从 0 开始的二维整数数组 rectangles 来表示 n 个矩形，其中 rectangles[i] = [widthi, heighti] 表示第 i 个矩形的宽度和高度。
+如果两个矩形 i 和 j（i < j）的宽高比相同，则认为这两个矩形 可互换 。
+更规范的说法是，两个矩形满足 widthi/heighti == widthj/heightj（使用实数除法而非整数除法），则认为这两个矩形 可互换 。
+计算并返回 rectangles 中有多少对 可互换 矩形。
+示例 1：
+输入：rectangles = [[4,8],[3,6],[10,20],[15,30]]
+输出：6
+解释：下面按下标（从 0 开始）列出可互换矩形的配对情况：
+- 矩形 0 和矩形 1 ：
+4/8 == 3/6
+- 矩形 0 和矩形 2 ：
+4/8 == 10/20
+- 矩形 0 和矩形 3 ：
+4/8 == 15/30
+- 矩形 1 和矩形 2 ：
+3/6 == 10/20
+- 矩形 1 和矩形 3 ：
+3/6 == 15/30
+- 矩形 2 和矩形 3 ：
+10/20 == 15/30
+示例 2：
+输入：rectangles = [[4,5],[7,8]]
+输出：0
+解释：不存在成对的可互换矩形。
+提示：
+n == rectangles.length
+1 <= n <= 105
+rectangles[i].length == 2
+1 <= widthi, heighti <= 105
+
+思路：周赛第二题（9min57s），数论
+遍历数组，对数组没项的两个值套gcd板子，得到的结果分别用数组两个值除
+对于处理后的数组进行排序
+排序数组后从第一项开始，如果与前一项的两个值都相同，那么就把结果值（初值0）加上前面相同值的个数值
+最后返回结果值即可
+
+上代码：
+class Solution {
+public:
+    long long res = 0;
+    int sum = 1;
+    
+    int gcd(int m, int n) {
+        while(m > 0) {
+            int c = n % m;
+            n = m;
+            m = c;
+        }
+        return n;
+    }
+    
+    long long interchangeableRectangles(vector<vector<int>>& rectangles) {
+        for(int i = 0; i < rectangles.size(); i++) {
+            int cur = gcd(rectangles[i][0], rectangles[i][1]);
+            rectangles[i][0] /= cur;
+            rectangles[i][1] /= cur;
+        }
+        sort(rectangles.begin(), rectangles.end());
+        for(int i = 1; i < rectangles.size(); i++) {
+            if(rectangles[i][0] == rectangles[i - 1][0] && rectangles[i][1] == rectangles[i - 1][1]) {
+                res += sum;
+                sum++;
+            } else sum = 1;
+        }
+        return res;
+    }
+};
