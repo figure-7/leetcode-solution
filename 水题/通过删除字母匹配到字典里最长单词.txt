@@ -1,0 +1,76 @@
+题目难度：MEDIUM
+
+给你一个字符串 s 和一个字符串数组 dictionary 作为字典，找出并返回字典中最长的字符串，该字符串可以通过删除 s 中的某些字符得到。
+如果答案不止一个，返回长度最长且字典序最小的字符串。
+如果答案不存在，则返回空字符串。
+示例 1：
+输入：s = "abpcplea", dictionary = ["ale","apple","monkey","plea"]
+输出："apple"
+示例 2：
+输入：s = "abpcplea", dictionary = ["a","b","c"]
+输出："a"
+提示：
+1 <= s.length <= 1000
+1 <= dictionary.length <= 1000
+1 <= dictionary[i].length <= 1000
+s 和 dictionary[i] 仅由小写英文字母组成
+
+思路：模拟
+（WA点1：算法错误）
+首先遍历给定数组
+先设置下标值为0（WA点2：下标值要预先设置在外面）
+针对数组每一项遍历字符
+如果当前数组对应字符串等于给定字符串，直接返回当前字符串即可（WA点3：缺少此处判断）
+针对每个字符，如果不等于给定字符串对应的下标对应的字符，那么下标值加一，直到下标值等于给定字符串长度
+如果下标值大于等于给定字符串长度了（给定字符串遍历结束当时当前数组对应字符串还是不符合子串条件），结束当前内部循环
+如果当前字符等于当前数组对应字符串最后一个字符（满足子串条件），那么比较当前数组对应字符串与结果字符串（初值空）的长度
+如果当前数组对应字符串的长度大于结果字符串，就把当前数组对应字符串给结果字符串
+否则如果长度相等，从前到后遍历比较字符
+如果当前数组对应字符串的字符小于结果字符串对应的字符，就把当前数组对应字符串给结果字符串
+否则如果当前数组对应字符串的字符大于结果字符串对应的字符，就结束当前循环
+否则继续遍历
+外部同样否则继续遍历
+遍历给定数组对应字符串字符最后要把下标值加一（WA点4：没有避免重复判断当前字符）
+最后返回结果字符串即可
+
+执行用时：
+60 ms
+, 在所有 C++ 提交中击败了
+59.41%
+的用户
+内存消耗：
+14.6 MB
+, 在所有 C++ 提交中击败了
+85.39%
+的用户
+（时间一般，空间不错）
+
+上代码：
+class Solution {
+public:
+    string res = "";
+    
+    string findLongestWord(string s, vector<string>& dictionary) {
+        for(int i = 0; i < dictionary.size(); i++) {
+            int siz = 0;
+            for(int j = 0; j < dictionary[i].size(); j++) {
+                if(dictionary[i] == s) return dictionary[i];
+                while(siz < s.size() && dictionary[i][j] != s[siz]) siz++;
+                if(siz >= s.size()) break;
+                if(j == dictionary[i].size() - 1) {
+                    if(res.size() < dictionary[i].size()) res = dictionary[i];
+                    else if(res.size() == dictionary[i].size()) {
+                        for(int k = 0; k < dictionary[i].size(); k++) {
+                            if(dictionary[i][k] < res[k]) res = dictionary[i];
+                            else if(dictionary[i][k] > res[k]) break;
+                            else continue;
+                        }
+                    }
+                    else continue;
+                }
+                siz++;
+            }
+        }
+        return res;
+    }
+};
