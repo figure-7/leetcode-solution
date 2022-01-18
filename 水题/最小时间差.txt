@@ -1,0 +1,52 @@
+题目难度：MEDIUM
+
+给定一个 24 小时制（小时:分钟 "HH:MM"）的时间列表，找出列表中任意两个时间的最小时间差并以分钟数表示。
+示例 1：
+输入：timePoints = ["23:59","00:00"]
+输出：1
+示例 2：
+输入：timePoints = ["00:00","23:59","00:00"]
+输出：0
+提示：
+2 <= timePoints <= 2 * 104
+timePoints[i] 格式为 "HH:MM"
+
+思路：模拟
+排序给定数组，遍历给定数组
+每两项计算两者时间的差值，利用字符串截取转数字计算
+每次循环结束把当前计算值和结果值取最小值给结果值（初值10000000）
+遍历结束取数组第一项与最后一项的时间差，把当前计算值和结果值取最小值给结果值
+最后返回结果值即可
+
+执行用时：
+20 ms
+, 在所有 C++ 提交中击败了
+15.21%
+的用户
+内存消耗：
+13.1 MB
+, 在所有 C++ 提交中击败了
+72.09%
+的用户
+（时间炸了，空间不错）
+
+上代码：
+class Solution {
+public:
+    int res = 10000000;
+
+    int findMinDifference(vector<string>& timePoints) {
+        sort(timePoints.begin(), timePoints.end());
+        for(int i = 0; i < timePoints.size() - 1; i++) {
+            int begina = stoi(timePoints[i].substr(0, 2)), beginb = stoi(timePoints[i + 1].substr(0, 2)), enda = stoi(timePoints[i].substr(3, 2)), endb = stoi(timePoints[i + 1].substr(3, 2));
+            int sum = (beginb - begina) * 60;
+            sum += endb;
+            sum -= enda;
+            res = min(res, sum);
+            sum = 0;
+        }
+        int lefta = (24 - stoi(timePoints[timePoints.size() - 1].substr(0, 2))) * 60, righta = stoi(timePoints[timePoints.size() - 1].substr(3, 2)), leftb = stoi(timePoints[0].substr(0, 2)) * 60, rightb = stoi(timePoints[0].substr(3, 2));
+        res = min(res, lefta - righta + leftb + rightb);
+        return res;
+    }
+};
