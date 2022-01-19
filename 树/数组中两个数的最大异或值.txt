@@ -1,0 +1,88 @@
+题目难度：MEDIUM
+
+给你一个整数数组 nums ，返回 nums[i] XOR nums[j] 的最大运算结果，其中 0 ≤ i ≤ j < n 。
+进阶：你可以在 O(n) 的时间解决这个问题吗？
+示例 1：
+输入：nums = [3,10,5,25,2,8]
+输出：28
+解释：最大运算结果是 5 XOR 25 = 28.
+示例 2：
+输入：nums = [0]
+输出：0
+示例 3：
+输入：nums = [2,4]
+输出：6
+示例 4：
+输入：nums = [8,10,2]
+输出：10
+示例 5：
+输入：nums = [14,70,53,83,49,91,36,80,92,51,66,70]
+输出：127
+提示：
+1 <= nums.length <= 2 * 104
+0 <= nums[i] <= 231 - 1
+
+思路：前缀树
+接下来上题解区题解：
+把每一个数字当成一个31位的01字符串，从最高位开始，建立字典树，在求异或的最大值的时候，每次尽量找跟当前位不一样的bit，这样就可以使异或结果的当前位为1，否则只能为0
+
+执行用时：
+118 ms
+, 在所有 Java 提交中击败了
+52.60%
+的用户
+内存消耗：
+57.1 MB
+, 在所有 Java 提交中击败了
+83.01%
+的用户
+（时间一般，空间不错）
+
+上代码：
+class Solution {
+    
+    public int findMaximumXOR(int[] nums) {
+        int res = 0;
+        Trie tree = new Trie();
+        for(int i = 1;i<nums.length;i++){
+            tree.insert(nums[i-1]);
+	//每步都要进行当前数组想的树路径
+            res = Math.max(res,tree.xor(nums[i]));
+	//计算最大异或值
+        }
+        return res;
+    }
+    class Trie{
+        Trie[] children;
+        public Trie(){
+            children = new Trie[2];
+        }
+        public void insert(int num){
+            Trie node = this;
+            for(int i = 30;i>=0;i--){
+                int bit = (num>>i)&1;
+                if(node.children[bit]==null){
+                    node.children[bit] = new Trie();
+                }
+                node = node.children[bit];
+            }
+        }
+	//初始化前缀树
+        public int xor(int num){
+            Trie node = this;
+            int res = 0;
+            for(int i = 30;i>=0;i--){
+                int bit = (num>>i)&1;
+                if(node.children[1-bit]!=null){
+                    res = res * 2 + 1;
+                    node = node.children[1-bit];
+                }else{
+                    res = res * 2;
+                    node = node.children[bit];
+                }
+	//计算最大值并寻求最佳路径
+            }
+            return res;
+        }
+    }
+}
