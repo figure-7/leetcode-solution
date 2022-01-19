@@ -1,0 +1,77 @@
+题目难度：MEDIUM
+
+在英语中，我们有一个叫做 词根(root) 的概念，可以词根后面添加其他一些词组成另一个较长的单词——我们称这个词为 继承词(successor)。
+例如，词根an，跟随着单词 other(其他)，可以形成新的单词 another(另一个)。
+现在，给定一个由许多词根组成的词典 dictionary 和一个用空格分隔单词形成的句子 sentence。
+你需要将句子中的所有继承词用词根替换掉。
+如果继承词有许多可以形成它的词根，则用最短的词根替换它。
+你需要输出替换之后的句子。
+示例 1：
+输入：dictionary = ["cat","bat","rat"], sentence = "the cattle was rattled by the battery"
+输出："the cat was rat by the bat"
+示例 2：
+输入：dictionary = ["a","b","c"], sentence = "aadsfasf absbs bbab cadsfafs"
+输出："a a b c"
+提示：
+1 <= dictionary.length <= 1000
+1 <= dictionary[i].length <= 100
+dictionary[i] 仅由小写字母组成。
+1 <= sentence.length <= 10^6
+sentence 仅由小写字母和空格组成。
+sentence 中单词的总量在范围 [1, 1000] 内。
+sentence 中每个单词的长度在范围 [1, 1000] 内。
+sentence 中单词之间由一个空格隔开。
+sentence 没有前导或尾随空格。
+
+思路：哈希表
+建立哈希表存储给定的所有前缀，遍历字符串将每个单词保存进新建数组中
+遍历新建数组，建立一个空字符串
+二重遍历每项数组值的每个字符，空字符串进行字符累加
+每次在哈希表搜索该字符串，如果找了结果字符串（初值空）就加上当前字符串和空格字符，结束内部循环
+否则遍历结束直接把结果字符串加上当前字符串和空格字符
+最后返回结果字符串即可
+
+执行用时：
+76 ms
+, 在所有 C++ 提交中击败了
+44.14%
+的用户
+内存消耗：
+26.3 MB
+, 在所有 C++ 提交中击败了
+89.25%
+的用户
+（时间一般，空间不错）
+
+上代码：
+class Solution {
+public:
+    unordered_map<string, int> map;
+    string s = "", res = "";
+    vector<string> curr;
+
+    string replaceWords(vector<string>& dictionary, string sentence) {
+        for(string str : dictionary) map[str] = 1;
+        for(int i = 0; i < sentence.size(); i++) {
+            if(sentence[i] != ' ') s += sentence[i];
+            else {
+                curr.push_back(s);
+                s = "";
+            }
+        }
+        curr.push_back(s);
+        for(string str : curr) {
+            string cur = "";
+            for(int i = 0; i < str.size(); i++) {
+                cur += str[i];
+                if(map.find(cur) != map.end()) {
+                    res += cur;
+                    break;
+                }
+                if(i == str.size() - 1) res += cur;
+            }
+            res += ' ';
+        }
+        return res.substr(0, res.size() - 1);
+    }
+};
