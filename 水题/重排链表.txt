@@ -1,0 +1,68 @@
+题目难度：MEIDUM
+
+给定一个单链表 L 的头节点 head ，单链表 L 表示为：
+L0 → L1 → … → Ln - 1 → Ln
+请将其重新排列后变为：
+L0 → Ln → L1 → Ln - 1 → L2 → Ln - 2 → …
+不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。
+示例 1：
+输入：head = [1,2,3,4]
+输出：[1,4,2,3]
+示例 2：
+输入：head = [1,2,3,4,5]
+输出：[1,5,2,4,3]
+提示：
+链表的长度范围为 [1, 5 * 104]
+1 <= node.val <= 1000
+
+思路：链表+队列
+建立两个链表继承给定链表
+遍历其中一个链表将节点值保存进建立的数组中
+循环当数组不为空时，利用一个布尔值依次将数组首项和尾项存入队列并删除，并反转布尔值
+最后遍历另外一个链表，将队列值按顺序赋值给该链表节点即可
+
+上代码：
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> curr;
+    queue<int> q;
+    bool flag = 1;
+
+    void reorderList(ListNode* head) {
+        ListNode* node = head;
+        ListNode* link = head;
+        while(node != nullptr) {
+            curr.push_back(node->val);
+            node = node->next;
+        }
+        while(curr.size() != 0) {
+            if(flag) {
+                q.push(curr[0]);
+                flag = 0;
+                vector<int>::iterator it = curr.begin();
+                curr.erase(it);
+            }
+            else {
+                q.push(curr[curr.size() - 1]);
+                flag = 1;
+                vector<int>::iterator it = curr.begin() + curr.size() - 1;
+                curr.erase(it);
+            }
+        }
+        while(link != nullptr) {
+            link->val = q.front();
+            q.pop();
+            link = link->next;
+        }
+    }
+};
