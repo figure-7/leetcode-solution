@@ -1,0 +1,86 @@
+题目难度：MEDIUM
+
+给你一个下标从 0 开始且长度为 n 的整数数组 differences ，它表示一个长度为 n + 1 的 隐藏 数组 相邻 元素之间的 差值 。
+更正式的表述为：我们将隐藏数组记作 hidden ，那么 differences[i] = hidden[i + 1] - hidden[i] 。
+同时给你两个整数 lower 和 upper ，它们表示隐藏数组中所有数字的值都在 闭 区间 [lower, upper] 之间。
+比方说，differences = [1, -3, 4] ，lower = 1 ，upper = 6 ，那么隐藏数组是一个长度为 4 且所有值都在 1 和 6 （包含两者）之间的数组。
+[3, 4, 1, 5] 和 [4, 5, 2, 6] 都是符合要求的隐藏数组。
+[5, 6, 3, 7] 不符合要求，因为它包含大于 6 的元素。
+[1, 2, 3, 4] 不符合要求，因为相邻元素的差值不符合给定数据。
+请你返回 符合 要求的隐藏数组的数目。
+如果没有符合要求的隐藏数组，请返回 0 。
+示例 1：
+输入：differences = [1,-3,4], lower = 1, upper = 6
+输出：2
+解释：符合要求的隐藏数组为：
+- [3, 4, 1, 5]
+- [4, 5, 2, 6]
+所以返回 2 。
+示例 2：
+输入：differences = [3,-4,5,1,-2], lower = -4, upper = 5
+输出：4
+解释：符合要求的隐藏数组为：
+- [-3, 0, -4, 1, 2, 0]
+- [-2, 1, -3, 2, 3, 1]
+- [-1, 2, -2, 3, 4, 2]
+- [0, 3, -1, 4, 5, 3]
+所以返回 4 。
+示例 3：
+输入：differences = [4,-7,2], lower = 3, upper = 6
+输出：0
+解释：没有符合要求的隐藏数组，所以返回 0 。
+提示：
+n == differences.length
+1 <= n <= 105
+-105 <= differences[i] <= 105
+-105 <= lower <= upper <= 105
+
+思路：双周赛第二题（19min59s），模拟
+先遍历给定值的范围，内部遍历给定数组
+之后按照外部遍历值来对内部数组遍历项进行累加
+每次判断累加后的结果是否超出给定两个值的范围
+超出就直接结束内部循环
+否则继续
+内部如果遍历到数组最后一项（当前外部遍历值符合题目条件）就记录外部遍历值（即符合题意条件的最小值），并结束两层循环
+同样按上面的步骤外部逆序遍历一次得到符合题意条件的最大值
+上面两个最大值分别由建立的两个值继承的（初值设置为最大和最小）
+这样结果返回一个三目运算符
+如果两者的差特别大（没有找到符合题意条件的值）就返回0即可
+否则返回两者的差加一（两者本身值都要算在内）即可
+
+
+上代码：
+class Solution {
+public:
+    int left = -1000000, right = 1000000;
+    
+    int numberOfArrays(vector<int>& differences, int lower, int upper) {
+        for(int i = lower; i <= upper; i++) {
+            bool flag = 0;
+            int a = i;
+            for(int j = 0; j < differences.size(); j++) {
+                a += differences[j];
+                if(a > upper || a < lower) break;
+                if(j == differences.size() - 1) {
+                    left = i;
+                    flag = 1;
+                }
+            }
+            if(flag) break;
+        }
+        for(int i = upper; i >= lower; i--) {
+            bool flag = 0;
+            int a = i;
+            for(int j = 0; j < differences.size(); j++) {
+                a += differences[j];
+                if(a < lower || a > upper) break;
+                if(j == differences.size() - 1) {
+                    right = i;
+                    flag = 1;
+                }
+            }
+            if(flag) break;
+        }
+        return (right - left) > 1000000 ? 0 : right - left + 1;
+    }
+};
