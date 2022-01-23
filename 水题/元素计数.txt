@@ -1,0 +1,47 @@
+题目难度：EASY
+
+给你一个整数数组 nums ，统计并返回在 nums 中同时具有一个严格较小元素和一个严格较大元素的元素数目。
+示例 1：
+输入：nums = [11,7,2,15]
+输出：2
+解释：元素 7 ：严格较小元素是元素 2 ，严格较大元素是元素 11 。
+元素 11 ：严格较小元素是元素 7 ，严格较大元素是元素 15 。
+总计有 2 个元素都满足在 nums 中同时存在一个严格较小元素和一个严格较大元素。
+示例 2：
+输入：nums = [-3,3,3,90]
+输出：2
+解释：元素 3 ：严格较小元素是元素 -3 ，严格较大元素是元素 90 。
+由于有两个元素的值为 3 ，总计有 2 个元素都满足在 nums 中同时存在一个严格较小元素和一个严格较大元素。
+提示：
+1 <= nums.length <= 100
+-105 <= nums[i] <= 105
+
+思路：周赛第一题（6min57s）， 模拟
+排序数组，先出数组最大最小值
+正向遍历数组，等于最小值的就删除，否则结束循环
+逆向遍历数组，等于最大值的就删除，否则结束循环
+（WA点， 逆向遍历删除数组项后下标导错了...）
+最后返回数组长度即可
+
+上代码：
+class Solution {
+public:
+    int countElements(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        int a = nums[0], b = nums[nums.size() - 1];
+        for(int i = 0; i < nums.size(); i++) {
+            if(a == nums[i]) {
+                vector<int>::iterator it = nums.begin() + i;
+    	        nums.erase(it);
+                i--;
+            } else break;
+        }
+        for(int i = nums.size() - 1; i >= 0; i--) {
+            if(b == nums[i]) {
+                vector<int>::iterator it = nums.begin() + i;
+    	        nums.erase(it);
+            } else break;
+        }
+        return nums.size();
+    }
+};
