@@ -1,0 +1,68 @@
+题目难度：MEDIUM
+
+复数 可以用字符串表示，遵循 "实部+虚部i" 的形式，并满足下述条件：
+实部 是一个整数，取值范围是 [-100, 100]
+虚部 也是一个整数，取值范围是 [-100, 100]
+i2 == -1
+给你两个字符串表示的复数 num1 和 num2 ，请你遵循复数表示形式，返回表示它们乘积的字符串。
+示例 1：
+输入：num1 = "1+1i", num2 = "1+1i"
+输出："0+2i"
+解释：(1 + i) * (1 + i) = 1 + i2 + 2 * i = 2i ，你需要将它转换为 0+2i 的形式。
+示例 2：
+输入：num1 = "1+-1i", num2 = "1+-1i"
+输出："0+-2i"
+解释：(1 - i) * (1 - i) = 1 + i2 - 2 * i = -2i ，你需要将它转换为 0+-2i 的形式。 
+提示：
+num1 和 num2 都是有效的复数表示。
+
+思路：模拟
+首先遍历字符串，按照加号分割为两个字符串
+将后面的字符串取消掉i字符
+之后将这两个字符串转换位为数字
+给定两个字符串都这样操作后得到四个数
+按提议计算出实部和虚部的大小
+之后再将实部虚部转换为字符串拼接得到的结果返回即可
+
+执行用时：
+0 ms
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+内存消耗：
+5.9 MB
+, 在所有 C++ 提交中击败了
+47.69%
+的用户
+（时间完杀！！！空间一般）
+
+上代码：
+class Solution {
+public:
+    string a = "", b = "", c = "", d = "", res = "";
+    bool flag = false;
+
+    string complexNumberMultiply(string num1, string num2) {
+        for(int i = 0; i < num1.size(); i++) {
+            if(flag) b += num1[i];
+            if(!flag && num1[i] != '+') a += num1[i];
+            else flag = true;
+        }
+        for(int i = 0; i < num2.size(); i++) {
+            if(!flag) d += num2[i];
+            if(flag && num2[i] != '+') c += num2[i];
+            else flag = false;
+        }
+        b = b.substr(0, b.size() - 1);
+        d = d.substr(0, d.size() - 1);
+        int aa = stoi(a), bb = stoi(b), cc = stoi(c), dd = stoi(d);
+        int resa = aa * cc, resb = aa * dd;
+        resa -= bb * dd;
+        resb += bb * cc;
+        res += to_string(resa);
+        res += '+';
+        res += to_string(resb);
+        res += 'i';
+        return res;
+    }
+};
