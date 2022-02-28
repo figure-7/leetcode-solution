@@ -1,0 +1,159 @@
+题目难度：HARD
+
+我们有 n 栋楼，编号从 0 到 n - 1 。
+每栋楼有若干员工。
+由于现在是换楼的季节，部分员工想要换一栋楼居住。
+给你一个数组 requests ，其中 requests[i] = [fromi, toi] ，表示一个员工请求从编号为 fromi 的楼搬到编号为 toi 的楼。
+一开始 所有楼都是满的，所以从请求列表中选出的若干个请求是可行的需要满足 每栋楼员工净变化为 0 。
+意思是每栋楼 离开 的员工数目 等于 该楼 搬入 的员工数数目。
+比方说 n = 3 且两个员工要离开楼 0 ，一个员工要离开楼 1 ，一个员工要离开楼 2 ，如果该请求列表可行，应该要有两个员工搬入楼 0 ，一个员工搬入楼 1 ，一个员工搬入楼 2 。
+请你从原请求列表中选出若干个请求，使得它们是一个可行的请求列表，并返回所有可行列表中最大请求数目。
+示例 1：
+输入：n = 5, requests = [[0,1],[1,0],[0,1],[1,2],[2,0],[3,4]]
+输出：5
+解释：请求列表如下：
+从楼 0 离开的员工为 x 和 y ，且他们都想要搬到楼 1 。
+从楼 1 离开的员工为 a 和 b ，且他们分别想要搬到楼 2 和 0 。
+从楼 2 离开的员工为 z ，且他想要搬到楼 0 。
+从楼 3 离开的员工为 c ，且他想要搬到楼 4 。
+没有员工从楼 4 离开。
+我们可以让 x 和 b 交换他们的楼，以满足他们的请求。
+我们可以让 y，a 和 z 三人在三栋楼间交换位置，满足他们的要求。
+所以最多可以满足 5 个请求。
+示例 2：
+输入：n = 3, requests = [[0,0],[1,2],[2,1]]
+输出：3
+解释：请求列表如下：
+从楼 0 离开的员工为 x ，且他想要回到原来的楼 0 。
+从楼 1 离开的员工为 y ，且他想要搬到楼 2 。
+从楼 2 离开的员工为 z ，且他想要搬到楼 1 。
+我们可以满足所有的请求。
+示例 3：
+输入：n = 4, requests = [[0,3],[3,1],[1,2],[2,0]]
+输出：4
+提示：
+1 <= n <= 20
+1 <= requests.length <= 16
+requests[i].length == 2
+0 <= fromi, toi < n
+
+思路：结构体+队列+DFS
+接下来上题解区题解：
+最小费用最大流(模板)
+目的是求出原图多余不平衡的边。
+用源点和汇点添加额外的边将所有点的出入配平
+进而求源点到汇点的最大流，途经的边就是原图不平衡的边（把它们去掉原图就可以平衡了）
+那么为了完成最多的方案，就要让去掉的边最少
+那么给每条边一个cost(等于1) 求出最大流所需的最小费用就是需要去掉的边的数量了
+
+执行用时：
+0 ms
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+内存消耗：
+10 MB
+, 在所有 C++ 提交中击败了
+58.47%
+的用户
+（时间完杀！！！空间一般）
+
+上代码：
+const int N = 20+5;
+const int INF = 1e9;
+template <typename T>
+struct ZKW_SPFA {
+    struct Edge {
+        int v, nex;
+        T w, c; // edge wight and cost
+        Edge(const int& _v, const int& _nex, const T& _w, const T& _c) \
+            : v(_v), nex(_nex), w(_w), c(_c) {}
+    };
+    vector<Edge> e;
+    int n, s, t;
+    int fir[N], vis[N];
+    T maxflow, mincost;
+    T dis[N];
+    ZKW_SPFA() { e.reserve(N << 4); }
+    void init(const int& _n) {
+        n = _n;
+        maxflow = mincost = 0;
+        e.clear();
+        memset(fir, -1, sizeof(int) * (n + 3));
+    }
+    void add_edge(const int& u, const int& v, const T& w = 1, const T& c = 0) {
+        e.emplace_back(v, fir[u], w, c); fir[u] = e.size() - 1;
+        e.emplace_back(u, fir[v], 0, -c); fir[v] = e.size() - 1;
+    }
+    pair<T, T> work(const int& _s, const int& _t) {
+        s = _s; t = _t;
+        while (spfa()) {
+            vis[t] = 1;
+            while (vis[t]) {
+                memset(vis, 0, sizeof(int) * (n + 3));
+                maxflow += dfs(s, INF);
+            }
+        }
+        return { maxflow, mincost };
+    }
+private:
+    bool spfa() {
+        memset(dis, 0x3f, sizeof(T) * (n + 3));
+        memset(vis, 0, sizeof(int) * (n + 3));
+        deque<int> q;
+        q.push_back(t);
+        dis[t] = 0;
+        vis[t] = 1;
+        while (q.size()) {
+            int u = q.front(); q.pop_front();
+            for (int i = fir[u], v; ~i; i = e[i].nex) {
+                v = e[i].v;
+                if (!e[i ^ 1].w || dis[v] <= dis[u] + e[i ^ 1].c) continue;
+                dis[v] = dis[u] + e[i ^ 1].c;
+                if (vis[v]) continue;
+                vis[v] = 1;
+                if (q.size() && dis[v] < dis[q.front()]) q.push_front(v);
+                else q.push_back(v);
+            }
+            vis[u] = 0;
+        }
+        return dis[s] < INF;
+    }
+    T dfs(const int& u, const T& flow) {
+        vis[u] = 1;
+        if (u == t || flow <= 0) return flow;
+        T res, used = 0;
+        for (int i = fir[u], v; ~i; i = e[i].nex) {
+            v = e[i].v;
+            if (vis[v] || !e[i].w || dis[u] != dis[v] + e[i].c) continue;
+            res = dfs(v, min(e[i].w, flow - used));
+            if (!res) continue;
+            mincost += res * e[i].c;
+            e[i].w -= res;
+            e[i ^ 1].w += res;
+            used += res;
+            if (used == flow) break;
+        }
+        return used;
+    }
+};
+
+class Solution {
+public:
+    int maximumRequests(int n, vector<vector<int>>& requests) {
+        int m = requests.size(), ans = 0;
+        vector<int> d(n);
+        ZKW_SPFA<int> zkw;
+        zkw.init(n+2);
+        for(auto req: requests){
+            zkw.add_edge(req[0], req[1], 1, 1);
+            d[req[1]]++;
+            d[req[0]]--;
+        }
+        for(int i = 0; i < n; ++i){
+            if(d[i] > 0) zkw.add_edge(i, n + 1, d[i], 0);
+            else if(d[i] < 0) zkw.add_edge(n, i, -d[i], 0);
+        }
+        return m - zkw.work(n, n + 1).second;
+    }
+};
