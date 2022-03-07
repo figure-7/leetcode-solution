@@ -1,0 +1,37 @@
+题目难度：EASY
+
+给定一个整数 num，将其转化为 7 进制，并以字符串形式输出。
+示例 1:
+输入: num = 100
+输出: "202"
+示例 2:
+输入: num = -7
+输出: "-10"
+提示：
+-107 <= num <= 107
+
+思路：DP
+直接网上套十进制转八进制板子
+之后注意返回字符串格式，并将数字8全部改为7
+否则字符串结果即可
+
+执行用时：
+0 ms
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+内存消耗：
+5.9 MB
+, 在所有 C++ 提交中击败了
+14.65%
+的用户
+（时间完杀！！！空间炸了）
+
+上代码：
+class Solution {
+public:
+    string convertToBase7(int num) {
+        if(num > -7 && num < 7) return to_string(num);
+        else return to_string(num % 7 + 10 * (stoi(convertToBase7(num / 7))));
+    }
+};
