@@ -1,0 +1,127 @@
+题目难度：HARD
+
+给定一个字符串 s，你可以通过在字符串前面添加字符将其转换为回文串。
+找到并返回可以用这种方式转换的最短回文串。
+示例 1：
+输入：s = "aacecaaa"
+输出："aaacecaaa"
+示例 2：
+输入：s = "abcd"
+输出："dcbabcd"
+提示：
+0 <= s.length <= 5 * 104
+s 仅由小写英文字母组成
+
+思路：模拟
+我们也可以不「投机取巧」，而是使用 KMP 字符串匹配算法来找出这个最长的前缀回文串。
+具体地，记 \hat{s} 
+s
+^
+  为 ss 的反序，由于 s_1s 
+1
+​
+  是 ss 的前缀，那么 \hat{s}_1 
+s
+^
+1
+​
+  就是 \hat{s} 
+s
+^
+  的后缀。
+考虑到 s_1s 
+1
+​
+  是一个回文串，因此 s_1 = \hat{s}_1s 
+1
+​
+ = 
+s
+^
+1
+​
+ ，s_1s 
+1
+​
+  同样是 \hat{s} 
+s
+^
+  的后缀。
+这样一来，我们将 ss 作为模式串，\hat{s} 
+s
+^
+  作为查询串进行匹配。当遍历到 \hat{s} 
+s
+^
+  的末尾时，如果匹配到 ss 中的第 ii 个字符，那么说明 ss 的前 ii 个字符与 \hat{s} 
+s
+^
+  的后 ii 个字符相匹配（即相同），ss 的前 ii 个字符对应 s_1s 
+1
+​
+ ，\hat{s} 
+s
+^
+  的后 ii 个字符对应 \hat{s}_1 
+s
+^
+1
+​
+ ，由于 s_1 = \hat{s}_1s 
+1
+​
+ = 
+s
+^
+1
+​
+ ，因此 s_1s 
+1
+​
+  就是一个回文串。
+如果存在更长的回文串，那么 KMP 算法的匹配结果也会大于 ii，因此 s_1s 
+1
+​
+  就是最长的前缀回文串。
+
+执行用时：
+0 ms
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+内存消耗：
+7.2 MB
+, 在所有 C++ 提交中击败了
+73.49%
+的用户
+（时间完杀！！！空间不错）
+
+上代码：
+class Solution {
+public:
+    string shortestPalindrome(string s) {
+        int n = s.size();
+        vector<int> fail(n, -1);
+        for (int i = 1; i < n; ++i) {
+            int j = fail[i - 1];
+            while (j != -1 && s[j + 1] != s[i]) {
+                j = fail[j];
+            }
+            if (s[j + 1] == s[i]) {
+                fail[i] = j + 1;
+            }
+        }
+        int best = -1;
+        for (int i = n - 1; i >= 0; --i) {
+            while (best != -1 && s[best + 1] != s[i]) {
+                best = fail[best];
+            }
+            if (s[best + 1] == s[i]) {
+                ++best;
+            }
+        }
+        string add = (best == n - 1 ? "" : s.substr(best + 1, n));
+        reverse(add.begin(), add.end());
+        return add + s;
+    }
+};
