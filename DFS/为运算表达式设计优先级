@@ -1,0 +1,83 @@
+题目难度：MEDIUM
+
+给你一个由数字和运算符组成的字符串 expression ，按不同优先级组合数字和运算符，计算并返回所有可能组合的结果。
+你可以 按任意顺序 返回答案。
+示例 1：
+输入：expression = "2-1-1"
+输出：[0,2]
+解释：
+((2-1)-1) = 0 
+(2-(1-1)) = 2
+示例 2：
+输入：expression = "2*3-4*5"
+输出：[-34,-14,-10,-10,10]
+解释：
+(2*(3-(4*5))) = -34 
+((2*3)-(4*5)) = -14 
+((2*(3-4))*5) = -10 
+(2*((3-4)*5)) = -10 
+(((2*3)-4)*5) = 10
+提示：
+1 <= expression.length <= 20
+expression 由数字和算符 '+'、'-' 和 '*' 组成。
+输入表达式中的所有整数值在范围 [0, 99] 
+
+思路：DFS
+接下来上题解区题解：
+分解 -> 解决（触底）-> 合并（回溯）
+void divid_merge(一个数组) {
+  if (达到数组边界) return;
+//相当于二叉树的后续遍历
+  divid_merge(左半个数组);
+  divid_merge(右半个数组);
+  merge(左半个数组, 右半个数组);
+}将字符串的运算符作为中间节点，左侧分为一组，右侧分为一组。
+递归得到，左边字符串的组合结果和右边字符串的结果。
+然后将左右字符串的结果通过运算符合并起来。
+
+执行用时：
+4 ms
+, 在所有 C++ 提交中击败了
+67.82%
+的用户
+内存消耗：
+11.3 MB
+, 在所有 C++ 提交中击败了
+34.21%
+的用户
+（时间一般，空间不咋地）
+
+上代码：
+class Solution {
+public:
+    vector<int> diffWaysToCompute(string expression) {
+        vector<int> ways;
+        int len=expression.size();
+        //到达边界
+        if(len==1||len==2){
+            ways.push_back(stoi(expression));
+            return ways;
+        }
+        for(int i=0;i<len;i++){
+            int c=expression[i];
+            if(c=='+'||c=='-'||c=='*'){
+                //分解得到左边字符串的组合结果
+               vector<int> left_ways=diffWaysToCompute(expression.substr(0,i));
+                //分解得到右边字符串的组合结果
+                vector<int> right_ways=diffWaysToCompute(expression.substr(i+1));
+                //将组合结果通过运算符组合
+                for(auto &l:left_ways){
+                    for(auto &r:right_ways){
+                        switch(c){
+                            case '+': ways.push_back(l+r); break;
+                            case '-': ways.push_back(l-r); break;
+                            case '*': ways.push_back(l*r); break;
+                        }
+                    }
+                }
+            }
+        }
+        //返回合并后的结果
+        return ways;
+    }
+};
