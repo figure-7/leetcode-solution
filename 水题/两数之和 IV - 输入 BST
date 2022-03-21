@@ -1,0 +1,62 @@
+题目难度：EASY
+
+给定一个二叉搜索树 root 和一个目标结果 k，如果 BST 中存在两个元素且它们的和等于给定的目标结果，则返回 true。
+示例 1：
+输入: root = [5,3,6,2,4,null,7], k = 9
+输出: true
+示例 2：
+输入: root = [5,3,6,2,4,null,7], k = 28
+输出: false
+提示:
+二叉树的节点个数的范围是  [1, 104].
+-104 <= Node.val <= 104
+root 为二叉搜索树
+-105 <= k <= 105
+
+思路：树+DFS
+套DFS板子，先序遍历二叉搜索树，用数组和哈希表存节点值
+遍历数组，每次判断如果给定值减去数组当前值不等于数组当前值（WA点：因为不存在两个一样节点值的节点）并且给定值减去数组当前值在哈希表中能找到就返回TRUE即可
+最后返回FALSE即可
+
+执行用时：
+40 ms
+, 在所有 C++ 提交中击败了
+49.50%
+的用户
+内存消耗：
+39.3 MB
+, 在所有 C++ 提交中击败了
+12.43%
+的用户
+（时间一般，空间炸了）
+
+上代码：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    unordered_map<int, int> map;
+    vector<int> curr;
+
+    void DFS(TreeNode* node) {
+        curr.push_back(node->val);
+        map[node->val] = 1;
+        if(node->left != nullptr) DFS(node->left);
+        if(node->right != nullptr) DFS(node->right);
+    }
+
+    bool findTarget(TreeNode* root, int k) {
+        DFS(root);
+        for(int cur : curr) if(k - cur != cur && map.find(k - cur) != map.end()) return true;
+        return false;
+    }
+};
