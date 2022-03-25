@@ -1,0 +1,111 @@
+题目难度：MEDIUM
+
+给你一个数组 nums ，请你完成两类查询。
+其中一类查询要求 更新 数组 nums 下标对应的值
+另一类查询要求返回数组 nums 中索引 left 和索引 right 之间（ 包含 ）的nums元素的 和 ，其中 left <= right
+实现 NumArray 类：
+NumArray(int[] nums) 用整数数组 nums 初始化对象
+void update(int index, int val) 将 nums[index] 的值 更新 为 val
+int sumRange(int left, int right) 返回数组 nums 中索引 left 和索引 right 之间（ 包含 ）的nums元素的 和 （即，nums[left] + nums[left + 1], ..., nums[right]）
+示例 1：
+输入：
+["NumArray", "sumRange", "update", "sumRange"]
+[[[1, 3, 5]], [0, 2], [1, 2], [0, 2]]
+输出：
+[null, 9, null, 8]
+解释：
+NumArray numArray = new NumArray([1, 3, 5]);
+numArray.sumRange(0, 2); // 返回 1 + 3 + 5 = 9
+numArray.update(1, 2);   // nums = [1,2,5]
+numArray.sumRange(0, 2); // 返回 1 + 2 + 5 = 8
+提示：
+1 <= nums.length <= 3 * 104
+-100 <= nums[i] <= 100
+0 <= index < nums.length
+-100 <= val <= 100
+0 <= left <= right < nums.length
+调用 pdate 和 sumRange 方法次数不大于 3 * 104 
+
+思路：
+接下来上题解区题解：
+线段树模板题，一个线段树数据结构，提供修改某个元素，返回一段区间和的能力。
+注意：
+每个接口都指定树内第k个元素，树的区间[l,r]
+数组个数最多为N，树的元素个数最多为4N
+树内元素下标从1开始
+
+执行用时：
+360 ms
+, 在所有 C++ 提交中击败了
+57.58%
+的用户
+内存消耗：
+154.3 MB
+, 在所有 C++ 提交中击败了
+10.72%
+的用户
+（时间一般，空间炸了）
+
+上代码：
+const int N = 12e4 + 10;
+class NumArray {
+public:
+    int f[N] = {0};
+    int n;
+    vector<int> nums;
+    void buildTree(int k, int l, int r)
+    {
+        if (l == r) {
+            f[k] = nums[l - 1];
+            return;
+        }
+        int m = ((r + l) >> 1);
+        buildTree(k + k, l, m);
+        buildTree(k + k + 1, m + 1, r);
+        f[k] = f[k + k] + f[k + k + 1];
+    }
+
+    void add(int k, int l, int r, int idx, int x)
+    {
+        f[k] += x;
+        if (l == r) {
+            nums[l - 1] += x;
+            return;
+        }
+        int m = ((r + l) >> 1);
+        if (idx <= m) {
+            add(k + k, l, m, idx, x);
+        } else {
+            add(k + k + 1, m + 1, r, idx, x);
+        }
+    }
+
+    int query(int k, int l, int r, int s, int t)
+    {   
+        if (l == s && r == t) {
+            return f[k];
+        }
+        int m = ((r + l) >> 1);
+        if (s > m) {
+            return query(k + k + 1, m + 1, r, s, t);
+        } else if (t <= m) {
+            return query(k + k, l, m, s, t);
+        } else {
+            return query(k + k + 1, m + 1, r, m + 1, t) +  query(k + k, l, m, s, m);
+        }
+    }
+
+    NumArray(vector<int>& nums_) {
+        n = nums_.size();
+        nums = nums_;
+        buildTree(1, 1, n);
+    }
+    
+    void update(int index, int val) {
+        add(1, 1, n, index + 1, val - nums[index]);
+    }
+    
+    int sumRange(int left, int right) {
+        return query(1, 1, n, left + 1, right + 1);
+    }
+};
