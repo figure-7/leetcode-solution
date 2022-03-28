@@ -1,0 +1,65 @@
+题目难度：MEDIUM
+
+给你一个字符串 s ，请你去除字符串中重复的字母，使得每个字母只出现一次。需保证 返回结果的字典序最小（要求不能打乱其他字符的相对位置）。
+示例 1：
+输入：s = "bcabc"
+输出："abc"
+示例 2：
+输入：s = "cbacdcbc"
+输出："acdb"
+提示：
+1 <= s.length <= 104
+s 由小写英文字母组成
+
+思路：见不同字符的最小子序列，同一题
+
+执行用时：
+0 ms
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+内存消耗：
+6.5 MB
+, 在所有 C++ 提交中击败了
+43.79%
+的用户
+（时间完杀！！！空间一般）
+
+上代码：
+class Solution {
+public:
+    string removeDuplicateLetters(string s) {
+        int vis[26];
+			deque<char> deque1;
+			map<char,int> map1;
+
+			deque1.clear();
+			map1.clear();
+			int len=s.size();
+			for(int i=0; i<len; i++)
+			{
+				vis[s[i]-'a']=0;
+				map1[s[i]]++;
+			}
+			for(int i=0; i<len; i++)
+			{
+				map1[s[i]]--;
+				if(vis[s[i]-'a'])
+					continue;
+				while(!deque1.empty()&&deque1.back()>s[i]&&map1[deque1.back()]>0)
+				{
+					vis[deque1.back()-'a']=0;
+					deque1.pop_back();
+				}
+				deque1.push_back(s[i]);
+				vis[s[i]-'a']=1;
+			}
+			string rnt;
+			while(!deque1.empty())
+			{
+				rnt += deque1.front();
+				deque1.pop_front();
+			}
+			return rnt;
+		}
+};
