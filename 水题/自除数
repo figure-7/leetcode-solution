@@ -1,0 +1,55 @@
+题目难度：EASY
+
+自除数 是指可以被它包含的每一位数整除的数。
+例如，128 是一个 自除数 ，因为 128 % 1 == 0，128 % 2 == 0，128 % 8 == 0。
+自除数 不允许包含 0 。
+给定两个整数 left 和 right ，返回一个列表，列表的元素是范围 [left, right] 内所有的 自除数 。
+示例 1：
+输入：left = 1, right = 22
+输出：[1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 15, 22]
+示例 2:
+输入：left = 47, right = 85
+输出：[48,55,66,77]
+提示：
+1 <= left <= right <= 104
+
+思路：模拟
+遍历给定两个值的范围，每次初始化布尔值TRUE，建立值等于遍历值
+计算出当前遍历值的所有余数后每次判断
+如果余数为0或者建立值余余数不等于0就把布尔值反转
+结束内部循环后判断如果布尔值为TRUE就把当前遍历值存进结果数组（初始化空）
+并把建立值赋值给遍历值
+最后返回结果数组即可
+
+执行用时：
+4 ms
+, 在所有 C++ 提交中击败了
+20.00%
+的用户
+内存消耗：
+6.2 MB
+, 在所有 C++ 提交中击败了
+74.51%
+的用户
+（时间炸了，空间不错）
+
+上代码：
+class Solution {
+public:
+    vector<int> res;
+
+    vector<int> selfDividingNumbers(int left, int right) {
+        for(int i = left; i <= right; i++) {
+            bool flag = true;
+            int cur = i;
+            while(i > 0) {
+                int aim = i % 10;
+                i /= 10;
+                if(aim == 0 || cur % aim != 0) flag = false;
+            }
+            if(flag) res.push_back(cur);
+            i = cur;
+        }
+        return res;
+    }
+};
