@@ -1,4 +1,2 @@
-for (i = 0; i < strlen(string); i++)
-    {
-        string[i] = tolower(string[i]);
-    }
+transform(s.begin(),s.end(),s.begin(),::tolower);//字母转小写
+transform(s.begin(),s.end(),s.begin(),::toupper);//字母转大写
