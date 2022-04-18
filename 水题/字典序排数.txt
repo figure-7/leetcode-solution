@@ -1,0 +1,43 @@
+题目难度：MEDIUM
+
+给你一个整数 n ，按字典序返回范围 [1, n] 内所有整数。
+你必须设计一个时间复杂度为 O(n) 且使用 O(1) 额外空间的算法。
+示例 1：
+输入：n = 13
+输出：[1,10,11,12,13,2,3,4,5,6,7,8,9]
+示例 2：
+输入：n = 2
+输出：[1,2]
+提示：
+1 <= n <= 5 * 104
+
+思路：模拟
+遍历从1到给定数值转为字符串进建立数组
+排序建立数组，建立数组转为数字存进结果数组
+最后返回结果数组即可
+
+执行用时：
+80 ms
+, 在所有 C++ 提交中击败了
+9.35%
+的用户
+内存消耗：
+20.7 MB
+, 在所有 C++ 提交中击败了
+5.19%
+的用户
+（时空都炸了）
+
+上代码：
+class Solution {
+public:
+    vector<string> curr;
+    vector<int> res;
+    
+    vector<int> lexicalOrder(int n) {
+        for(int i = 1; i <= n; i++) curr.push_back(to_string(i));
+        sort(curr.begin(), curr.end());
+        for(string s : curr) res.push_back(stoi(s));
+        return res;
+    }
+};
