@@ -1,0 +1,57 @@
+题目难度：MEDIUM
+
+给定2D空间中四个点的坐标 p1, p2, p3 和 p4，如果这四个点构成一个正方形，则返回 true 。
+点的坐标 pi 表示为 [xi, yi] 。
+输入 不是 按任何顺序给出的。
+一个 有效的正方形 有四条等边和四个等角(90度角)。
+示例 1:
+输入: p1 = [0,0], p2 = [1,1], p3 = [1,0], p4 = [0,1]
+输出: True
+示例 2:
+输入：p1 = [0,0], p2 = [1,1], p3 = [1,0], p4 = [0,12]
+输出：false
+示例 3:
+输入：p1 = [1,0], p2 = [-1,0], p3 = [0,1], p4 = [0,-1]
+输出：true
+提示:
+p1.length == p2.length == p3.length == p4.length == 2
+-104 <= xi, yi <= 104
+
+思路：模拟
+先判断给定四个以为数组是不是都相同，都相同返回FALSE即可（WA点3：缺少此处判断）
+将给定四个一维数组存进建立二维数组中
+排序二维数组，计算第一个点与第二个点距离和第二个点与第三个点的距离
+计算第一个点与第二个点距离和第三个点与第四个点的距离（WA点1：缺少此处判断，除了对角线的点两两点要距离相等判断）
+计算两个对角线值（第一个点与第四个点距离和第二个点与第三个点距离）（WA点2：缺少此处判断，两条对角线长度要相等）
+最后返回三目运算符：如果符合上述计算条件返回TRUE即可
+否则返回FALSE即可
+
+执行用时：
+4 ms
+, 在所有 C++ 提交中击败了
+75.76%
+的用户
+内存消耗：
+25.9 MB
+, 在所有 C++ 提交中击败了
+33.33%
+的用户
+(时间不错，空间不咋地)
+
+上代码：
+class Solution {
+public:
+    vector<vector<int> > curr;
+
+    bool validSquare(vector<int>& p1, vector<int>& p2, vector<int>& p3, vector<int>& p4) {
+        if(p1[0] == p2[0] && p1[0] == p3[0]) return false;
+        curr.push_back(p1);
+        curr.push_back(p2);
+        curr.push_back(p3);
+        curr.push_back(p4);
+        sort(curr.begin(), curr.end());
+        int a = curr[1][0] - curr[0][0], b = curr[1][1] - curr[0][1], c = curr[3][0] - curr[2][0], d = curr[3][1] - curr[2][1], e = curr[2][0] - curr[0][0], f = curr[2][1] - curr[0][1], g = curr[3][0] - curr[0][0], h = curr[3][1] - curr[0][1], i = curr[2][0] - curr[1][0], j = curr[2][1] - curr[1][1];
+        int lena = a * a + b * b, lenb = c * c + d * d, lenc = e * e + f * f, lend = g * g + h * h, lene = i * i + j * j;
+        return lena == lenb  && lena == lenc && lend == lene? true : false;
+    }
+};
