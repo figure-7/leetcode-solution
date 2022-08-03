@@ -1,0 +1,73 @@
+题目难度：MEDIUM
+
+序列化二叉树的一种方法是使用 前序遍历 。当我们遇到一个非空节点时，我们可以记录下这个节点的值。
+如果它是一个空节点，我们可以使用一个标记值记录，例如 #。
+例如，上面的二叉树可以被序列化为字符串 "9,3,4,#,#,1,#,#,2,#,6,#,#"，其中 # 代表一个空节点。
+给定一串以逗号分隔的序列，验证它是否是正确的二叉树的前序序列化。
+编写一个在不重构树的条件下的可行算法。
+保证 每个以逗号分隔的字符或为一个整数或为一个表示 null 指针的 '#' 。
+你可以认为输入格式总是有效的
+例如它永远不会包含两个连续的逗号，比如 "1,,3" 。
+注意：不允许重建树。
+示例 1:
+输入: preorder = "9,3,4,#,#,1,#,#,2,#,6,#,#"
+输出: true
+示例 2:
+输入: preorder = "1,#"
+输出: false
+示例 3:
+输入: preorder = "9,#,#,1"
+输出: false
+提示:
+1 <= preorder.length <= 104
+preorder 由以逗号 “，” 分隔的 [0,100] 范围内的整数和 “#” 组成
+
+思路：模拟
+遍历字符串按照逗号截取字符串保存进建立数组，如果建立数组长度等于1并且值为“#”返回TRUE即可
+如果建立数组长度等于1并且值不为“#”返回FALSE即可（WA点1，2：这里写反了）
+如果建立数组中字符串全为“#”返回FALSE即可（WA点3：缺少此处判断）（WA点4：马虎）
+遍历建立数组中的字符串，建立变量值（初值2），开始判断如果建立变量值等于0返回FALSE即可
+否则如果当前字符串为“#”建立变量值减一，否则建立变量值加一
+最后返回三目运算符如果建立变量值等于0返回TRUE即可
+否则返回FALSE即可
+
+执行用时：
+4 ms
+, 在所有 C++ 提交中击败了
+69.65%
+的用户
+内存消耗：
+9.6 MB
+, 在所有 C++ 提交中击败了
+12.22%
+的用户
+（时间一般，空间炸了）
+
+上代码：
+class Solution {
+public:
+    int sum = 2;
+    vector<string> curr;
+    string s = "";
+
+    bool isValidSerialization(string preorder) {
+        for(int i = 0; i < preorder.size(); i++) {
+            if(preorder[i] == ',') {
+                curr.push_back(s);
+                s = "";
+            } else s += preorder[i];
+        }
+        curr.push_back(s);
+        if(curr.size() == 1) return curr[0] == "#" ? true : false;
+        for(int i = 0; i < curr.size(); i++) {
+            if(curr[i] != "#") break;
+            if(i == curr.size() - 1) return false; 
+        }
+        for(int i = 1; i < curr.size(); i++) {
+            if(sum == 0) return false;
+            if(curr[i] == "#")  sum--;
+            else sum++;
+        }
+        return sum == 0 ? true : false;
+    }
+};
