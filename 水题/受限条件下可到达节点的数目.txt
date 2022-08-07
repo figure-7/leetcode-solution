@@ -1,0 +1,75 @@
+题目难度：MEDIUM
+
+现有一棵由 n 个节点组成的无向树，节点编号从 0 到 n - 1 ，共有 n - 1 条边。
+给你一个二维整数数组 edges ，长度为 n - 1 ，其中 edges[i] = [ai, bi] 表示树中节点 ai 和 bi 之间存在一条边。
+另给你一个整数数组 restricted 表示 受限 节点。
+在不访问受限节点的前提下，返回你可以从节点 0 到达的 最多 节点数目。
+注意，节点 0 不 会标记为受限节点。
+示例 1：
+输入：n = 7, edges = [[0,1],[1,2],[3,1],[4,0],[0,5],[5,6]], restricted = [4,5]
+输出：4
+解释：上图所示正是这棵树。
+在不访问受限节点的前提下，只有节点 [0,1,2,3] 可以从节点 0 到达。
+示例 2：
+输入：n = 7, edges = [[0,1],[0,2],[0,5],[0,4],[3,2],[6,5]], restricted = [4,2,1]
+输出：3
+解释：上图所示正是这棵树。
+在不访问受限节点的前提下，只有节点 [0,5,6] 可以从节点 0 到达。
+提示：
+2 <= n <= 105
+edges.length == n - 1
+edges[i].length == 2
+0 <= ai, bi < n
+ai != bi
+edges 表示一棵有效的树
+1 <= restricted.length < n
+1 <= restricted[i] < n
+restricted 中的所有值 互不相同
+
+思路：周赛第二题（27min33s），DFS
+建立第一个哈希表存给定一维数组，
+建立二维数组存下标值为起点，终点为目的值（WA点2：数组空间没开够...）
+遍历给定二维数组，正反存两遍进二维数组
+建立队列先存0
+DFS内部遍历队列，并取当前队列第一项作为下标的二维数组值，如果第二个哈希表（初始空）中没有当前值就进第二个哈希表，并且当前值入队，结果值加一
+结束条件为队列空
+最后返回三目运算符判断结果值如果等于0返回1即可（WA点1：结果最少为1）
+否则返回结果值即可
+
+上代码：
+class Solution {
+public:
+    unordered_map<int, int> map, mapper;
+    queue<int> qu;
+    int res = 0;
+    vector<vector<int> > curr;
+    
+    void DFS(queue<int> q) {
+        if(q.empty()) return ;
+        int aim = q.front();
+        q.pop();
+        for(int i = 0; i < curr[aim].size(); i++) {
+            if(map.find(curr[aim][i]) == map.end()) {
+                if(mapper.find(curr[aim][i]) == mapper.end()) {
+                    mapper[curr[aim][i]] = 1;
+                    q.push(curr[aim][i]);
+                    res++;
+                }
+            }
+        }
+        DFS(q);
+    }
+    
+    int reachableNodes(int n, vector<vector<int>>& edges, vector<int>& restricted) {
+        vector<vector<int> > sum(100005);
+        curr = sum;
+        for(int i = 0; i < edges.size(); i++) {
+            curr[edges[i][0]].push_back(edges[i][1]);
+            curr[edges[i][1]].push_back(edges[i][0]);   
+        }
+        for(int cur : restricted) map[cur] = 1;
+        qu.push(0);
+        DFS(qu);
+        return res == 0 ? 1 : res;
+    }
+};
