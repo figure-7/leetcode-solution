@@ -1,0 +1,83 @@
+题目难度：？
+
+请参照课程内容，用静态数组实现一个动态数组，包括：
+push_back(int n) - 在数组末尾插入新元素 n，无需返回
+pop_back() - 删除数组中的最后一个元素，无需返回
+size() - 返回数组长度
+index(int idx)- 返回数组中下标为 idx 的元素
+题目保证所给操作均合法。
+示例：
+输入：
+["LCArray", "size", "push_back", "pop_back", "size", "push_back", "size", "index", "pop_back", "push_back"]
+[[], [], [95], [], [], [37], [], [0], [], [28]]
+输出：
+[null,0,null,null,0,null,1,37,null,null]
+解释：
+LCArray l = LCArray()
+l.size()        // 获取数组长度，此时数组为空，返回 0
+l.push_back(95) // 在数组末尾插入新元素 95，返回 null
+l.pop_back()    // 删除数组中的最后一个元素，返回 null
+l.size()        // 获取数组长度，此时数组为空，返回 0
+l.push_back(37) // 在数组末尾插入新元素 37，返回 null
+l.size()        // 获取数组长度，返回 1
+l.index(0)      // 返回数组中下标为 0 的元素 37
+l.pop_back()    // 删除数组中的最后一个元素，返回 null
+l.push_back(28) // 在数组末尾插入新元素 28，返回 null
+
+思路：设计问题
+建立数组
+LCArray()：什么也不做即可
+push_back：存数据即可
+pop_back：删除数组最后一个元素即可
+size：返回数组长度即可
+index返回三目运算符如果数组长度为零返回0即可，否则返回指定下标数组值即可
+
+执行用时：
+4 ms
+, 在所有 C++ 提交中击败了
+90.91%
+的用户
+内存消耗：
+10.7 MB
+, 在所有 C++ 提交中击败了
+9.09%
+的用户
+（时间不错，空间炸了）
+
+上代码：
+class LCArray {
+public:
+    vector<int> curr;
+
+    LCArray() {
+
+    }
+    
+    void push_back(int n) {
+        curr.push_back(n);
+    }
+    
+    void pop_back() {
+        if(curr.size() != 0) {
+            vector<int>::iterator it = curr.begin() + curr.size() - 1;
+    	    curr.erase(it);
+        }
+    }
+    
+    int size() {
+        return curr.size();
+    }
+    
+    int index(int idx) {
+        return curr.size() == 0 ? 0 : curr[idx];
+    }
+};
+
+/**
+ * Your LCArray object will be instantiated and called as such:
+ * LCArray* obj = new LCArray();
+ * obj->push_back(n);
+ * obj->pop_back();
+ * int param_3 = obj->size();
+ * int param_4 = obj->index(idx);
+ */
