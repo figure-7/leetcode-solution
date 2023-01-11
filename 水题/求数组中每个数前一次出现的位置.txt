@@ -1,0 +1,43 @@
+给定一维数组，求数组中每个数字 前一次 出现的位置。
+如果是第一次出现则返回 -1。
+示例：
+输入：[1,3,1,2,1]
+输出：[-1,-1,0,-1,2]
+
+思路：哈希表
+建立哈希表存和结果数组
+遍历给定数组，如果当前数组值出现在哈希表就把哈希表当前值存进结果数组，然后哈希表值改为当前下标
+否则哈希表存当前数组值，值为当前下标，结果数组存-1
+最后返回结果数组即可
+
+执行用时：
+4 ms
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+内存消耗：
+8.1 MB
+, 在所有 C++ 提交中击败了
+100.00%
+的用户
+（时空都完杀！！！）
+
+上代码：
+class Solution {
+public:
+    unordered_map<int, int> map;
+    vector<int> res;
+
+    vector<int> find_left_repeat_numII(vector<int>& nums) {
+        for(int i = 0; i < nums.size(); i++) {
+            if(map.find(nums[i]) == map.end()) {
+                map[nums[i]] = i;
+                res.push_back(-1);
+            } else {
+                res.push_back(map[nums[i]]);
+                map[nums[i]] = i;
+            }
+        }
+        return res;
+    }
+};
