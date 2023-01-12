@@ -1,0 +1,60 @@
+题目难度：MEDIUM
+
+给定两个字符串 a 和 b，寻找重复叠加字符串 a 的最小次数，使得字符串 b 成为叠加后的字符串 a 的子串，如果不存在则返回 -1。
+注意：
+字符串 "abc" 重复叠加 0 次是 ""，重复叠加 1 次是 "abc"，重复叠加 2 次是 "abcabc"。
+示例 1：
+输入：a = "abcd", b = "cdabcdab"
+输出：3
+解释：a 重复叠加三遍后为 "abcdabcdabcd", 此时 b 是其子串。
+示例 2：
+输入：a = "a", b = "aa"
+输出：2
+示例 3：
+输入：a = "a", b = "a"
+输出：1
+示例 4：
+输入：a = "abc", b = "wxyz"
+输出：-1
+提示：
+1 <= a.length <= 104
+1 <= b.length <= 104
+a 和 b 由小写英文字母组成
+
+思路：模拟
+一重遍历，每次拼接一次给定第一个字符串根据累加次数把结果值（初值0）加一
+遍历到拼接字符串长度大于给定第二个字符串且在拼接一次结束
+结束后如果拼接的字符串中包含给定第二个字符串则返回结果值即可
+最后返回-1即可
+
+执行用时：
+8 ms
+, 在所有 C++ 提交中击败了
+55.43%
+的用户
+内存消耗：
+6.9 MB
+, 在所有 C++ 提交中击败了
+36.26%
+的用户
+（时间一般，空间不咋地）
+
+上代码：
+class Solution {
+public:
+    int res = 1;
+
+    int repeatedStringMatch(string a, string b) {
+        string str = a;
+        while(str.size() <= b.size()) {
+            if(str == b) return res;
+            str += a;
+            res++;
+        }
+        if(str.find(b) != string::npos) return res;
+        str += a;
+        res++;
+        if(str.find(b) != string::npos) return res;
+        return -1;
+    }
+};
